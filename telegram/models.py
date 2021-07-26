@@ -55,6 +55,8 @@ class GroupMembership(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    last_seen = models.DateTimeField("last seen", default=datetime.now)
+    messages_count = models.PositiveIntegerField("messages count", default=0)
 
     def __str__(self):
         return f"{self.user} in {self.group}"
