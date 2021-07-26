@@ -1,11 +1,77 @@
 from django.contrib import admin
+
 from university.models import (
     Department,
     Degree,
     Course,
+    CourseDegree,
+    DEGREE_TYPES,
 )
 
 
-@admin.register(Department, Degree, Course)
+class CourseDegreeInline(admin.TabularInline):
+    model = CourseDegree
+    extra = 1
+
+
+class DegreeTypeFilter(admin.SimpleListFilter):
+    title = "degree type"
+    parameter_name = "degree_type"
+
+    def lookups(self, request, model_admin):
+        return DEGREE_TYPES
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        return queryset.filter(type=self.value())
+
+
+class CourseDegreeNameFilter(admin.SimpleListFilter):
+    title = "degree name"
+    parameter_name = "degree_name"
+
+    def lookups(self, request, model_admin):
+        degrees = Degree.objects.all()
+        return (
+            (d.pk, d.name) for d in degrees
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        return queryset.filter(degree__in=self.value())
+
+
+class CourseDegreeTypeFilter(admin.SimpleListFilter):
+    title = "degree type"
+    parameter_name = "degree_type"
+
+    def lookups(self, request, model_admin):
+        return DEGREE_TYPES
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        matched_degrees = Degree.objects.filter(type=self.value())
+        return queryset.filter(degree__in=matched_degrees).distinct()
+
+
+@admin.register(Department)
 class BaseAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(Degree)
+class DegreeAdmin(admin.ModelAdmin):
+    list_filter = (DegreeTypeFilter, )
+    fields = ("name", "type", "department", )
+    inlines = (CourseDegreeInline, )
+
+
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ("name", "cfu", "str_degrees", )
+    list_filter = (CourseDegreeNameFilter, CourseDegreeTypeFilter, )
+    fields = ("name", "cfu", "group", "wiki_link", )
+    inlines = (CourseDegreeInline, )

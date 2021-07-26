@@ -1,7 +1,7 @@
+from django.contrib import admin
 from django.db import models
 
 from telegram.models import Group as TgGroup
-
 
 DEGREE_TYPES = (
     ('B', "Triennale"),
@@ -36,13 +36,21 @@ class Course(models.Model):
         verbose_name_plural = "Courses"
 
     group = models.ForeignKey(TgGroup, on_delete=models.SET_NULL, related_name="courses", blank=True, null=True)
-    degree = models.ManyToManyField(Degree, through="CourseDegree")
+    degree = models.ManyToManyField(Degree, through="CourseDegree", related_name="courses")
     name = models.CharField("name", max_length=128)
     cfu = models.PositiveSmallIntegerField("CFUs")
     wiki_link = models.CharField("wiki link", max_length=128, blank=True, null=True)
 
+    @property
+    @admin.display(
+        ordering='name',
+        description='Degrees',
+    )
+    def str_degrees(self):
+        return ', '.join([d.name for d in self.degree.all()])
+
     def __str__(self):
-        return f"{self.name} ({self.degree})"
+        return f"{self.name} ({self.str_degrees})"
 
 
 class CourseDegree(models.Model):
@@ -53,4 +61,4 @@ class CourseDegree(models.Model):
     semester = models.PositiveSmallIntegerField("semester", default=0)  # 0 = no semester assigned
 
     def __str__(self):
-        return f"{self.course} ({self.course})"
+        return f"{self.course.name} ∈ {self.degree.name}"
