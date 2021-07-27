@@ -36,7 +36,7 @@ class Course(models.Model):
         verbose_name_plural = "Courses"
 
     group = models.ForeignKey(TgGroup, on_delete=models.SET_NULL, related_name="courses", blank=True, null=True)
-    degree = models.ManyToManyField(Degree, through="CourseDegree", related_name="courses")
+    degrees = models.ManyToManyField(Degree, through="CourseDegree", related_name="courses")
     name = models.CharField("name", max_length=128)
     cfu = models.PositiveSmallIntegerField("CFUs")
     wiki_link = models.CharField("wiki link", max_length=128, blank=True, null=True)
@@ -47,7 +47,7 @@ class Course(models.Model):
         description='Degrees',
     )
     def str_degrees(self):
-        return ', '.join([d.name for d in self.degree.all()])
+        return ', '.join([d.name for d in self.degrees.all()])
 
     def __str__(self):
         return f"{self.name} ({self.str_degrees})"

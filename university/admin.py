@@ -54,7 +54,7 @@ class CourseDegreeTypeFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         matched_degrees = Degree.objects.filter(type=self.value())
-        return queryset.filter(degree__in=matched_degrees).distinct()
+        return queryset.filter(degrees__in=matched_degrees).distinct()
 
 
 @admin.register(Department)
