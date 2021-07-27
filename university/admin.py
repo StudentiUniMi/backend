@@ -58,13 +58,14 @@ class CourseDegreeTypeFilter(admin.SimpleListFilter):
 
 
 @admin.register(Department)
-class BaseAdmin(admin.ModelAdmin):
-    pass
+class DepartmentAdmin(admin.ModelAdmin):
+    search_fields = ("name", )
 
 
 @admin.register(Degree)
 class DegreeAdmin(admin.ModelAdmin):
     list_filter = (DegreeTypeFilter, )
+    search_fields = ("name", "department", )
     fields = ("name", "type", "department", )
     inlines = (CourseDegreeInline, )
 
@@ -73,5 +74,6 @@ class DegreeAdmin(admin.ModelAdmin):
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("name", "cfu", "str_degrees", )
     list_filter = (CourseDegreeNameFilter, CourseDegreeTypeFilter, )
+    search_fields = ("name", )
     fields = ("name", "cfu", "group", "wiki_link", )
     inlines = (CourseDegreeInline, )
