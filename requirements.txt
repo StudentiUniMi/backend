@@ -2,3 +2,4 @@ botogram2
 django
 psycopg2-binary
 pillow  # required by django ImageField
+djangorestframework
