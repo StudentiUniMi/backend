@@ -50,4 +50,4 @@ class VerboseDepartmentSerializer(serializers.ModelSerializer):
         model = Department
         fields = ("pk", "name", "degrees", )
 
-    degrees = VerboseDegreeSerializer(many=True, read_only=True)
+    degrees = DegreeSerializer(many=True, read_only=True)
