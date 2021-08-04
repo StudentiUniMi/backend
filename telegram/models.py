@@ -17,6 +17,7 @@ class User(models.Model):
     id = models.PositiveBigIntegerField("Telegram user ID", primary_key=True, unique=True)
     first_name = models.CharField("first name", max_length=256)
     last_name = models.CharField("last name", max_length=256, blank=True, null=True)
+    username = models.CharField("username", max_length=64, blank=True, null=True)
     reputation = models.IntegerField("reputation", default=0)
     warn_count = models.IntegerField("warn count", default=0)
     banned = models.BooleanField("banned?", default=False)
