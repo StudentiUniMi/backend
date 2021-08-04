@@ -28,13 +28,13 @@ class CourseDegreeSerializer(serializers.ModelSerializer):
 class DegreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Degree
-        fields = ("pk", "name", "type", )
+        fields = ("pk", "name", "type", "slug", )
 
 
 class VerboseDegreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Degree
-        fields = ("pk", "name", "type", "courses", )
+        fields = ("pk", "name", "type", "courses", "slug", )
 
     courses = CourseDegreeSerializer(source="coursedegree_set", many=True, read_only=True)
 

@@ -66,7 +66,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 class DegreeAdmin(admin.ModelAdmin):
     list_filter = (DegreeTypeFilter, )
     search_fields = ("name", "department", )
-    fields = ("name", "type", "department", )
+    fields = ("name", "type", "department", "slug", )
     inlines = (CourseDegreeInline, )
 
 

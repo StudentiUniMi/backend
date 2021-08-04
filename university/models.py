@@ -25,6 +25,7 @@ class Degree(models.Model):
     name = models.CharField("name", max_length=128)
     type = models.CharField("degree type", max_length=1, choices=DEGREE_TYPES)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="degrees")
+    slug = models.CharField("slug", max_length=64, default="default_slug")  # the default is needed for migrations
 
     def __str__(self):
         return f"{self.name} [{''.join([t[1] if t[0] == self.type else '' for t in DEGREE_TYPES])}]"  # hacky shit

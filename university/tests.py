@@ -23,8 +23,20 @@ from university.serializers import (
 class CourseTestCase(TestCase):
     def setUp(self):
         dep1 = Department.objects.create(pk=1, name="Computer Science Department")
-        deg1 = Degree.objects.create(pk=1, name="Computer Science", type='B', department=dep1)
-        deg2 = Degree.objects.create(pk=2, name="Music Information Science", type='B', department=dep1)
+        deg1 = Degree.objects.create(
+            pk=1,
+            name="Computer Science",
+            type='B',
+            slug="computer_science",
+            department=dep1,
+        )
+        deg2 = Degree.objects.create(
+            pk=2,
+            name="Music Information Science",
+            type='B',
+            slug="music_information_science",
+            department=dep1,
+        )
         group1 = TgGroup.objects.create(
             id=42069,
             title="Computer Architecture II fan club",
@@ -106,9 +118,27 @@ class DegreeTestCase(TestCase):
         dep1 = Department.objects.create(name="Computer Science Department")
         dep2 = Department.objects.create(name="Medicine Department")
 
-        self.deg1 = Degree.objects.create(pk=1, name="Computer Science", type='B', department=dep1)
-        self.deg2 = Degree.objects.create(pk=2, name="Computer Science", type='M', department=dep1)
-        self.deg3 = Degree.objects.create(pk=3, name="Medicine", type='C', department=dep2)
+        self.deg1 = Degree.objects.create(
+            pk=1,
+            name="Computer Science",
+            type='B',
+            slug="computer_science_b",
+            department=dep1,
+        )
+        self.deg2 = Degree.objects.create(
+            pk=2,
+            name="Computer Science",
+            type='M',
+            slug="computer_science_m",
+            department=dep1,
+        )
+        self.deg3 = Degree.objects.create(
+            pk=3,
+            name="Medicine",
+            type='C',
+            slug="medicine",
+            department=dep2,
+        )
 
         self.course1 = Course.objects.create(
             pk=1,
@@ -149,16 +179,19 @@ class DegreeTestCase(TestCase):
                 "pk": 1,
                 "name": "Computer Science",
                 "type": 'B',
+                "slug": "computer_science_b",
             },
             {
                 "pk": 2,
                 "name": "Computer Science",
                 "type": 'M',
+                "slug": "computer_science_m",
             },
             {
                 "pk": 3,
                 "name": "Medicine",
                 "type": 'C',
+                "slug": "medicine",
             }
         ])
 
@@ -168,6 +201,7 @@ class DegreeTestCase(TestCase):
             "pk": 1,
             "name": "Computer Science",
             "type": 'B',
+            "slug": "computer_science_b",
             "courses": [
                 {
                     "course": {
@@ -206,9 +240,27 @@ class DepartmentTestCase(TestCase):
         self.dep2 = Department.objects.create(pk=2, name="Medicine Department")
         self.dep3 = Department.objects.create(pk=3, name="Physics Department")
 
-        Degree.objects.create(pk=1, name="Computer Science", type='B', department=self.dep1)
-        Degree.objects.create(pk=2, name="Computer Science", type='M', department=self.dep1)
-        Degree.objects.create(pk=3, name="Medicine", type='C', department=self.dep2)
+        Degree.objects.create(
+            pk=1,
+            name="Computer Science",
+            type='B',
+            slug="computer_science_b",
+            department=self.dep1,
+        )
+        Degree.objects.create(
+            pk=2,
+            name="Computer Science",
+            type='M',
+            slug="computer_science_m",
+            department=self.dep1,
+        )
+        Degree.objects.create(
+            pk=3,
+            name="Medicine",
+            type='C',
+            slug="medicine",
+            department=self.dep2,
+        )
 
     def test_str(self):
         self.assertEqual(str(self.dep1), self.dep1.name)
@@ -246,11 +298,13 @@ class DepartmentTestCase(TestCase):
                     "pk": 1,
                     "name": "Computer Science",
                     "type": 'B',
+                    "slug": "computer_science_b",
                 },
                 {
                     "pk": 2,
                     "name": "Computer Science",
                     "type": 'M',
+                    "slug": "computer_science_m",
                 },
             ],
         })
@@ -262,6 +316,7 @@ class DepartmentTestCase(TestCase):
                     "pk": 3,
                     "name": "Medicine",
                     "type": 'C',
+                    "slug": "medicine",
                 },
             ],
         })
