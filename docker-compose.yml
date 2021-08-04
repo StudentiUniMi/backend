@@ -3,6 +3,7 @@ version: '3'
 volumes:
   studentiunimi_backend_postgres:
     external: true
+  static_files:
 
 networks:
   db_net:
@@ -31,6 +32,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DBNAME=${POSTGRES_DBNAME}
       - SECRET_KEY=${SECRET_KEY}
+    volumes:
+      - static_files:/usr/src/app/static/
     depends_on:
       - postgres
     networks:
@@ -42,7 +45,7 @@ services:
     container_name: studentiunimi_backend_nginx
     volumes:
       - ./config/nginx.conf:/etc/nginx/conf.d/nginx.conf
-      - ./static:/static
+      - static_files:/static
     networks:
       - django_net
       - nginx_net
