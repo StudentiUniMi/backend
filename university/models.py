@@ -63,3 +63,12 @@ class CourseDegree(models.Model):
 
     def __str__(self):
         return f"{self.course.name} ∈ {self.degree.name}"
+
+
+class CourseLink(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="links")
+    name = models.CharField("link name", max_length=32)
+    url = models.URLField("link URL")
+
+    def __str__(self):
+        return f"{str(self.course)} - {self.name}"

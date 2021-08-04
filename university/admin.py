@@ -5,12 +5,18 @@ from university.models import (
     Degree,
     Course,
     CourseDegree,
+    CourseLink,
     DEGREE_TYPES,
 )
 
 
 class CourseDegreeInline(admin.TabularInline):
     model = CourseDegree
+    extra = 1
+
+
+class CourseLinkInline(admin.TabularInline):
+    model = CourseLink
     extra = 1
 
 
@@ -76,4 +82,4 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = (CourseDegreeNameFilter, CourseDegreeTypeFilter, )
     search_fields = ("name", )
     fields = ("name", "cfu", "group", "wiki_link", )
-    inlines = (CourseDegreeInline, )
+    inlines = (CourseDegreeInline, CourseLinkInline, )

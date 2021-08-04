@@ -6,15 +6,23 @@ from university.models import (
     Degree,
     Department,
     CourseDegree,
+    CourseLink,
 )
+
+
+class CourseLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseLink
+        fields = ("name", "url", )
 
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ("pk", "name", "cfu", "wiki_link", "group", )
+        fields = ("pk", "name", "cfu", "wiki_link", "links", "group", )
 
     group = GroupSerializer()
+    links = CourseLinkSerializer(many=True)
 
 
 class CourseDegreeSerializer(serializers.ModelSerializer):

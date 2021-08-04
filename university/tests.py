@@ -5,6 +5,7 @@ from telegram.models import Group as TgGroup
 from university.models import (
     Course,
     CourseDegree,
+    CourseLink,
     Degree,
     Department,
 )
@@ -50,6 +51,16 @@ class CourseTestCase(TestCase):
             cfu=12,
         )
         CourseDegree.objects.create(degree=deg1, course=self.course1, year=1, semester=1)
+        CourseLink.objects.create(
+            course=self.course1,
+            name="Ariel (1° ed.)",
+            url="https//ariel.example.com/courses/programming_1_firsted",
+        )
+        CourseLink.objects.create(
+            course=self.course1,
+            name="Ariel (2° ed.)",
+            url="https://ariel.example.com/courses/programming_1_seconded",
+        )
 
         self.course2 = Course.objects.create(
             pk=2,
@@ -59,6 +70,11 @@ class CourseTestCase(TestCase):
         )
         CourseDegree.objects.create(degree=deg1, course=self.course2, year=1, semester=2)
         CourseDegree.objects.create(degree=deg2, course=self.course2, year=1, semester=1)
+        CourseLink.objects.create(
+            course=self.course2,
+            name="Ariel",
+            url="https://ariel.example.com/courses/linear_algebra_1"
+        )
 
         self.course3 = Course.objects.create(
             pk=3,
@@ -89,6 +105,16 @@ class CourseTestCase(TestCase):
                 "name": "Programming I",
                 "cfu": 12,
                 "wiki_link": None,
+                "links": [
+                    {
+                        "name": "Ariel (1° ed.)",
+                        "url": "https//ariel.example.com/courses/programming_1_firsted",
+                    },
+                    {
+                        "name": "Ariel (2° ed.)",
+                        "url": "https://ariel.example.com/courses/programming_1_seconded",
+                    },
+                ],
                 "group": None,
             },
             {
@@ -96,6 +122,12 @@ class CourseTestCase(TestCase):
                 "name": "Linear Algebra I",
                 "cfu": 6,
                 "wiki_link": "https://example.com/wiki/linear_algebra_i.php",
+                "links": [
+                    {
+                        "name": "Ariel",
+                        "url": "https://ariel.example.com/courses/linear_algebra_1",
+                    },
+                ],
                 "group": None,
             },
             {
@@ -103,6 +135,7 @@ class CourseTestCase(TestCase):
                 "name": "Computer Architecture II",
                 "cfu": 6,
                 "wiki_link": None,
+                "links": [],
                 "group": {
                     "id": 42069,
                     "title": "Computer Architecture II fan club",
@@ -146,6 +179,11 @@ class DegreeTestCase(TestCase):
             cfu=12,
         )
         CourseDegree.objects.create(degree=self.deg1, course=self.course1, year=1, semester=1)
+        CourseLink.objects.create(
+            course=self.course1,
+            name="Ariel (1° ed.)",
+            url="https//ariel.example.com/courses/programming_1_firsted",
+        )
 
         group1 = TgGroup.objects.create(
             id=69420,
@@ -209,6 +247,12 @@ class DegreeTestCase(TestCase):
                         "name": "Programming I",
                         "cfu": 12,
                         "wiki_link": None,
+                        "links": [
+                            {
+                                "name": "Ariel (1° ed.)",
+                                "url": "https//ariel.example.com/courses/programming_1_firsted",
+                            },
+                        ],
                         "group": None,
                     },
                     "year": 1,
@@ -220,6 +264,7 @@ class DegreeTestCase(TestCase):
                         "name": "Linear Algebra I",
                         "cfu": 6,
                         "wiki_link": "https://example.com/wiki/linear_algebra_i.php",
+                        "links": [],
                         "group": {
                             "id": 69420,
                             "title": "Linear Algebra I fan club",
