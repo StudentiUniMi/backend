@@ -24,7 +24,7 @@ services:
       - db_net
 
   django:
-    build: .
+    image: ghcr.io/studentiunimi/backend:latest
     container_name: studentiunimi_backend_django
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
