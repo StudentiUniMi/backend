@@ -13,7 +13,7 @@ networks:
 
 services:
   postgres:
-    image: postgres
+    image: postgres:12
     container_name: studentiunimi_backend_postgres
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
