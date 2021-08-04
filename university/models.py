@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.db import models
 
-from telegram.models import Group as TgGroup
+from telegram.models import (
+    User as TgUser,
+    Group as TgGroup,
+)
 
 DEGREE_TYPES = (
     ('B', "Triennale"),
@@ -15,6 +18,19 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Representative(models.Model):
+    class Meta:
+        verbose_name = "Representative"
+        verbose_name_plural = "Representatives"
+
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="representatives")
+    tguser = models.ForeignKey(TgUser, on_delete=models.CASCADE, related_name="representative")
+    title = models.CharField("title", max_length=64)
+
+    def __str__(self):
+        return f"{str(self.tguser)}, {self.title} ({self.department.name})"
 
 
 class Degree(models.Model):

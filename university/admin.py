@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from university.models import (
+    Representative,
     Department,
     Degree,
     Course,
@@ -8,6 +9,11 @@ from university.models import (
     CourseLink,
     DEGREE_TYPES,
 )
+
+
+class RepresentativeInline(admin.TabularInline):
+    model = Representative
+    extra = 1
 
 
 class CourseDegreeInline(admin.TabularInline):
@@ -63,9 +69,16 @@ class CourseDegreeTypeFilter(admin.SimpleListFilter):
         return queryset.filter(degrees__in=matched_degrees).distinct()
 
 
+@admin.register(Representative)
+class RepresentativeAdmin(admin.ModelAdmin):
+    search_fields = ("tguser__first_name", "tguser__last_name", "tguser__username", )
+    fields = ("department", "tguser", "title", )
+
+
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
     search_fields = ("name", )
+    inlines = (RepresentativeInline, )
 
 
 @admin.register(Degree)

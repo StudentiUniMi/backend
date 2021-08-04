@@ -1,13 +1,25 @@
 from rest_framework import serializers
 
-from telegram.serializers import GroupSerializer
+from telegram.serializers import (
+    GroupSerializer as TgGroupSerializer,
+    UserSerialzier as TgUserSerializer,
+)
 from university.models import (
+    Representative,
     Course,
     Degree,
     Department,
     CourseDegree,
     CourseLink,
 )
+
+
+class RepresentativeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Representative
+        fields = ("tguser", "title")
+
+    tguser = TgUserSerializer()
 
 
 class CourseLinkSerializer(serializers.ModelSerializer):
@@ -21,7 +33,7 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = ("pk", "name", "cfu", "wiki_link", "links", "group", )
 
-    group = GroupSerializer()
+    group = TgGroupSerializer()
     links = CourseLinkSerializer(many=True)
 
 
@@ -56,6 +68,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class VerboseDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ("pk", "name", "degrees", )
+        fields = ("pk", "name", "representatives", "degrees", )
 
     degrees = DegreeSerializer(many=True, read_only=True)
+    representatives = RepresentativeSerializer(many=True)

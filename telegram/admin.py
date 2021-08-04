@@ -31,7 +31,7 @@ class GroupOwnerFilter(admin.SimpleListFilter):
 class UserAdmin(admin.ModelAdmin):
     list_display = ("__str__", "reputation", "warn_count", "banned", "permissions_level", )
     search_fields = ("id", "first_name", "last_name", )
-    fields = ("id", "first_name", "last_name", "reputation", "warn_count", "banned", "permissions_level", "last_seen", )
+    fields = ("id", "first_name", "last_name", "username", "reputation", "warn_count", "banned", "permissions_level", "last_seen", )
     inlines = (GroupMembershipInline, )
 
 

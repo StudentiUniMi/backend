@@ -1,13 +1,17 @@
 from django.test import TestCase
 from rest_framework.renderers import JSONRenderer as Renderer
 
-from telegram.models import Group as TgGroup
+from telegram.models import (
+    Group as TgGroup,
+    User as TgUser,
+)
 from university.models import (
     Course,
     CourseDegree,
     CourseLink,
     Degree,
     Department,
+    Representative,
 )
 from university.serializers import (
     CourseSerializer,
@@ -306,6 +310,28 @@ class DepartmentTestCase(TestCase):
             slug="medicine",
             department=self.dep2,
         )
+        tgus1 = TgUser.objects.create(
+            id=26170256,
+            first_name="Marco",
+            last_name="Aceti",
+            username="acetimarco",
+        )
+        Representative.objects.create(
+            department=self.dep2,
+            tguser=tgus1,
+            title="Representative",
+        )
+        tgus2 = TgUser.objects.create(
+            id=108121631,
+            first_name="Davide",
+            last_name="Busolin",
+            username="davidebusolin",
+        )
+        Representative.objects.create(
+            department=self.dep2,
+            tguser=tgus2,
+            title="Chad",
+        )
 
     def test_str(self):
         self.assertEqual(str(self.dep1), self.dep1.name)
@@ -352,10 +378,31 @@ class DepartmentTestCase(TestCase):
                     "slug": "computer_science_m",
                 },
             ],
+            "representatives": [],
         })
         self.assertJSONEqual(Renderer().render(VerboseDepartmentSerializer(self.dep2).data), {
             "pk": 2,
             "name": "Medicine Department",
+            "representatives": [
+                {
+                    "tguser": {
+                        "id": 26170256,
+                        "first_name": "Marco",
+                        "last_name": "Aceti",
+                        "username": "acetimarco",
+                    },
+                    "title": "Representative"
+                },
+                {
+                    "tguser": {
+                        "id": 108121631,
+                        "first_name": "Davide",
+                        "last_name": "Busolin",
+                        "username": "davidebusolin",
+                    },
+                    "title": "Chad",
+                }
+            ],
             "degrees": [
                 {
                     "pk": 3,
@@ -369,4 +416,5 @@ class DepartmentTestCase(TestCase):
             "pk": 3,
             "name": "Physics Department",
             "degrees": [],
+            "representatives": [],
         })
