@@ -6,6 +6,7 @@ volumes:
 
 networks:
   db_net:
+  django_net:
   nginx_net:
     external: true
 
@@ -34,4 +35,16 @@ services:
       - postgres
     networks:
       - db_net
+      - django_net
+
+  nginx:
+    image: nginx:latest
+    container_name: studentiunimi_backend_nginx
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./static:/static
+    networks:
+      - django_net
       - nginx_net
+    depends_on:
+      - django

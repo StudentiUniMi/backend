@@ -16,9 +16,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = bool(os.environ.get("DEBUG", False))
 
 ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "0.0.0.0",
-    "api.studentiunimi.it",
+    'django',
 ]
 
 INSTALLED_APPS = [
@@ -103,6 +101,7 @@ USE_L10N = True
 USE_TZ = False
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
