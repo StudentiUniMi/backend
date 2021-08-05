@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
+import telegrambot.urls
 import university.views
 
 router = routers.DefaultRouter()
@@ -15,4 +16,5 @@ router.register(r"departments", university.views.DepartmentViewSet, basename="De
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('telegrambot/', include(telegrambot.urls))
 ]
