@@ -3,7 +3,7 @@
 import datetime
 from django.db import migrations, models
 import django.db.models.deletion
-import telegram.models
+import telegrambot.models
 
 
 class Migration(migrations.Migration):
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigIntegerField(primary_key=True, serialize=False, unique=True, verbose_name='Telegram group ID')),
                 ('title', models.CharField(max_length=512, verbose_name='title')),
                 ('description', models.TextField(blank=True, max_length=2048, null=True, verbose_name='description')),
-                ('profile_picture', models.ImageField(blank=True, null=True, upload_to=telegram.models.Group._format_filename)),
+                ('profile_picture', models.ImageField(blank=True, null=True, upload_to=telegrambot.models.Group._format_filename)),
                 ('invite_link', models.CharField(blank=True, max_length=128, null=True, verbose_name='invite link')),
             ],
             options={
@@ -72,21 +72,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='groupmembership',
             name='group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='telegram.group'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='telegrambot.group'),
         ),
         migrations.AddField(
             model_name='groupmembership',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='telegram.user'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='telegrambot.user'),
         ),
         migrations.AddField(
             model_name='group',
             name='members',
-            field=models.ManyToManyField(related_name='member_of', through='telegram.GroupMembership', to='telegram.User'),
+            field=models.ManyToManyField(related_name='member_of', through='telegrambot.GroupMembership', to='telegrambot.User'),
         ),
         migrations.AddField(
             model_name='group',
             name='owner',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='groups_owned', to='telegram.user'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='groups_owned', to='telegrambot.user'),
         ),
     ]

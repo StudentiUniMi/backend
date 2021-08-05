@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from telegram.serializers import (
+from telegrambot.serializers import (
     GroupSerializer as TgGroupSerializer,
     UserSerialzier as TgUserSerializer,
 )

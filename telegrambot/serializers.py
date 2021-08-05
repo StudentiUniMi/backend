@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from telegram.models import (
+from telegrambot.models import (
     User,
     Group,
 )

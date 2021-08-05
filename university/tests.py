@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.renderers import JSONRenderer as Renderer
 
-from telegram.models import (
+from telegrambot.models import (
     Group as TgGroup,
     User as TgUser,
 )

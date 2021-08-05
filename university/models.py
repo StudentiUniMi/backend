@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from telegram.models import (
+from telegrambot.models import (
     User as TgUser,
     Group as TgGroup,
 )

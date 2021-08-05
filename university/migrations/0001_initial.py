@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('telegram', '0001_initial'),
+        ('telegrambot', '0001_initial'),
     ]
 
     operations = [
@@ -64,6 +64,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='course',
             name='group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='courses', to='telegram.group'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='courses', to='telegrambot.group'),
         ),
     ]

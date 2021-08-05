@@ -1,5 +1,5 @@
 from django.contrib import admin
-from telegram.models import (
+from telegrambot.models import (
     User,
     Group,
     GroupMembership,
