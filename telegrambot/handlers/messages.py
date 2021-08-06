@@ -1,13 +1,9 @@
-from datetime import datetime
-
 from telegram import Update, User, Message, Chat
-from telegram.ext import CallbackContext
-from telegram.ext.dispatcher import DispatcherHandlerStop
+from telegram.ext import CallbackContext, DispatcherHandlerStop
 
+from telegrambot.handlers import utils
 from telegrambot.models import (
-    User as DBUser,
     Group as DBGroup,
-    GroupMembership as DBGroupMembership,
 )
 
 
@@ -32,29 +28,4 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         # TODO: Log this thing somewhere
         raise DispatcherHandlerStop
 
-    dbuser = DBUser.objects.update_or_create(
-        id=sender.id,
-        defaults={
-            "first_name": sender.first_name,
-            "last_name": sender.last_name,
-            "username": sender.username,
-            "last_seen": datetime.now(),
-        }
-    )[0]
-    if dbuser.banned:
-        # The user is globally banned from the network
-        context.bot.ban_chat_member(
-            chat_id=chat.id,
-            user_id=sender.id,
-        )
-        raise DispatcherHandlerStop
-
-    dbmembership = DBGroupMembership.objects.update_or_create(
-        user_id=sender.id,
-        group_id=chat.id,
-        defaults={
-            "last_seen": datetime.now(),
-        }
-    )[0]
-    dbmembership.messages_count += 1
-    dbmembership.save()
+    utils.save_user(sender, chat, context.bot)
