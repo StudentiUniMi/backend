@@ -2,6 +2,7 @@ from datetime import datetime
 
 from telegram import Update, User, Message, Chat
 from telegram.ext import CallbackContext
+from telegram.ext.dispatcher import DispatcherHandlerStop
 
 from telegrambot.models import (
     User as DBUser,
@@ -10,7 +11,7 @@ from telegrambot.models import (
 )
 
 
-def group_messages_handler(update: Update, context: CallbackContext) -> None:
+def handle_group_messages(update: Update, context: CallbackContext) -> None:
     """
     Handles a message in a group by updating the database
     """
@@ -19,7 +20,17 @@ def group_messages_handler(update: Update, context: CallbackContext) -> None:
     chat: Chat = message.chat
 
     if sender.id == context.bot.id:
-        return  # Ignore messages sent by the bot
+        # Ignore messages sent by the bot itself
+        raise DispatcherHandlerStop
+
+    try:
+        dbgroup = DBGroup.objects.get(id=chat.id)
+        dbgroup.title = chat.title
+        dbgroup.save(force_update=True, update_fields=["title", ])
+    except DBGroup.DoesNotExist:
+        # The group is not in the database; ignore all updates from it
+        # TODO: Log this thing somewhere
+        raise DispatcherHandlerStop
 
     dbuser = DBUser.objects.update_or_create(
         id=sender.id,
@@ -31,18 +42,13 @@ def group_messages_handler(update: Update, context: CallbackContext) -> None:
         }
     )[0]
     if dbuser.banned:
+        # The user is globally banned from the network
         context.bot.ban_chat_member(
             chat_id=chat.id,
             user_id=sender.id,
         )
-        return
+        raise DispatcherHandlerStop
 
-    DBGroup.objects.update_or_create(
-        id=chat.id,
-        defaults={
-            "title": chat.title,
-        }
-    )
     dbmembership = DBGroupMembership.objects.update_or_create(
         user_id=sender.id,
         group_id=chat.id,
