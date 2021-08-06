@@ -1,6 +1,7 @@
-from django.db import models
-
 from datetime import datetime
+
+import telegram
+from django.db import models
 
 
 class User(models.Model):
@@ -61,3 +62,28 @@ class GroupMembership(models.Model):
 
     def __str__(self):
         return f"{self.user} in {self.group}"
+
+
+class TelegramBot(models.Model):
+    """
+    This model represents an authorized Telegram bot
+    """
+    class Meta:
+        verbose_name = "Telegram bot"
+        verbose_name_plural = "Telegram bots"
+
+    token = models.CharField("token", max_length=64, primary_key=True)
+    notes = models.TextField("notes", blank=True, null=True)
+
+    @property
+    def username(self):
+        bot = telegram.Bot(self.token)
+        return f"@{bot.username}"
+
+    @property
+    def censured_token(self):
+        bot_id, secret = self.token.split(":")
+        return f"{bot_id}:{'•' * (len(secret)-5)}{secret[-5:]}"
+
+    def __str__(self):
+        return self.username

@@ -3,6 +3,7 @@ from telegrambot.models import (
     User,
     Group,
     GroupMembership,
+    TelegramBot,
 )
 
 
@@ -42,3 +43,9 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ("title", )
     fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", )
     inlines = (GroupMembershipInline, )
+
+
+@admin.register(TelegramBot)
+class TelegramBotAdmin(admin.ModelAdmin):
+    list_display = ("username", "censured_token", "notes")
+    fields = ("token", "notes")
