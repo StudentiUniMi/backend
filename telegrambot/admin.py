@@ -1,9 +1,10 @@
 from django.contrib import admin
+
 from telegrambot.models import (
     User,
     Group,
     GroupMembership,
-    TelegramBot,
+    TelegramBot, UserPrivilege,
 )
 
 
@@ -43,6 +44,25 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ("title", )
     fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", )
     inlines = (GroupMembershipInline, )
+
+
+@admin.register(UserPrivilege)
+class UserPrivilegeAdmin(admin.ModelAdmin):
+    list_display = ("user", "type", "scope", )
+    fieldsets = (
+        (None, {
+            "fields": ("user", "type", )
+        }),
+        ("Authorization", {
+            "fields": ("scope", "authorized_groups", "authorized_degrees", "authorized_departments"),
+        }),
+        ("Telegram privileges", {
+            "classes": ("collapse", ),
+            "fields": ("custom_title", "can_change_info", "can_invite_users", "can_pin_messages", "can_manage_chat",
+                       "can_delete_messages", "can_manage_voice_chats", "can_restrict_members",
+                       "can_promote_members", ),
+        })
+    )
 
 
 @admin.register(TelegramBot)

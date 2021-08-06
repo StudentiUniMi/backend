@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import telegram
+from django.apps import apps
 from django.db import models
 
 
@@ -27,6 +28,36 @@ class User(models.Model):
 
     def __str__(self):
         return f"{self.first_name}{f' {self.last_name}' if self.last_name else ''} [{self.id}]"
+
+    def get_privileges(self, chat):
+        if self.privileges.count() == 0:
+            return False
+
+        if group_privileges := self.privileges.filter(
+                scope=UserPrivilege.PrivilegeScopes.GROUPS,
+                authorized_groups__id__in=[chat.id, ]
+        ):
+            return group_privileges[0]
+
+        Degree = apps.get_model("university", "Degree")  # Avoid circular imports
+        degrees = Degree.objects.filter(courses__group__id=chat.id)
+
+        if degree_privileges := self.privileges.filter(
+                scope=UserPrivilege.PrivilegeScopes.DEGREES,
+                authorized_degrees__in=degrees,
+        ):
+            return degree_privileges[0]
+
+        if department_privileges := self.privileges.filter(
+                scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS,
+                authorized_departments__degrees__in=degrees,
+        ):
+            return department_privileges[0]
+
+        if privileges := self.privileges.filter(scope=UserPrivilege.PrivilegeScopes.ALL):
+            return privileges[0]
+
+        return False
 
 
 class Group(models.Model):
@@ -62,6 +93,94 @@ class GroupMembership(models.Model):
 
     def __str__(self):
         return f"{self.user} in {self.group}"
+
+
+class UserPrivilege(models.Model):
+    """
+    This model allows you to set granular permissions and custom titles to special users
+    (such as representatives, professors, tutor, etc...).
+    An user can have multiple instances of this class associated;
+    in case of multiple associations the most specific one is considered (see scope field).
+    """
+
+    class Meta:
+        verbose_name = "User privilege"
+        verbose_name_plural = "User privileges"
+
+    class PrivilegeTypes(models.TextChoices):
+        ADMIN = 'A', "Amministratore"
+        PROFESSOR = 'P', "Docente"
+        REPRESENTATIVE = 'R', "Rappresentante"
+        TUTOR = 'T', "Tutor"
+        OTHER = 'O', "Other"
+
+    class PrivilegeScopes(models.TextChoices):
+        GROUPS = 'G', "Solo i gruppi autorizzati"
+        DEGREES = 'Dg', "Solo i c.d.L. autorizzati"
+        DEPARTMENTS = 'Di', "Solo i dipartimenti autorizzati"
+        ALL = 'A', "Tutto l'Ateneo"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="privileges")
+    type = models.CharField("type", choices=PrivilegeTypes.choices, max_length=2, default=PrivilegeTypes.ADMIN)
+
+    scope = models.CharField(
+        "privileges scope",
+        choices=PrivilegeScopes.choices,
+        max_length=2,
+        help_text="Dove si dovrebbero applicare i permessi?"
+                  "\nIn caso di sovrapposizione, si applica il permesso più specifico.",
+        default=PrivilegeScopes.GROUPS,
+    )
+    authorized_groups = models.ManyToManyField(
+        Group,
+        related_name="privileged_users",
+        blank=True,
+    )
+    authorized_degrees = models.ManyToManyField(
+        "university.Degree",
+        related_name="privileged_users",
+        blank=True,
+    )
+    authorized_departments = models.ManyToManyField(
+        "university.Department",
+        related_name="privileged_users",
+        blank=True,
+    )
+
+    # Telegram privileges
+    custom_title = models.CharField("custom title", max_length=16, blank=True, null=True)
+    can_change_info = models.BooleanField(
+        help_text="True, if the user is allowed to change the chat title, photo and other settings",
+    )
+    can_invite_users = models.BooleanField(
+        help_text="True, if the user is allowed to invite new users to the chat",
+    )
+    can_pin_messages = models.BooleanField(
+        help_text="True, if the user is allowed to pin messages; groups and supergroups only",
+    )
+    can_manage_chat = models.BooleanField(
+        help_text="True, if the administrator can access the chat event log, chat statistics, message statistics in "
+                  "channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. "
+                  "Implied by any other administrator privilege",
+    )
+    can_delete_messages = models.BooleanField(
+        help_text="True, if the administrator can delete messages of other users",
+    )
+    can_manage_voice_chats = models.BooleanField(
+        help_text="True, if the administrator can manage voice chats",
+    )
+    can_restrict_members = models.BooleanField(
+        help_text="True, if the administrator can restrict, ban or unban chat members",
+    )
+    can_promote_members = models.BooleanField(
+        help_text="True, if the administrator can add new administrators with a subset of their own privileges or "
+                  "demote administrators that he has promoted, directly or indirectly "
+                  "(promoted by administrators that were appointed by the user)",
+    )
+
+    def __str__(self):
+        return f"{self.PrivilegeTypes(self.type).name.title()} {str(self.user)}, " \
+               f"{self.PrivilegeScopes(self.scope).name.lower()} scope"
 
 
 class TelegramBot(models.Model):
