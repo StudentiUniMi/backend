@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from telegrambot.serializers import (
     GroupSerializer as TgGroupSerializer,
-    UserSerialzier as TgUserSerializer,
+    UserSerializer as TgUserSerializer,
 )
 from university.models import (
     Representative,

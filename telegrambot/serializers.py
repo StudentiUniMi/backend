@@ -12,7 +12,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "profile_picture", "invite_link")
 
 
-class UserSerialzier(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "first_name", "last_name", "username", )
