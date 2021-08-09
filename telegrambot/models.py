@@ -76,6 +76,7 @@ class Group(models.Model):
     invite_link = models.CharField("invite link", max_length=128, blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="groups_owned", blank=True, null=True)
     members = models.ManyToManyField(User, through="GroupMembership", related_name="member_of")
+    bot = models.ForeignKey("TelegramBot", on_delete=models.SET_NULL, related_name="groups", blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} [{self.id}]"
