@@ -6,12 +6,13 @@ from rest_framework.renderers import JSONRenderer as Renderer
 from telegrambot.models import (
     User as TgUser,
     Group as TgGroup,
-    TelegramBot,
+    TelegramBot, UserPrivilege,
 )
 from telegrambot.serializers import (
     UserSerializer,
     GroupSerializer,
 )
+from university.models import Department, Degree, Course, CourseDegree
 
 TEST_BOT_TOKEN = os.environ.get("TEST_BOT_TOKEN", None)
 if not TEST_BOT_TOKEN:
@@ -96,6 +97,156 @@ class TelegramGroupTestCase(TestCase):
             "profile_picture": None,
             "invite_link": "https://example.com/join/physics_2",
         })
+
+
+class UserPrivilegeTestCase(TestCase):
+    def setUp(self):
+        self.maxDiff = None
+        self.group1 = TgGroup.objects.create(
+            id=123,
+            title="Programming I fan club",
+        )
+        self.group2 = TgGroup.objects.create(
+            id=321,
+            title="We <3 Linear Algebra",
+        )
+        self.group3 = TgGroup.objects.create(
+            id=111,
+            title="Anatomy I group"
+        )
+
+        dip1 = Department.objects.create(name="Computer Science Department")
+        dip2 = Department.objects.create(name="Health Department")
+        deg1 = Degree.objects.create(
+            name="Computer science",
+            type='B',
+            department=dip1,
+        )
+        Degree.objects.create(
+            name="Medicine",
+            type='C',
+            department=dip2,
+        )
+        course1 = Course.objects.create(
+            name="Programming I",
+            cfu=12,
+            group=self.group1,
+        )
+        CourseDegree.objects.create(
+            course=course1,
+            degree=deg1,
+            year=1, semester=1,
+        )
+        course2 = Course.objects.create(
+            name="Linear Algebra I",
+            cfu=6,
+            group=self.group2,
+        )
+        CourseDegree.objects.create(
+            course=course2,
+            degree=deg1,
+            year=1, semester=2,
+        )
+
+        self.usr1 = TgUser.objects.create(
+            id=26170256,
+            first_name="Marco",
+            last_name="Aceti",
+            username="acetimarco",
+        )
+        self.usr2 = TgUser.objects.create(
+            id=244426552,
+            first_name="Sette",
+            last_name="Magic",
+        )
+        self.usr3 = TgUser.objects.create(
+            id=108121631,
+            first_name="Davide",
+            last_name="Busolin",
+            username="davidebusolin",
+        )
+
+        self.priv1 = UserPrivilege.objects.create(
+            user=self.usr1,
+            type=UserPrivilege.PrivilegeTypes.TUTOR,
+            scope=UserPrivilege.PrivilegeScopes.GROUPS,
+            custom_title="Tutor",
+            can_change_info=False,
+            can_invite_users=False,
+            can_pin_messages=True,
+            can_manage_chat=False,
+            can_delete_messages=False,
+            can_manage_voice_chats=False,
+            can_restrict_members=False,
+            can_promote_members=False,
+        )
+        self.priv1.authorized_groups.add(self.group1)
+        self.priv1.save()
+
+        self.priv2 = UserPrivilege.objects.create(
+            user=self.usr1,
+            type=UserPrivilege.PrivilegeTypes.ADMIN,
+            scope=UserPrivilege.PrivilegeScopes.ALL,
+            custom_title="C.A.N.",
+            can_change_info=True,
+            can_invite_users=True,
+            can_pin_messages=True,
+            can_manage_chat=True,
+            can_delete_messages=True,
+            can_manage_voice_chats=True,
+            can_restrict_members=True,
+            can_promote_members=True,
+        )
+
+        self.priv3 = UserPrivilege.objects.create(
+            user=self.usr2,
+            type=UserPrivilege.PrivilegeTypes.ADMIN,
+            scope=UserPrivilege.PrivilegeScopes.DEGREES,
+            custom_title="Administrator",
+            can_change_info=True,
+            can_invite_users=True,
+            can_pin_messages=True,
+            can_manage_chat=True,
+            can_delete_messages=True,
+            can_manage_voice_chats=True,
+            can_restrict_members=True,
+            can_promote_members=False,
+        )
+        self.priv3.authorized_degrees.add(deg1)
+        self.priv3.save()
+
+        self.priv4 = UserPrivilege.objects.create(
+            user=self.usr3,
+            type=UserPrivilege.PrivilegeTypes.REPRESENTATIVE,
+            scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS,
+            custom_title="Representative",
+            can_change_info=False,
+            can_invite_users=False,
+            can_pin_messages=False,
+            can_manage_chat=True,
+            can_delete_messages=False,
+            can_manage_voice_chats=False,
+            can_restrict_members=False,
+            can_promote_members=False,
+        )
+        self.priv4.authorized_departments.add(dip1)
+        self.priv4.save()
+
+    def test_privilege(self):
+        # The most specific privilege is the one that should be returned
+        self.assertEqual(self.usr1.get_privileges(self.group1), self.priv1)
+        self.assertEqual(self.usr1.get_privileges(self.group2), self.priv2)
+        self.assertEqual(self.usr1.get_privileges(self.group3), self.priv2)
+
+        # self.usr2 is admin within the Computer Science degree, not Medicine
+        self.assertEqual(self.usr2.get_privileges(self.group1), self.priv3)
+        self.assertEqual(self.usr2.get_privileges(self.group2), self.priv3)
+        self.assertEqual(self.usr2.get_privileges(self.group3), False)
+
+        # self.usr3 is admin within the Computer Science degree, not Health
+        self.assertEqual(self.usr3.get_privileges(self.group1), self.priv4)
+        self.assertEqual(self.usr3.get_privileges(self.group2), self.priv4)
+        self.assertEqual(self.usr3.get_privileges(self.group3), False)
 
 
 class TelegramBotTestCase(TestCase):
