@@ -30,5 +30,7 @@ jobs:
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DEBUG: 1
+          TEST_BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
+          TEST_BOT_USERNAME: ${{ secrets.TEST_BOT_USERNAME }}
         run: |
           python manage.py test
