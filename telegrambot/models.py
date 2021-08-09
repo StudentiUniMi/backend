@@ -4,6 +4,8 @@ import telegram
 from django.apps import apps
 from django.db import models
 
+from telegrambot.handlers import utils
+
 
 class User(models.Model):
     class Meta:
@@ -182,6 +184,18 @@ class UserPrivilege(models.Model):
     def __str__(self):
         return f"{self.PrivilegeTypes(self.type).name.title()} {str(self.user)}, " \
                f"{self.PrivilegeScopes(self.scope).name.lower()} scope"
+
+    def save(self, *args, **kwargs):
+        groups = self.user.member_of.all()
+        for group in groups:
+            utils.set_admin_rights(self.user, group)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        groups = self.user.member_of.all()
+        for group in groups:
+            utils.remove_admin_rights(self.user, group)
+        super().delete(*args, **kwargs)
 
 
 class TelegramBot(models.Model):

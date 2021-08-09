@@ -4,6 +4,7 @@ from telegram import Update, User, Message, Chat
 from telegram.ext import CallbackContext
 
 from telegrambot.handlers import utils
+from telegrambot.models import User as DBUser
 
 
 def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
@@ -17,7 +18,8 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
     for member in members:
         if member.id == message.from_user.id:
             continue
-        utils.save_user(member, chat, context.bot)
+        dbuser: DBUser = utils.save_user(member, chat, context.bot)
+        utils.set_admin_rights(dbuser, chat)
 
     welcome = f"{'Benvenuto' if len(members) == 1 else 'Benvenuti'} " \
               f"{', '.join([m.first_name for m in members])}"
