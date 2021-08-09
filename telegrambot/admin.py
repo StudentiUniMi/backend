@@ -42,7 +42,7 @@ class GroupAdmin(admin.ModelAdmin):
     list_display = ("__str__", "owner", )
     list_filter = (GroupOwnerFilter, )
     search_fields = ("title", )
-    fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", "bot", )
+    fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", "bot", "welcome_model", )
     inlines = (GroupMembershipInline, )
 
 

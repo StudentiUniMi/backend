@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 import telegram
 from django.apps import apps
@@ -79,9 +80,21 @@ class Group(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="groups_owned", blank=True, null=True)
     members = models.ManyToManyField(User, through="GroupMembership", related_name="member_of")
     bot = models.ForeignKey("TelegramBot", on_delete=models.SET_NULL, related_name="groups", blank=True, null=True)
+    welcome_model = models.TextField("Welcome model", default=(
+        "<b>{greetings}</b> nel gruppo {title}"
+        "\n\nIscriviti al canale @studenti_unimi"
+    ), help_text="Available format parameters: {greetings} and {title}")
 
     def __str__(self):
         return f"{self.title} [{self.id}]"
+
+    def generate_welcome_message(self, members: List[User]) -> str:
+        greetings = f"{'Benvenuto' if len(members) == 1 else 'Benvenuti'} " \
+                  f"{', '.join([m.first_name for m in members])}"
+        return self.welcome_model.format(
+            greetings=greetings,
+            title=self.title,
+        )
 
 
 class GroupMembership(models.Model):
