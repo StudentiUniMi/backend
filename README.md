@@ -68,10 +68,11 @@ Before doing any processing, the specified token must match an instance of the `
 
 Once again, here's an incomplete list of features:
 
-- [x] Architecture
+- [ ] Architecture
   - [x] Webhook endpoint
   - [x] Ignore request if the bot is not recognized
   - [x] Update dispatcher
+  - [ ] Translations (i18n)
 
 - [ ] Information gathering
   - [ ] Users
@@ -85,7 +86,7 @@ Once again, here's an incomplete list of features:
 - [ ] Groups
   - [ ] Welcome messages
     - [x] Greet the user 
-    - [ ] Per-group customized welcome message
+    - [x] Per-group customized welcome message
     - [ ] CAPTCHA and rules acceptance for new users
   - [ ] Moderation
     - [x] Auto-ban globally banned users 
@@ -97,7 +98,7 @@ Once again, here's an incomplete list of features:
     - [ ] Moderation logging
   - [ ] Special users
     - [x] Recognize special users permissions scope
-    - [ ] Automatically set special user permissions and custom titles 
+    - [x] Automatically set special user permissions and custom titles 
   - [ ] Automatic group creation
   - ...
 
