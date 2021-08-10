@@ -2,19 +2,23 @@
 
 The `urlpatterns` list routes URLs to views.
 """
+from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
+from django.views.generic import RedirectView
 
 import telegrambot.urls
-import university.views
-
-router = routers.DefaultRouter()
-router.register(r"degrees", university.views.DegreeViewSet, basename="Degree")
-router.register(r"departments", university.views.DepartmentViewSet, basename="Department")
+import university.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('telegrambot/', include(telegrambot.urls))
+    path('api/', include(university.urls)),
+    path('telegrambot/', include(telegrambot.urls)),
 ]
+
+if not settings.DEBUG:
+    urlpatterns.append(
+        path('', RedirectView.as_view(url="https://github.com/StudentiUniMi/backend"),
+             name='github-redirect'),
+    )
+
