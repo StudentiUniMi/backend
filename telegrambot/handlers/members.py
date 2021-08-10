@@ -11,9 +11,7 @@ from telegrambot.models import (
 
 
 def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
-    """
-    Handles new chat members who just joined a group
-    """
+    """Handle new chat members who just joined a group and greet them"""
     message: Message = update.message
     chat: Chat = message.chat
     members: List[User] = message.new_chat_members
@@ -21,7 +19,7 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
     for member in members:
         if member.id == message.from_user.id:
             continue
-        dbuser: DBUser = utils.save_user(member, chat, context.bot)
+        dbuser: DBUser = utils.save_user(member, chat)
         utils.set_admin_rights(dbuser, chat)
 
     dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)

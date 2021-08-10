@@ -2,11 +2,17 @@ from datetime import datetime
 
 import telegram
 from django.apps import apps
-from telegram import Bot, User, Chat, TelegramError
+from telegram import User, Chat, TelegramError
 from telegram.ext import DispatcherHandlerStop
 
 
+# def get_bot(chat: Chat) -> telegram.Bot
 def get_bot(chat: Chat) -> telegram.Bot:
+    """Get the proper telegram.Bot instance for a chat.
+
+    :param chat: the considered Telegram chat
+    :return: the telegram.Bot who is in that chat
+    """
     DBGroup = apps.get_model("telegrambot.Group")
     if isinstance(chat, DBGroup):
         dbgroup = chat
@@ -16,9 +22,16 @@ def get_bot(chat: Chat) -> telegram.Bot:
     return bot
 
 
-def save_user(user: User, chat: Chat, bot: Bot):
-    """
-    Saves (or updates) an user (in a group) in the database.
+# Annotations in this file are not always possible because circular imports
+# def save_user(user: User, chat: Chat) -> telegrambot.User
+def save_user(user: User, chat: Chat):
+    """Save a Telegram user and their group membership to the database.
+    Should be used before processing any update, to ensure the correctness of the database.
+    If the user is globally banned, it will be banned from the chat.
+
+    :param user: the Telegram user to save
+    :param chat: the Telegram chat the user is in
+    :return: telegrambot.User object representing the user
     """
     DBUser = apps.get_model("telegrambot.User")
     dbuser = DBUser.objects.update_or_create(
@@ -32,6 +45,7 @@ def save_user(user: User, chat: Chat, bot: Bot):
     )[0]
     if dbuser.banned:
         # The user is globally banned from the network
+        bot = get_bot(chat)
         bot.ban_chat_member(
             chat_id=chat.id,
             user_id=user.id,
@@ -51,7 +65,14 @@ def save_user(user: User, chat: Chat, bot: Bot):
     return dbuser
 
 
-def set_admin_rights(dbuser, chat):
+# def set_admin_rights(dbuser: telegrambot.User, chat: Union[telegram.Chat, telegrambot.Chat]) -> None
+def set_admin_rights(dbuser, chat) -> None:
+    """Try to set chat admin rights in a chat if the user has privileges.
+
+    :param dbuser: the telegrambot.User to promote
+    :param chat: the considered Telegram chat
+    :return: None
+    """
     privileges = dbuser.get_privileges(chat)
     if not privileges:
         return
@@ -81,7 +102,14 @@ def set_admin_rights(dbuser, chat):
         pass
 
 
-def remove_admin_rights(dbuser, chat: Chat):
+# def remove_admin_rights(dbuser: telegrambot.User, chat: Union[telegram.Chat, telegrambot.Chat]) -> None
+def remove_admin_rights(dbuser, chat) -> None:
+    """Remove all admin rights of an user in a chat.
+
+    :param dbuser: the telegrambot.User to demote
+    :param chat: the considered Telegram chat
+    :return: None
+    """
     bot = get_bot(chat)
     try:
         bot.promote_chat_member(

@@ -8,8 +8,10 @@ from telegrambot.models import (
 
 
 def handle_group_messages(update: Update, context: CallbackContext) -> None:
-    """
-    Handles a message in a group by updating the database
+    """Handle a message in a group by updating the database.
+
+    :raises: DispatcherHandlerStop if the messages comes from the bot itself or
+    the group does not exists in the database.
     """
     message: Message = update.message
     sender: User = message.from_user
@@ -28,4 +30,4 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         # TODO: Log this thing somewhere
         raise DispatcherHandlerStop
 
-    utils.save_user(sender, chat, context.bot)
+    utils.save_user(sender, chat)

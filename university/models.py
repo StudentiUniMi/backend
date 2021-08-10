@@ -14,13 +14,22 @@ DEGREE_TYPES = (
 
 
 class Department(models.Model):
+    """An university department.
+
+    Example: Computer Science Department "Giovanni degli Antoni"
+    """
     name = models.CharField("name", max_length=64)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Representative(models.Model):
+    """An university representative.
+    Mainly used to show contact information on the website.
+
+    Example: Giulio Lucani
+    """
     class Meta:
         verbose_name = "Representative"
         verbose_name_plural = "Representatives"
@@ -29,11 +38,15 @@ class Representative(models.Model):
     tguser = models.ForeignKey(TgUser, on_delete=models.CASCADE, related_name="representative")
     title = models.CharField("title", max_length=64)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{str(self.tguser)}, {self.title} ({self.department.name})"
 
 
 class Degree(models.Model):
+    """An university degree.
+
+    Example: Bachelor of Computer Science
+    """
     class Meta:
         verbose_name = "Degree"
         verbose_name_plural = "Degrees"
@@ -43,11 +56,16 @@ class Degree(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="degrees")
     slug = models.CharField("slug", max_length=64, default="default_slug")  # the default is needed for migrations
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} [{''.join([t[1] if t[0] == self.type else '' for t in DEGREE_TYPES])}]"  # hacky shit
 
 
 class Course(models.Model):
+    """An university course.
+
+    Example: Programming I
+    """
+
     class Meta:
         verbose_name = "Course"
         verbose_name_plural = "Courses"
@@ -63,14 +81,19 @@ class Course(models.Model):
         ordering='name',
         description='Degrees',
     )
-    def str_degrees(self):
+    def str_degrees(self) -> str:
+        """Return a comma-separated list of linked degrees"""
         return ', '.join([d.name for d in self.degrees.all()])
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.str_degrees})"
 
 
 class CourseDegree(models.Model):
+    """The relation between a course and a degree.
+
+    Example: Programming I is offered the 1st semester of the 1st year of the Computer Science degree
+    """
     # https://docs.djangoproject.com/en/3.2/topics/db/models/#extra-fields-on-many-to-many-relationships
     degree = models.ForeignKey(Degree, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -82,6 +105,7 @@ class CourseDegree(models.Model):
 
 
 class CourseLink(models.Model):
+    """Additional links to show on the website for a specific course."""
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="links")
     name = models.CharField("link name", max_length=32)
     url = models.URLField("link URL")

@@ -9,6 +9,10 @@ from telegrambot.handlers import utils
 
 
 class User(models.Model):
+    """A Telegram user.
+    Every user seen by the bot should be automatically saved or updated in the database.
+    An user can be special: see UserPrivileges class and get_privileges method for more information.
+    """
     class Meta:
         ordering = ["id"]
         verbose_name = "Telegram user"
@@ -29,10 +33,19 @@ class User(models.Model):
     permissions_level = models.IntegerField("permission level", default=0)
     last_seen = models.DateTimeField(default=datetime.now)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.first_name}{f' {self.last_name}' if self.last_name else ''} [{self.id}]"
 
     def get_privileges(self, chat):
+        """Return the UserPrivilege object associated with the user.
+        If the user has more UserPrivilege objects associated, the most specific one is returned.
+
+        Example: if an user is both Representative in a whole department and Tutor in a group,
+        in that group the proper privilege is Tutor.
+
+        :param chat: the chat in which to check privileges
+        :return: the correct UserPrivilege object
+        """
         if self.privileges.count() == 0:
             return False
 
@@ -64,12 +77,19 @@ class User(models.Model):
 
 
 class Group(models.Model):
+    """A Telegram group.
+    Unlike the User class, the objects of this class are not created automatically,
+    but they're inserted by an administrator on the admin interface.
+    If the bot receives an update from an unknown group, it should ignore it
+    and alert the bot administrators.
+    """
     class Meta:
         ordering = ["id"]
         verbose_name = "Telegram group"
         verbose_name_plural = "Telegram groups"
 
     def _format_filename(self, filename):
+        """Helper function used to generate an appropriate filename for a group profile picture"""
         return f"gropics/{self.id}_{filename}"
 
     id = models.BigIntegerField("Telegram group ID", primary_key=True, unique=True)
@@ -85,12 +105,17 @@ class Group(models.Model):
         "\n\nIscriviti al canale @studenti_unimi"
     ), help_text="Available format parameters: {greetings} and {title}")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.title} [{self.id}]"
 
     def generate_welcome_message(self, members: List[User]) -> str:
+        """Generate a customized welcome message by filling the welcome_model.
+
+        :param members: list of new members who just joined the group
+        :return: the welcome message
+        """
         greetings = f"{'Benvenuto' if len(members) == 1 else 'Benvenuti'} " \
-                  f"{', '.join([m.first_name for m in members])}"
+                    f"{', '.join([m.first_name for m in members])}"
         return self.welcome_model.format(
             greetings=greetings,
             title=self.title,
@@ -98,6 +123,11 @@ class Group(models.Model):
 
 
 class GroupMembership(models.Model):
+    """A relation between an user and a group.
+    Should be created when an user enters (or is recognized) in a group.
+
+    TODO: Add status field (member, left, banned, kicked, ...)
+    """
     class Meta:
         verbose_name = "Telegram group membership"
         verbose_name_plural = "Telegram groups memberships"
@@ -107,16 +137,17 @@ class GroupMembership(models.Model):
     last_seen = models.DateTimeField("last seen", default=datetime.now)
     messages_count = models.PositiveIntegerField("messages count", default=0)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user} in {self.group}"
 
 
 class UserPrivilege(models.Model):
-    """
+    """User privileges.
     This model allows you to set granular permissions and custom titles to special users
     (such as representatives, professors, tutor, etc...).
-    An user can have multiple instances of this class associated;
-    in case of multiple associations the most specific one is considered (see scope field).
+
+    An user can have multiple instances of this class associated.
+    In case of multiple associations the most specific one is considered, based on scope field.
     """
 
     class Meta:
@@ -198,13 +229,15 @@ class UserPrivilege(models.Model):
         return f"{self.PrivilegeTypes(self.type).name.title()} {str(self.user)}, " \
                f"{self.PrivilegeScopes(self.scope).name.lower()} scope"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
+        """Save the current instance and set the proper permissions in all groups the user is in"""
         groups = self.user.member_of.all()
         for group in groups:
             utils.set_admin_rights(self.user, group)
         super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
+        """Save the current instance and revoke all special permissions in all groups the user is in"""
         groups = self.user.member_of.all()
         for group in groups:
             utils.remove_admin_rights(self.user, group)
@@ -212,8 +245,8 @@ class UserPrivilege(models.Model):
 
 
 class TelegramBot(models.Model):
-    """
-    This model represents an authorized Telegram bot
+    """An authorized Telegram bot.
+    The instances of this model must NEVER be returned by the API.
     """
     class Meta:
         verbose_name = "Telegram bot"
@@ -223,14 +256,18 @@ class TelegramBot(models.Model):
     notes = models.TextField("notes", blank=True, null=True)
 
     @property
-    def username(self):
+    def username(self) -> str:
+        """Return the bot username"""
         bot = telegram.Bot(self.token)
         return f"@{bot.username}"
 
     @property
-    def censured_token(self):
+    def censured_token(self) -> str:
+        """Return a censured version of the token, with only the last five characters visible.
+        Remains unsafe to show to unauthenticated users variations of the bot token.
+        """
         bot_id, secret = self.token.split(":")
         return f"{bot_id}:{'•' * (len(secret)-5)}{secret[-5:]}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.username
