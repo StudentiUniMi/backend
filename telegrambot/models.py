@@ -36,6 +36,15 @@ class User(models.Model):
     def __str__(self) -> str:
         return f"{self.first_name}{f' {self.last_name}' if self.last_name else ''} [{self.id}]"
 
+    @property
+    def name(self):
+        """The full name of the user"""
+        return f"{self.first_name}{f' {self.last_name}' if self.last_name else ''}"
+
+    def generate_mention(self):
+        """Generate an HTML mention of the user"""
+        return f"<a href=\"tg://user?id={self.id}\">{self.name}</a>"
+
     def get_privileges(self, chat):
         """Return the UserPrivilege object associated with the user.
         If the user has more UserPrivilege objects associated, the most specific one is returned.

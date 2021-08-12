@@ -1,10 +1,10 @@
 import telegram
 import telegram.ext
 from telegram import Update
-from telegram.ext import MessageHandler, Filters
+from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import Dispatcher
 
-from telegrambot.handlers import messages, members
+from telegrambot.handlers import messages, members, moderation
 from telegrambot.handlers.filters import NewChatMemberFilter
 
 
@@ -23,6 +23,28 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         filters=NewChatMemberFilter(),
         callback=members.handle_new_chat_members,
     ), group=1)
+
+    # Admin commands
+    dispatcher.add_handler(CommandHandler(
+        command="warn",
+        callback=moderation.handle_warn_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="kick",
+        callback=moderation.handle_kick_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="ban",
+        callback=moderation.handle_ban_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="mute",
+        callback=moderation.handle_mute_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="free",
+        callback=moderation.handle_free_command,
+    ), group=2)
 
     update = Update.de_json(json_update, bot)
     dispatcher.process_update(update)

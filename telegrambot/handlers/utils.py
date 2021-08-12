@@ -128,3 +128,45 @@ def remove_admin_rights(dbuser, chat) -> None:
         # The bot has no enough rights
         # TODO: Alert administrators
         pass
+
+
+def can_moderate(user, chat) -> bool:
+    """Return True if the user can restrict other members"""
+    DBUser = apps.get_model("telegrambot.User")
+
+    dbuser: DBUser = DBUser.objects.get(id=user.id)
+    privileges = dbuser.get_privileges(chat)
+    if not privileges or not privileges.can_restrict_members:
+        return False
+    return True
+
+
+def get_targets_of_command(message):
+    """Get the target users of a command."""
+    DBUser = apps.get_model("telegrambot.User")
+
+    entities = message.parse_entities()
+    targets = list()
+    for entity in entities:
+        parsed = entities[entity]
+        if entity.type == "mention":
+            try:
+                dbuser = DBUser.objects.get(username__iexact=parsed[1:])
+                targets.append(dbuser)
+            except DBUser.DoesNotExist or DBUser.MultipleObjectsReturned:
+                continue
+        elif entity.type == "text_mention":
+            try:
+                dbuser = DBUser.objects.get(id=entity.user.id)
+                targets.append(dbuser)
+            except DBUser.DoesNotExist:
+                continue
+
+    if message.reply_to_message:
+        try:
+            dbuser = DBUser.objects.get(id=message.reply_to_message.from_user.id)
+            targets.append(dbuser)
+        except DBUser.DoesNotExist:
+            pass
+
+    return targets
