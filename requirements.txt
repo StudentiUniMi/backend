@@ -3,3 +3,4 @@ psycopg2-binary
 pillow  # required by django ImageField
 djangorestframework
 python-telegram-bot
+django-background-tasks

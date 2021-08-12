@@ -6,7 +6,7 @@ from telegram import User, Chat, TelegramError
 from telegram.ext import DispatcherHandlerStop
 
 
-# def get_bot(chat: Chat) -> telegram.Bot
+# def get_bot(chat: Union[Chat, telegrambot.Group, int]) -> telegram.Bot
 def get_bot(chat: Chat) -> telegram.Bot:
     """Get the proper telegram.Bot instance for a chat.
 
@@ -17,7 +17,7 @@ def get_bot(chat: Chat) -> telegram.Bot:
     if isinstance(chat, DBGroup):
         dbgroup = chat
     else:
-        dbgroup = DBGroup.objects.get(id=chat.id)
+        dbgroup = DBGroup.objects.get(id=chat if isinstance(chat, int) else chat.id)
     bot = telegram.Bot(dbgroup.bot.token)
     return bot
 

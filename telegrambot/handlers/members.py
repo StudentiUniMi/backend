@@ -3,6 +3,7 @@ from typing import List
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 
+from telegrambot import tasks
 from telegrambot.handlers import utils
 from telegrambot.models import (
     User as DBUser,
@@ -24,7 +25,7 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
 
     dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
 
-    context.bot.send_message(
+    msg: Message = context.bot.send_message(
         chat_id=chat.id,
         text=dbgroup.generate_welcome_message(members),
         reply_to_message_id=message.message_id,
@@ -48,3 +49,4 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
             ],
         ]),
     )
+    tasks.delete_message(chat.id, msg.message_id)
