@@ -1,6 +1,6 @@
 from typing import List
 
-from telegram import Update, User, Message, Chat
+from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 
 from telegrambot.handlers import utils
@@ -29,4 +29,22 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
         text=dbgroup.generate_welcome_message(members),
         reply_to_message_id=message.message_id,
         parse_mode="html",
+        reply_markup=InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(
+                    text="↗️ Visita studentiunimi.it",
+                    url="https://studentiunimi.it/",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📣 Canale notizie",
+                    url="https://t.me/studenti_unimi",
+                ),
+                InlineKeyboardButton(
+                    text="👥 Gruppo generale",
+                    url="https://t.me/unimichat",
+                ),
+            ],
+        ]),
     )
