@@ -75,10 +75,10 @@ Once again, here's an incomplete list of features:
   - [ ] Translations (i18n)
 
 - [ ] Information gathering
-  - [ ] Users
+  - [x] Users
     - [x] Gather and update general information
     - [x] Update sent message count
-    - [ ] Update group membership
+    - [x] Update group membership
   - [ ] Groups
     - [x] Update, if different, chat title 
     - [ ] Periodically update chat photo, description, ...
@@ -91,14 +91,16 @@ Once again, here's an incomplete list of features:
   - [ ] Moderation
     - [x] Auto-ban globally banned users 
     - [ ] Global ban (temporary and permanent)
-    - [ ] Group ban (temporary and permanent)
-    - [ ] Group mute (temporary and permanent)
-    - [ ] Group kick
-    - [ ] Global warn
-    - [ ] Moderation logging
-  - [ ] Special users
+    - [x] Group ban (temporary and permanent)
+    - [x] Group mute (temporary and permanent)
+    - [x] Group kick
+    - [x] Global warn
+    - [x] Moderation logging
+    - [ ] Info command for administrators
+  - [x] Special users
     - [x] Recognize special users permissions scope
-    - [x] Automatically set special user permissions and custom titles 
+    - [x] Automatically set special user permissions and custom titles
+  - [x] Auto-delete welcome and moderation messages
   - [ ] Automatic group creation
   - ...
 
