@@ -4,6 +4,7 @@ from typing import List
 import telegram
 from django.apps import apps
 from django.db import models
+from telegram import ChatInviteLink
 
 from telegrambot.handlers import utils
 
@@ -108,7 +109,7 @@ class Group(models.Model):
     invite_link = models.CharField("invite link", max_length=128, blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="groups_owned", blank=True, null=True)
     members = models.ManyToManyField(User, through="GroupMembership", related_name="member_of")
-    bot = models.ForeignKey("TelegramBot", on_delete=models.SET_NULL, related_name="groups", blank=True, null=True)
+    bot = models.ForeignKey("TelegramBot", on_delete=models.SET_NULL, related_name="groups", blank=False, null=True)
     welcome_model = models.TextField("Welcome model", default=(
         "<b>{greetings}</b> nel gruppo {title}"
         "\n\nIscriviti al canale @studenti_unimi"
@@ -129,6 +130,12 @@ class Group(models.Model):
             greetings=greetings,
             title=self.title,
         )
+
+    def update_invite_link(self):
+        """Update the saved chat invite link"""
+        bot = telegram.Bot(self.bot.token)
+        self.invite_link = bot.create_chat_invite_link(chat_id=self.id).invite_link
+        self.save()
 
 
 class GroupMembership(models.Model):
@@ -263,12 +270,15 @@ class TelegramBot(models.Model):
 
     token = models.CharField("token", max_length=64, primary_key=True)
     notes = models.TextField("notes", blank=True, null=True)
+    username = models.CharField("username", max_length=32, blank=True)
 
-    @property
-    def username(self) -> str:
-        """Return the bot username"""
+    def save(self, *args, **kwargs):
         bot = telegram.Bot(self.token)
-        return f"@{bot.username}"
+        try:
+            self.username = f"@{bot.username}"
+        except (telegram.error.Unauthorized, telegram.error.InvalidToken):
+            self.username = "[Invalid bot token]"
+        super().save(*args, **kwargs)
 
     @property
     def censured_token(self) -> str:
