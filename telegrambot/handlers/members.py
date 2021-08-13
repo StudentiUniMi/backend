@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember
@@ -8,6 +9,7 @@ from telegrambot.handlers import utils
 from telegrambot.models import (
     User as DBUser,
     Group as DBGroup,
+    GroupMembership,
 )
 
 
@@ -58,7 +60,14 @@ def handle_chat_member_updates(update: Update, _: CallbackContext) -> None:
     chat: Chat = update.chat_member.chat
     new: ChatMember = update.chat_member.new_chat_member
 
-    # TODO: update GroupMembership model
+    GroupMembership.objects.update_or_create(
+        user_id=new.user.id,
+        group_id=chat.id,
+        defaults={
+            "status": new.status,
+            "last_seen": datetime.now(),
+        }
+    )
 
     if new.status == ChatMember.LEFT:
         logging.log(logging.USER_LEFT, chat=chat, target=user)

@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 
 import telegram
+from telegram import ChatMember
 from django.apps import apps
 from django.db import models
 from telegram import ChatInviteLink
@@ -141,17 +142,29 @@ class Group(models.Model):
 class GroupMembership(models.Model):
     """A relation between an user and a group.
     Should be created when an user enters (or is recognized) in a group.
-
-    TODO: Add status field (member, left, banned, kicked, ...)
     """
     class Meta:
         verbose_name = "Telegram group membership"
         verbose_name_plural = "Telegram groups memberships"
 
+    class MembershipStatus(models.TextChoices):
+        CREATOR = ChatMember.CREATOR
+        ADMINISTRATOR = ChatMember.ADMINISTRATOR
+        MEMBER = ChatMember.MEMBER
+        RESTRICTED = ChatMember.RESTRICTED
+        LEFT = ChatMember.LEFT
+        KICKED = ChatMember.KICKED  # it means 'banned'
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     last_seen = models.DateTimeField("last seen", default=datetime.now)
     messages_count = models.PositiveIntegerField("messages count", default=0)
+    status = models.CharField(
+        "status",
+        max_length=16,
+        choices=MembershipStatus.choices,
+        default=MembershipStatus.MEMBER,
+    )
 
     def __str__(self) -> str:
         return f"{self.user} in {self.group}"
