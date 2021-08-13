@@ -1,7 +1,7 @@
 import telegram
 import telegram.ext
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, CommandHandler
+from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler
 from telegram.ext.dispatcher import Dispatcher
 
 from telegrambot.handlers import messages, members, moderation
@@ -22,6 +22,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
     dispatcher.add_handler(MessageHandler(
         filters=NewChatMemberFilter(),
         callback=members.handle_new_chat_members,
+    ), group=1)
+    dispatcher.add_handler(ChatMemberHandler(
+        callback=members.handle_chat_member_updates,
+        chat_member_types=ChatMemberHandler.ANY_CHAT_MEMBER,
     ), group=1)
 
     # Admin commands

@@ -1,6 +1,7 @@
 from telegram import Update, User, Message, Chat
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 
+from telegrambot import logging
 from telegrambot.handlers import utils
 from telegrambot.models import (
     Group as DBGroup,
@@ -27,7 +28,8 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         dbgroup.save(force_update=True, update_fields=["title", ])
     except DBGroup.DoesNotExist:
         # The group is not in the database; ignore all updates from it
-        # TODO: Log this thing somewhere
+        logging.log(logging.CHAT_DOES_NOT_EXIST, chat)
+        context.bot.leave_chat(chat_id=chat.id)
         raise DispatcherHandlerStop
 
     utils.save_user(sender, chat)
