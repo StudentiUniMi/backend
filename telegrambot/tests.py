@@ -1,4 +1,5 @@
 import os
+from unittest import skipIf
 
 from django.test import TestCase
 from rest_framework.renderers import JSONRenderer as Renderer
@@ -15,11 +16,7 @@ from telegrambot.serializers import (
 from university.models import Department, Degree, Course, CourseDegree
 
 TEST_BOT_TOKEN = os.environ.get("TEST_BOT_TOKEN", None)
-if not TEST_BOT_TOKEN:
-    raise AssertionError("Please set the TELEGRAM_TEST_BOT_TOKEN environment variable")
 TEST_BOT_USERNAME = os.environ.get("TEST_BOT_USERNAME", None)
-if not TEST_BOT_USERNAME:
-    raise AssertionError("Please set the TELEGRAM_TEST_BOT_USERNAME environment variable")
 
 
 class TelegramUserTestCase(TestCase):
@@ -268,6 +265,7 @@ class UserPrivilegeTestCase(TestCase):
         self.assertEqual(self.usr3.get_privileges(self.group3), False)
 
 
+@skipIf(not (TEST_BOT_USERNAME and TEST_BOT_TOKEN), "The TEST_BOT_* environment variables are not set")
 class TelegramBotTestCase(TestCase):
     def setUp(self):
         self.maxDiff = None
