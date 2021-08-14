@@ -100,7 +100,7 @@ def handle_global_ban_command(update: Update, context: CallbackContext) -> None:
 
     text = "🔴️ <b>I seguenti utenti sono stati bannati da tutti i gruppi</b>:"
     for dbuser in targets:
-        groups = Group.objects.filter(users__id=dbuser.id)
+        groups = Group.objects.filter(members__id=dbuser.id)
         for group in groups:
             context.bot.ban_chat_member(chat_id=group.id, user_id=dbuser.id)
             text += f"\n- {dbuser.generate_mention()}"
