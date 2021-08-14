@@ -42,6 +42,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         callback=moderation.handle_ban_command,
     ), group=2)
     dispatcher.add_handler(CommandHandler(
+        command="global_ban",
+        callback=moderation.handle_global_ban_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
         command="mute",
         callback=moderation.handle_mute_command,
     ), group=2)

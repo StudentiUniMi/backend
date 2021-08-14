@@ -90,7 +90,7 @@ Once again, here's an incomplete list of features:
     - [ ] CAPTCHA and rules acceptance for new users
   - [ ] Moderation
     - [x] Auto-ban globally banned users 
-    - [ ] Global ban (temporary and permanent)
+    - [x] Global ban (temporary and permanent)
     - [x] Group ban (temporary and permanent)
     - [x] Group mute (temporary and permanent)
     - [x] Group kick
