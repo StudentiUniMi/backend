@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprivilege',
             name='can_superban_members',
-            field=models.BooleanField(default=False, help_text='True, if the administrator can ban a member from all groups of the network. This should be setonly for the members of the C.A.N.'),
+            field=models.BooleanField(default=False, help_text='True, if the administrator can ban a member from all groups of the network. This should be set only for the members of the C.A.N.'),
             preserve_default=False,
         ),
     ]

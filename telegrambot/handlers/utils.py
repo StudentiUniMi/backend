@@ -145,6 +145,8 @@ def can_superban(user) -> bool:
     """Return True if the user can superban other members"""
     Privileges = apps.get_model("telegrambot.UserPrivilege")
     privs = Privileges.objects.get(user_id=user.id)
+    if privs is None:
+        return False
     return privs.can_superban_members
 
 
