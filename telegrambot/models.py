@@ -253,6 +253,10 @@ class UserPrivilege(models.Model):
                   "demote administrators that he has promoted, directly or indirectly "
                   "(promoted by administrators that were appointed by the user)",
     )
+    can_superban_members = models.BooleanField(
+        help_text="True, if the administrator can ban a member from all groups of the network. This should be set"
+                  "only for the members of the C.A.N.",
+    )
 
     def __str__(self):
         return f"{self.PrivilegeTypes(self.type).name.title()} {str(self.user)}, " \

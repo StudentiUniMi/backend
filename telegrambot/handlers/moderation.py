@@ -91,7 +91,7 @@ def handle_global_ban_command(update: Update, context: CallbackContext) -> None:
     sender: User = message.from_user
     chat: Chat = message.chat
 
-    if not utils.can_moderate(sender, chat):
+    if not utils.can_superban(sender):
         return
 
     targets = utils.get_targets_of_command(message)
