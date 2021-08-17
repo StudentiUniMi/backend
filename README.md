@@ -96,7 +96,7 @@ Once again, here's an incomplete list of features:
     - [x] Group kick
     - [x] Global warn
     - [x] Moderation logging
-    - [ ] Info command for administrators
+    - [x] Info command for administrators
   - [x] Special users
     - [x] Recognize special users permissions scope
     - [x] Automatically set special user permissions and custom titles
