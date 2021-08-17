@@ -8,7 +8,8 @@ from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
-import telegrambot.models as models
+import telegrambot.models as t_models
+import university.models as u_models
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
@@ -179,7 +180,7 @@ def handle_info_command(update: Update, context: CallbackContext) -> None:
 
     for dbuser in targets:
         text = ""
-        user = models.User.objects.get(id=dbuser.id)
+        user = t_models.User.objects.get(id=dbuser.id)
         text += "[" + str(user.id) + "](tg://user?id=" + str(user.id) + ")\n"
         text += ("Nome: " + user.first_name + "\n") if user.first_name is not None else ""
         text += ("Cognome: " + user.last_name + "\n") if user.last_name is not None else ""
@@ -190,8 +191,7 @@ def handle_info_command(update: Update, context: CallbackContext) -> None:
         text += "Livello dei permessi: " + str(user.permissions_level) + "\n"
         text += "🕗 Ultimo messaggio: " + str(user.last_seen.strftime("%d-%m-%Y %H:%M")) + "\n"
 
-        # TODO remove annotations
-        privs: list[models.UserPrivilege] = models.UserPrivilege.objects.filter(user=user.id)
+        privs = t_models.UserPrivilege.objects.filter(user=user.id)
         if privs is not None:
             text += "\n"
             for priv in privs:
@@ -206,20 +206,20 @@ def handle_info_command(update: Update, context: CallbackContext) -> None:
 
                 if priv.scope == priv.PrivilegeScopes.GROUPS:
                     text += " nei seguenti gruppi:\n"
-                    for group in models.Group.objects.filter(privileged_users__user__id=user.id):
+                    for group in t_models.Group.objects.filter(privileged_users__user__id=user.id):
                         text += "    \[`" + str(group.id) + "`] " + group.title + "\n"
                 elif priv.scope == priv.PrivilegeScopes.DEGREES:
                     text += " nei gruppi dei seguenti C.d.L.:\n"
-                    for degree in priv.authorized_degrees:
+                    for degree in u_models.Degree.objects.filter(privileged_users__user_id=user.id):
                         text += "    " + degree.name + "\n"
                 elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
                     text += " nei gruppi dei seguenti dipartimenti:\n"
-                    for department in priv.authorized_departments:
+                    for department in u_models.Department.objects.filter(privileged_users__user_id=user.id):
                         text += "    " + department.name + "\n"
                 else:
                     text += "\n"
 
-        present_in_groups = models.GroupMembership.objects.filter(user__id=user.id)
+        present_in_groups = t_models.GroupMembership.objects.filter(user__id=user.id)
         if present_in_groups is not None:
             text += "\nE' presente nei seguenti gruppi:\n"
             for group_mem in present_in_groups:
