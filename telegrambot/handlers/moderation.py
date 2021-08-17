@@ -8,6 +8,7 @@ from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
+import telegrambot.models as models
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
@@ -156,3 +157,76 @@ def handle_free_command(update: Update, context: CallbackContext) -> None:
 
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
     tasks.delete_message(chat.id, msg.message_id)
+
+
+def handle_info_command(update: Update, context: CallbackContext) -> None:
+    """Handles the info command issued by an administrator.
+
+    The command is supposed to show information about the specified user(s).
+    """
+    # TODO
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    if not utils.can_moderate(sender, chat):
+        return
+
+    targets = utils.get_targets_of_command(message)
+    if not targets:
+        sender.send_message("Target(s) were not specified for comand `/info`!", parse_mode="markdown")
+        return
+
+    for dbuser in targets:
+        text = ""
+        user = models.User.objects.get(id=dbuser.id)
+        text += "[" + str(user.id) + "](tg://user?id=" + str(user.id) + ")\n"
+        text += ("Nome: " + user.first_name + "\n") if user.first_name is not None else ""
+        text += ("Cognome: " + user.last_name + "\n") if user.last_name is not None else ""
+        text += ("Username: " + user.username + "\n") if user.username is not None else ""
+        text += "🔺 Reputazione: " + str(user.reputation) + "\n"
+        text += "🟡 Ammonizioni: " + str(user.warn_count) + "\n"
+        text += "🚫 E' bannato dal network? " + ("Si" if user.banned else "No") + "\n"
+        text += "Livello dei permessi: " + str(user.permissions_level) + "\n"
+        text += "🕗 Ultimo messaggio: " + str(user.last_seen.strftime("%d-%m-%Y %H:%M")) + "\n"
+
+        # TODO remove annotations
+        privs: list[models.UserPrivilege] = models.UserPrivilege.objects.filter(user=user.id)
+        if privs is not None:
+            text += "\n"
+            for priv in privs:
+                p_type = None
+                for x in priv.PrivilegeTypes.choices:
+                    if x[0] == priv.type:
+                        p_type = x[1]
+                if p_type is None:
+                    continue
+
+                text += "E' " + p_type
+
+                if priv.scope == priv.PrivilegeScopes.GROUPS:
+                    text += " nei seguenti gruppi:\n"
+                    for group in models.Group.objects.filter(privileged_users__user__id=user.id):
+                        text += "    \[`" + str(group.id) + "`] " + group.title + "\n"
+                elif priv.scope == priv.PrivilegeScopes.DEGREES:
+                    text += " nei gruppi dei seguenti C.d.L.:\n"
+                    for degree in priv.authorized_degrees:
+                        text += "    " + degree.name + "\n"
+                elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
+                    text += " nei gruppi dei seguenti dipartimenti:\n"
+                    for department in priv.authorized_departments:
+                        text += "    " + department.name + "\n"
+                else:
+                    text += "\n"
+
+        present_in_groups = models.GroupMembership.objects.filter(user__id=user.id)
+        if present_in_groups is not None:
+            text += "\nE' presente nei seguenti gruppi:\n"
+            for group_mem in present_in_groups:
+                if group_mem.group.invite_link is None or "":
+                    text += "    \["+ str(group_mem.group.id) + "] " + group_mem.group.title + "\n"
+                else:
+                    text += "    \[[" + str(group_mem.group.id) +"](" + group_mem.group.invite_link + ")] "\
+                            + group_mem.group.title + "\n"
+
+    sender.send_message(text, parse_mode="markdown")
