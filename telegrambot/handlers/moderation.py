@@ -229,4 +229,4 @@ def handle_info_command(update: Update, context: CallbackContext) -> None:
                     text += "    \[[" + str(group_mem.group.id) +"](" + group_mem.group.invite_link + ")] "\
                             + group_mem.group.title + "\n"
 
-    sender.send_message(text, parse_mode="markdown")
+    sender.send_message(text, parse_mode="markdown", disable_web_page_preview=True)
