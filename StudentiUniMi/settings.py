@@ -10,7 +10,7 @@ import sys
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-if "SECRET_KEY" not in os.environ:
+if not os.environ.get("SECRET_KEY", False):
     print("+++[SECURITY ALERT]+++\tYou didn't set the SECRET_KEY env variable. Don't run this thing in production!")
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "abc")
