@@ -34,6 +34,7 @@ class User(models.Model):
     banned = models.BooleanField("banned?", default=False)
     permissions_level = models.IntegerField("permission level", default=0)
     last_seen = models.DateTimeField(default=datetime.now)
+    verified = models.BooleanField("verified?", default=False)
 
     def __str__(self) -> str:
         return f"{self.first_name}{f' {self.last_name}' if self.last_name else ''} [{self.id}]"

@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import List
 
-from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember
+from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember,\
+    ChatPermissions
 from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
@@ -50,6 +51,12 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
                     url="https://t.me/unimichat",
                 ),
             ],
+            [
+                InlineKeyboardButton(
+                    text="✅",
+                    callback_data="verify"
+                )
+            ],
         ]),
     )
     tasks.delete_message(chat.id, msg.message_id)
@@ -71,3 +78,19 @@ def handle_chat_member_updates(update: Update, _: CallbackContext) -> None:
 
     if new.status == ChatMember.LEFT:
         logging.log(logging.USER_LEFT, chat=chat, target=user)
+
+
+def handle_verification(update: Update, context: CallbackContext) -> None:
+    user = update.callback_query.from_user
+    chat = update.callback_query.message.chat
+
+    try:
+        dbuser: DBUser = DBUser.objects.get(id=user.id)
+        if not dbuser.verified:
+            dbuser.verified = True
+            dbuser.save()
+            context.bot.restrict_chat_member(chat.id, user.id, ChatPermissions(can_send_messages=True))
+    except DBUser.DoesNotExist:
+        # If we don't find a user it means the user is already in the group, there's no need to register him here,
+        # it will happen when he'll send the first message
+        pass

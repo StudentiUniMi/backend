@@ -1,11 +1,13 @@
-from telegram import Update, User, Message, Chat
+from telegram import Update, User, Message, Chat, ChatPermissions
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 
 from telegrambot import logging
 from telegrambot.handlers import utils
 from telegrambot.models import (
     Group as DBGroup,
+    User as DBUser,
 )
+from telegrambot.handlers import members
 
 
 def handle_group_messages(update: Update, context: CallbackContext) -> None:
@@ -31,5 +33,14 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         logging.log(logging.CHAT_DOES_NOT_EXIST, chat)
         context.bot.leave_chat(chat_id=chat.id)
         raise DispatcherHandlerStop
+
+    try:
+        dbuser: DBUser = DBUser.objects.get(id=sender.id)
+        if not dbuser.verified:
+            context.bot.restrict_chat_member(chat.id, sender.id, ChatPermissions(can_send_messages=False))
+            members.handle_new_chat_members(update, context)
+    except DBUser.DoesNotExist:
+        context.bot.restrict_chat_member(chat.id, sender.id, ChatPermissions(can_send_messages=False))
+        members.handle_new_chat_members(update, context)
 
     utils.save_user(sender, chat)
