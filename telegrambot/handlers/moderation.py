@@ -180,7 +180,10 @@ def handle_info_command(update: Update, context: CallbackContext) -> None:
 
     for dbuser in targets:
         text = ""
-        user = t_models.User.objects.get(id=dbuser.id)
+        try:
+            user = t_models.User.objects.get(id=dbuser.id)
+        except t_models.User.DoesNotExist:
+            continue
         text += "[" + str(user.id) + "](tg://user?id=" + str(user.id) + ")\n"
         text += ("Nome: " + user.first_name + "\n") if user.first_name is not None else ""
         text += ("Cognome: " + user.last_name + "\n") if user.last_name is not None else ""
