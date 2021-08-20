@@ -82,14 +82,18 @@ def handle_chat_member_updates(update: Update, _: CallbackContext) -> None:
 
 def handle_verification(update: Update, context: CallbackContext) -> None:
     user = update.callback_query.from_user
-    chat = update.callback_query.message.chat
 
     try:
         dbuser: DBUser = DBUser.objects.get(id=user.id)
+        groups: list[GroupMembership] = GroupMembership.objects.filter(user_id=user.id)
         if not dbuser.verified:
             dbuser.verified = True
             dbuser.save()
-            context.bot.restrict_chat_member(chat.id, user.id, ChatPermissions(can_send_messages=True))
+            for group in groups:
+                context.bot.restrict_chat_member(group.group.id, user.id, ChatPermissions(can_send_messages=True))
+        else:
+            for group in groups:
+                context.bot.restrict_chat_member(group.group.id, user.id, ChatPermissions(can_send_messages=True))
     except DBUser.DoesNotExist:
         # If we don't find a user it means the user is already in the group, there's no need to register him here,
         # it will happen when he'll send the first message

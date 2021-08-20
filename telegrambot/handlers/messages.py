@@ -34,13 +34,28 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         context.bot.leave_chat(chat_id=chat.id)
         raise DispatcherHandlerStop
 
-    try:
-        dbuser: DBUser = DBUser.objects.get(id=sender.id)
-        if not dbuser.verified:
-            context.bot.restrict_chat_member(chat.id, sender.id, ChatPermissions(can_send_messages=False))
-            members.handle_new_chat_members(update, context)
-    except DBUser.DoesNotExist:
-        context.bot.restrict_chat_member(chat.id, sender.id, ChatPermissions(can_send_messages=False))
-        members.handle_new_chat_members(update, context)
+    # This could probably be done better
+    if len(update.message.new_chat_members) == 0 and update.message.left_chat_member is None:
+        try:
+            dbuser: DBUser = DBUser.objects.get(id=sender.id)
+            found = False
+            if not dbuser.verified:
+                for member in context.bot.get_chat_administrators(chat.id):
+                    if member.user.id == sender.id:
+                        dbuser.verified = True
+                        dbuser.save()
+                        found = True
+                        break
+                if not found:
+                    context.bot.restrict_chat_member(chat.id, sender.id, ChatPermissions(can_send_messages=False))
+                    members.handle_new_chat_members(update, context)
+        except DBUser.DoesNotExist:
+            found = False
+            for member in context.bot.get_chat_administrators(chat.id):
+                if member.user.id == sender.id:
+                    found = True
+            if not found:
+                context.bot.restrict_chat_member(chat.id, sender.id, ChatPermissions(can_send_messages=False))
+                members.handle_new_chat_members(update, context)
 
     utils.save_user(sender, chat)
