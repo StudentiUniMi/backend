@@ -1,0 +1,9 @@
+<html>
+<body>
+<form action="{% url 'parse-json' %}" method="post">
+    {% csrf_token %}
+    <textarea name="json_data" cols="80" rows="10"></textarea>
+    <input type="submit">
+</form>
+</body>
+</html>

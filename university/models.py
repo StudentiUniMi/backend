@@ -18,7 +18,7 @@ class Department(models.Model):
 
     Example: Computer Science Department "Giovanni degli Antoni"
     """
-    name = models.CharField("name", max_length=64)
+    name = models.CharField("name", max_length=128, unique=True)
 
     def __str__(self) -> str:
         return self.name
@@ -51,7 +51,7 @@ class Degree(models.Model):
         verbose_name = "Degree"
         verbose_name_plural = "Degrees"
 
-    name = models.CharField("name", max_length=128)
+    name = models.CharField("name", max_length=128, unique=True)
     type = models.CharField("degree type", max_length=1, choices=DEGREE_TYPES)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="degrees")
     slug = models.CharField("slug", max_length=64, default="default_slug")  # the default is needed for migrations

@@ -9,11 +9,13 @@ from django.views.generic import RedirectView
 
 import telegrambot.urls
 import university.urls
+import university.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(university.urls)),
     path('telegrambot/', include(telegrambot.urls)),
+    path('parse-json-data', university.views.parse_json, name="parse-json"),
 ]
 
 if not settings.DEBUG:
