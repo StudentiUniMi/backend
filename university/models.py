@@ -50,8 +50,9 @@ class Degree(models.Model):
     class Meta:
         verbose_name = "Degree"
         verbose_name_plural = "Degrees"
+        unique_together = ("name", "type")
 
-    name = models.CharField("name", max_length=128, unique=True)
+    name = models.CharField("name", max_length=128)
     type = models.CharField("degree type", max_length=1, choices=DEGREE_TYPES)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="degrees")
     slug = models.CharField("slug", max_length=64, default="default_slug")  # the default is needed for migrations
