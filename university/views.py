@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpRequest
 from django.core.exceptions import PermissionDenied
 from django.db.utils import IntegrityError
+from django.db import transaction
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -49,7 +50,8 @@ def parse_json(request: HttpRequest):
             dep = Department()
             dep.name = course["dipartimento"]
             try:
-                dep.save()  # If already present it raises IntegrityError
+                with transaction.atomic():
+                    dep.save()  # If already present it raises IntegrityError
             except IntegrityError:
                 dep = Department.objects.get(name=course["dipartimento"])
 
