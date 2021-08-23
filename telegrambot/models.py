@@ -256,6 +256,7 @@ class UserPrivilege(models.Model):
     can_superban_members = models.BooleanField(
         help_text="True, if the administrator can ban a member from all groups of the network. This should be set"
                   " only for the members of the C.A.N.",
+        default=False
     )
 
     def __str__(self):
