@@ -8,7 +8,7 @@ from django.db import transaction
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from university.models import Degree, Department, DEGREE_TYPES
+from university.models import Degree, Department, Course, DEGREE_TYPES
 from university.serializers import (
     DegreeSerializer,
     VerboseDegreeSerializer,
@@ -30,7 +30,7 @@ def _get_verbose_object(model, serializer, pk):
     return Response(serializer.data)
 
 
-def parse_json(request: HttpRequest):
+def parse_degrees(request: HttpRequest):
     """The data passed to this endpoint is the output of the script that can be found
     at https://github.com/StudentiUniMi/cdl-scraper
     """
@@ -80,7 +80,29 @@ def parse_json(request: HttpRequest):
             text = ""
         return HttpResponse("Data has been added succesfully!" + text)  # Should probably give back a proper HTML page
     else:
-        return render(request, 'models/degree_json_parser.html')
+        return render(request, 'models/degrees_json_parser.html')
+
+
+def parse_courses(request: HttpRequest):
+    if not request.user.is_authenticated:
+        raise PermissionDenied
+    if request.method == "POST":
+        try:
+            data = json.loads(request.POST["json_data"])
+        except json.JSONDecodeError:
+            return HttpResponse("The data that was provided is not a well-formed JSON object!")
+
+        for c in data.keys():
+            course = Course()
+            course.name = c
+            course.cfu = 0 if data[c]["cfu"] == "" else int(data[c]["cfu"])
+            try:
+                course.save()
+            except IntegrityError:
+                pass
+        return HttpResponse("Data has been added succesfully!")
+    else:
+        return render(request, 'models/courses_json_parser.html')
 
 
 class DegreeViewSet(viewsets.ViewSet):

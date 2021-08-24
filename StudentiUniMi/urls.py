@@ -15,7 +15,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(university.urls)),
     path('telegrambot/', include(telegrambot.urls)),
-    path('parse-json-data', university.views.parse_json, name="parse-json"),
+    path('parse-json-data/', include(university.urls)),
 ]
 
 if not settings.DEBUG:
