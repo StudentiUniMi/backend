@@ -105,6 +105,7 @@ def handle_global_ban_command(update: Update, context: CallbackContext) -> None:
             context.bot.ban_chat_member(chat_id=group.id, user_id=dbuser.id)
         text += f"\n- {dbuser.generate_mention()}"
         dbuser.banned = True
+        dbuser.save()
         logging.log(logging.MODERATION_SUPERBAN, chat=chat, target=dbuser, issuer=sender)
 
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
