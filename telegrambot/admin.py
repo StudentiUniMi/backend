@@ -60,7 +60,7 @@ class UserPrivilegeAdmin(admin.ModelAdmin):
             "classes": ("collapse", ),
             "fields": ("custom_title", "can_change_info", "can_invite_users", "can_pin_messages", "can_manage_chat",
                        "can_delete_messages", "can_manage_voice_chats", "can_restrict_members",
-                       "can_promote_members", ),
+                       "can_promote_members", "can_superban_members", ),
         })
     )
 

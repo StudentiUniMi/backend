@@ -143,6 +143,16 @@ def can_moderate(user, chat) -> bool:
     return True
 
 
+def can_superban(user) -> bool:
+    """Return True if the user can superban other members"""
+    Privileges = apps.get_model("telegrambot.UserPrivilege")
+    try:
+        privs = Privileges.objects.get(user_id=user.id)
+    except Privileges.DoesNotExist:
+        return False
+    return privs.can_superban_members
+
+
 def get_targets_of_command(message):
     """Get the target users of a command."""
     DBUser = apps.get_model("telegrambot.User")
