@@ -156,3 +156,31 @@ def handle_free_command(update: Update, context: CallbackContext) -> None:
 
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
     tasks.delete_message(chat.id, msg.message_id)
+
+
+def handle_info_command(update: Update, _: CallbackContext) -> None:
+    """Handles the info command issued by an administrator.
+
+    The command is supposed to show information about the specified user(s).
+    """
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    if not utils.can_moderate(sender, chat):
+        return
+
+    targets = utils.get_targets_of_command(message)
+    if not targets:
+        sender.send_message("Target(s) were not specified for command `/info`!", parse_mode="markdown")
+        return
+
+    for dbuser in targets:
+        text = utils.format_user_info(dbuser)
+        if not text:
+            continue
+
+        # User must start the bot in private before he can receive messages from it
+        sender.send_message(text, parse_mode="markdown", disable_web_page_preview=True)
+
+    message.delete()
