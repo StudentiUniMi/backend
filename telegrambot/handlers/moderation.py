@@ -8,8 +8,6 @@ from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
-import telegrambot.models as t_models
-import university.models as u_models
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
@@ -160,12 +158,11 @@ def handle_free_command(update: Update, context: CallbackContext) -> None:
     tasks.delete_message(chat.id, msg.message_id)
 
 
-def handle_info_command(update: Update, context: CallbackContext) -> None:
+def handle_info_command(update: Update, _: CallbackContext) -> None:
     """Handles the info command issued by an administrator.
 
     The command is supposed to show information about the specified user(s).
     """
-    # TODO
     message: Message = update.message
     sender: User = message.from_user
     chat: Chat = message.chat
@@ -175,61 +172,15 @@ def handle_info_command(update: Update, context: CallbackContext) -> None:
 
     targets = utils.get_targets_of_command(message)
     if not targets:
-        sender.send_message("Target(s) were not specified for comand `/info`!", parse_mode="markdown")
+        sender.send_message("Target(s) were not specified for command `/info`!", parse_mode="markdown")
         return
 
     for dbuser in targets:
-        text = ""
-        try:
-            user = t_models.User.objects.get(id=dbuser.id)
-        except t_models.User.DoesNotExist:
+        text = utils.format_user_info(dbuser)
+        if not text:
             continue
-        text += "[" + str(user.id) + "](tg://user?id=" + str(user.id) + ")\n"
-        text += ("Nome: " + user.first_name + "\n") if user.first_name is not None else ""
-        text += ("Cognome: " + user.last_name + "\n") if user.last_name is not None else ""
-        text += ("Username: " + user.username + "\n") if user.username is not None else ""
-        text += "🔺 Reputazione: " + str(user.reputation) + "\n"
-        text += "🟡 Ammonizioni: " + str(user.warn_count) + "\n"
-        text += "🚫 E' bannato dal network? " + ("Si" if user.banned else "No") + "\n"
-        text += "Livello dei permessi: " + str(user.permissions_level) + "\n"
-        text += "🕗 Ultimo messaggio: " + str(user.last_seen.strftime("%d-%m-%Y %H:%M")) + "\n"
 
-        privs = t_models.UserPrivilege.objects.filter(user=user.id)
-        if privs is not None:
-            text += "\n"
-            for priv in privs:
-                p_type = None
-                for x in priv.PrivilegeTypes.choices:
-                    if x[0] == priv.type:
-                        p_type = x[1]
-                if p_type is None:
-                    continue
+        # User must start the bot in private before he can receive messages from it
+        sender.send_message(text, parse_mode="markdown", disable_web_page_preview=True)
 
-                text += "E' " + p_type
-
-                if priv.scope == priv.PrivilegeScopes.GROUPS:
-                    text += " nei seguenti gruppi:\n"
-                    for group in t_models.Group.objects.filter(privileged_users__user__id=user.id):
-                        text += "    \[`" + str(group.id) + "`] " + group.title + "\n"
-                elif priv.scope == priv.PrivilegeScopes.DEGREES:
-                    text += " nei gruppi dei seguenti C.d.L.:\n"
-                    for degree in u_models.Degree.objects.filter(privileged_users__user_id=user.id):
-                        text += "    " + degree.name + "\n"
-                elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
-                    text += " nei gruppi dei seguenti dipartimenti:\n"
-                    for department in u_models.Department.objects.filter(privileged_users__user_id=user.id):
-                        text += "    " + department.name + "\n"
-                else:
-                    text += "\n"
-
-        present_in_groups = t_models.GroupMembership.objects.filter(user__id=user.id)
-        if present_in_groups is not None:
-            text += "\nE' presente nei seguenti gruppi:\n"
-            for group_mem in present_in_groups:
-                if group_mem.group.invite_link is None or "":
-                    text += "    \["+ str(group_mem.group.id) + "] " + group_mem.group.title + "\n"
-                else:
-                    text += "    \[[" + str(group_mem.group.id) +"](" + group_mem.group.invite_link + ")] "\
-                            + group_mem.group.title + "\n"
-
-    sender.send_message(text, parse_mode="markdown", disable_web_page_preview=True)
+    message.delete()
