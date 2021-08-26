@@ -436,7 +436,7 @@ class DataEntryTestCase(TestCase):
         self.factory = RequestFactory()
 
     def _request(self, path: str, json_data: str, render_view, excepted_response: bytes):
-        request = self.factory.post(path, data={"json_data": json_data})
+        request = self.factory.post(path, data=json_data, content_type="application/json")
         for user in self.users:
             request.user = user[0]
             try:
@@ -476,3 +476,5 @@ class DataEntryTestCase(TestCase):
             render_view=university_views.import_courses,
             excepted_response=b"The data that was provided is not a well-formed JSON object!",
         )
+
+    # TODO: test the actual import of the data

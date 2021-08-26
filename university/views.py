@@ -41,7 +41,7 @@ def import_degrees(request: HttpRequest):
         return render(request, 'models/degrees_json_parser.html')
 
     try:
-        data = json.loads(request.POST["json_data"])
+        data = json.loads(request.body)
     except json.JSONDecodeError:
         return HttpResponse("The data that was provided is not a well-formed JSON object!")
 
@@ -89,7 +89,7 @@ def import_courses(request: HttpRequest):
         return render(request, 'models/courses_json_parser.html')
 
     try:
-        data = json.loads(request.POST["json_data"])
+        data = json.loads(request.body)
     except json.JSONDecodeError:
         return HttpResponse("The data that was provided is not a well-formed JSON object!")
 
