@@ -1,11 +1,14 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser, Permission
+from django.core.exceptions import PermissionDenied
+from django.test import TestCase, Client, RequestFactory
 from rest_framework.renderers import JSONRenderer as Renderer
 
 from telegrambot.models import (
     Group as TgGroup,
     User as TgUser,
 )
+from university import test_data
+from university import views as university_views
 from university.models import (
     Course,
     CourseDegree,
@@ -21,7 +24,6 @@ from university.serializers import (
     DepartmentSerializer,
     VerboseDepartmentSerializer,
 )
-from .test_data import data as t_data
 
 
 # Test models
@@ -424,33 +426,53 @@ class DepartmentTestCase(TestCase):
 
 class DataEntryTestCase(TestCase):
     def setUp(self):
-        u = User()
-        u.username = "stud"
-        u.password = "pbkdf2_sha256$260000$UJgmwSuMA4dMp72jVMgmkO$EATbgbI1R+WyXCAw53GpRBxyTsHzOl5EGNymJyv2/c4="
-        u.save()
+        user3 = User.objects.create(username="marco", password="backend")
+        user3.user_permissions.add(Permission.objects.get(codename="add_course"))
+        self.users = [
+            (AnonymousUser(), False),  # anon user
+            (User.objects.create(username="giuseppe", password="network"), False),  # unauthorized user
+            (user3, True),  # authorized user
+        ]
+        self.factory = RequestFactory()
+
+    def _request(self, path: str, json_data: str, render_view, excepted_response: bytes):
+        request = self.factory.post(path, data={"json_data": json_data})
+        for user in self.users:
+            request.user = user[0]
+            try:
+                response = render_view(request)
+                self.assertEqual(response.content, excepted_response)
+            except PermissionDenied:
+                self.assertFalse(user[1])
 
     def test_correct_degrees_entry(self):
-        c = Client()
-        c.login(username="stud", password="stud")
-        resp = c.post("/parse-json-data/degrees", {"json_data": t_data.degree_data})
-        self.assertEqual(resp.content, b'Data has been added succesfully!')
+        self._request(
+            path="/api/import/degrees",
+            json_data=test_data.degree_data,
+            render_view=university_views.import_degrees,
+            excepted_response=b"Data has been added successfully!",
+        )
 
     def test_malformed_degrees_json(self):
-        data = "asd"
-        c = Client()
-        c.login(username="stud", password="stud")
-        resp = c.post("/parse-json-data/degrees", {"json_data": data})
-        self.assertEqual(resp.content, b'The data that was provided is not a well-formed JSON object!')
+        self._request(
+            path="/api/import/degrees",
+            json_data="asd",
+            render_view=university_views.import_degrees,
+            excepted_response=b"The data that was provided is not a well-formed JSON object!",
+        )
 
     def test_correct_courses_entry(self):
-        c = Client()
-        c.login(username="stud", password="stud")
-        resp = c.post("/parse-json-data/courses", {"json_data": t_data.course_data})
-        self.assertEqual(resp.content, b'Data has been added succesfully!')
+        self._request(
+            path="/api/import/courses",
+            json_data=test_data.course_data,
+            render_view=university_views.import_courses,
+            excepted_response=b"Data has been added successfully!",
+        )
 
-    def test_malformed_degrees_json(self):
-        data = "asd"
-        c = Client()
-        c.login(username="stud", password="stud")
-        resp = c.post("/parse-json-data/courses", {"json_data": data})
-        self.assertEqual(resp.content, b'The data that was provided is not a well-formed JSON object!')
+    def test_malformed_courses_json(self):
+        self._request(
+            path="/api/import/courses",
+            json_data="asd",
+            render_view=university_views.import_courses,
+            excepted_response=b"The data that was provided is not a well-formed JSON object!",
+        )

@@ -1,10 +1,9 @@
 import json
 
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpRequest
 from django.core.exceptions import PermissionDenied
 from django.db.utils import IntegrityError
-from django.db import transaction
+from django.http import HttpResponse, HttpRequest
+from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -30,79 +29,79 @@ def _get_verbose_object(model, serializer, pk):
     return Response(serializer.data)
 
 
-def parse_degrees(request: HttpRequest):
+def import_degrees(request: HttpRequest):
     """The data passed to this endpoint is the output of the script that can be found
     at https://github.com/StudentiUniMi/cdl-scraper
     """
-    if not request.user.is_authenticated:
+    user = request.user
+    if not user.is_authenticated or not user.has_perm("university.add_course"):
         raise PermissionDenied
-    if request.method == "POST":
-        try:
-            data = json.loads(request.POST["json_data"])
-        except json.JSONDecodeError:
-            return HttpResponse("The data that was provided is not a well-formed JSON object!")
 
-        unparsed = []
-
-        for course in data:
-            if course["dipartimento"] == "":
-                continue
-            dep = Department()
-            dep.name = course["dipartimento"]
-            try:
-                with transaction.atomic():
-                    dep.save()  # If already present it raises IntegrityError
-            except IntegrityError:
-                dep = Department.objects.get(name=course["dipartimento"])
-
-            deg = Degree()
-            deg.name = course["corso"]
-            if course["tipo"] == "Laurea triennale":
-                deg.type = DEGREE_TYPES[0][0]
-            elif course["tipo"] == "Laurea magistrale":
-                deg.type = DEGREE_TYPES[1][0]
-            elif course["tipo"] == "Laurea magistrale a ciclo unico":
-                deg.type = DEGREE_TYPES[2][0]
-            else:
-                unparsed.append(course)
-                continue
-            deg.department = dep
-            try:
-                deg.save()
-            except IntegrityError:
-                pass
-
-        if len(unparsed) > 0:
-            text = "<br><br>The following JSON objects couldn't be added, please do so manually:<br>"
-            for course in unparsed:
-                text += "&emsp;" + str(course) + "<br>"
-        else:
-            text = ""
-        return HttpResponse("Data has been added succesfully!" + text)  # Should probably give back a proper HTML page
-    else:
+    if request.method == "GET":
         return render(request, 'models/degrees_json_parser.html')
 
+    try:
+        data = json.loads(request.POST["json_data"])
+    except json.JSONDecodeError:
+        return HttpResponse("The data that was provided is not a well-formed JSON object!")
 
-def parse_courses(request: HttpRequest):
-    if not request.user.is_authenticated:
-        raise PermissionDenied
-    if request.method == "POST":
+    unparsed = []
+    for course in data:
+        if len(course["dipartimento"]) == 0:
+            continue
+
+        dep = Department.objects.get_or_create(defaults={"name": course["dipartimento"]})[0]
+        deg = Degree()
+        deg.name = course["corso"]
+        if course["tipo"] == "Laurea triennale":
+            deg.type = DEGREE_TYPES[0][0]
+        elif course["tipo"] == "Laurea magistrale":
+            deg.type = DEGREE_TYPES[1][0]
+        elif course["tipo"] == "Laurea magistrale a ciclo unico":
+            deg.type = DEGREE_TYPES[2][0]
+        else:
+            unparsed.append(course)
+            continue
+        deg.department = dep
         try:
-            data = json.loads(request.POST["json_data"])
-        except json.JSONDecodeError:
-            return HttpResponse("The data that was provided is not a well-formed JSON object!")
+            deg.save()
+        except IntegrityError:
+            pass
 
-        for c in data.keys():
-            course = Course()
-            course.name = c
-            course.cfu = 0 if data[c]["cfu"] == "" else int(data[c]["cfu"])
-            try:
-                course.save()
-            except IntegrityError:
-                pass
-        return HttpResponse("Data has been added succesfully!")
+    if len(unparsed) > 0:
+        text = "<br><br>The following JSON objects couldn't be added, please do so manually:<br>"
+        for course in unparsed:
+            text += "&emsp;" + str(course) + "<br>"
     else:
+        text = ""
+    return HttpResponse("Data has been added successfully!" + text)  # Should probably give back a proper HTML page
+
+
+def import_courses(request: HttpRequest):
+    """The data passed to this endpoint is the output of the script that can be found
+    at https://github.com/StudentiUniMi/cdl-scraper
+    """
+    user = request.user
+    if not user.is_authenticated or not user.has_perm("university.add_course"):
+        raise PermissionDenied
+
+    if request.method == "GET":
         return render(request, 'models/courses_json_parser.html')
+
+    try:
+        data = json.loads(request.POST["json_data"])
+    except json.JSONDecodeError:
+        return HttpResponse("The data that was provided is not a well-formed JSON object!")
+
+    for c in data.keys():
+        course = Course()
+        course.name = c
+        course.cfu = 0 if data[c]["cfu"] == "" else int(data[c]["cfu"])
+        try:
+            course.save()
+        except IntegrityError:
+            pass
+    return HttpResponse("Data has been added successfully!")
 
 
 class DegreeViewSet(viewsets.ViewSet):

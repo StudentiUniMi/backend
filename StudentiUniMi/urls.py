@@ -9,13 +9,11 @@ from django.views.generic import RedirectView
 
 import telegrambot.urls
 import university.urls
-import university.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(university.urls)),
     path('telegrambot/', include(telegrambot.urls)),
-    path('parse-json-data/', include(university.urls)),
 ]
 
 if not settings.DEBUG:
@@ -23,4 +21,3 @@ if not settings.DEBUG:
         path('', RedirectView.as_view(url="https://github.com/StudentiUniMi/backend"),
              name='github-redirect'),
     )
-

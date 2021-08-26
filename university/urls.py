@@ -11,6 +11,6 @@ router.register(r"departments", views.DepartmentViewSet, basename="Department")
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('degrees', university.views.parse_degrees, name="parse-degrees"),
-    path('courses', university.views.parse_courses, name="parse-courses")
+    path("import/degrees", university.views.import_degrees, name="import-degrees"),
+    path("import/courses", university.views.import_courses, name="import-courses")
 ]
