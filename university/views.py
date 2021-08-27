@@ -101,13 +101,17 @@ def import_courses(request: HttpRequest):
 
     ignored = 0
     added = 0
-    for c in data.keys():
-        course = Course()
-        course.name = c
-        course.cfu = 0 if data[c]["cfu"] == "" else int(data[c]["cfu"])
+    for c in data:
         try:
-            course.save()
-            added += 1
+            _, created = Course.objects.get_or_create(
+                name=c["title"],
+                cfu=0 if c["cfu"] == "" else int(c["cfu"]),
+                slug_unimi=c["title"]
+            )
+            if created:
+                added += 1
+            else:
+                ignored += 1
         except IntegrityError:
             ignored += 1
     text = "\n{} courses were already present and have been ignored.\n{} courses have been added to the database."\

@@ -70,12 +70,12 @@ class Course(models.Model):
     class Meta:
         verbose_name = "Course"
         verbose_name_plural = "Courses"
-        unique_together = ("name", "cfu")
 
     group = models.ForeignKey(TgGroup, on_delete=models.SET_NULL, related_name="courses", blank=True, null=True)
     degrees = models.ManyToManyField(Degree, through="CourseDegree", related_name="courses")
     name = models.CharField("name", max_length=128)
     cfu = models.PositiveSmallIntegerField("CFUs")
+    slug_unimi = models.CharField(max_length=200, unique=True, null=True)
     wiki_link = models.CharField("wiki link", max_length=128, blank=True, null=True)
 
     @property

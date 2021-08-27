@@ -41,7 +41,7 @@
 	<form action="/api/import/{{ type }}s" method="post">
 		<p>{% csrf_token %}</p>
 		<p>Insert the JSON:</p>
-		<textarea name="json_data" cols="80" rows="20">{}</textarea><br/>
+		<textarea name="json_data" cols="80" rows="20"></textarea><br/>
 		<button type="button" onclick="submitForm()">
 			Import
 		</button>
