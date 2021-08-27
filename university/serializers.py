@@ -51,14 +51,6 @@ class DegreeSerializer(serializers.ModelSerializer):
         fields = ("pk", "name", "type", "slug", )
 
 
-class VerboseDegreeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Degree
-        fields = ("pk", "name", "type", "courses", "slug", )
-
-    courses = CourseDegreeSerializer(source="coursedegree_set", many=True, read_only=True)
-
-
 class DepartmentSerializer(serializers.ModelSerializer):
     degree_count = serializers.SerializerMethodField()
     representative_count = serializers.SerializerMethodField()
@@ -74,6 +66,14 @@ class DepartmentSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_representative_count(obj):
         return obj.representatives.count()
+
+
+class VerboseDegreeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Degree
+        fields = ("pk", "name", "type", "department", "slug", )
+
+    department = DepartmentSerializer()
 
 
 class VerboseDepartmentSerializer(serializers.ModelSerializer):

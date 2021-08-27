@@ -37,6 +37,20 @@ def degrees_by_department(request):
 
 
 @api_view(["GET"])
+def degree_by_slug(request):
+    slug = request.query_params.get("slug", None)
+    if not slug:
+        return Response({"ok": False, "error": "Please provide an unique slug"}, status=400)
+
+    try:
+        degree = Degree.objects.get(slug=slug)
+    except Degree.DoesNotExist:
+        return Response({"ok": False, "error": "Not found"}, status=404)
+    serializer = VerboseDegreeSerializer(degree)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
 def courses_by_degree(request):
     degree_id = request.query_params.get("deg_id", None)
     if not degree_id:
