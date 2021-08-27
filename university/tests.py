@@ -156,8 +156,8 @@ class CourseTestCase(TestCase):
 
 class DegreeTestCase(TestCase):
     def setUp(self):
-        dep1 = Department.objects.create(name="Computer Science Department")
-        dep2 = Department.objects.create(name="Medicine Department")
+        dep1 = Department.objects.create(pk=1, name="Computer Science Department")
+        dep2 = Department.objects.create(pk=2, name="Medicine Department")
 
         self.deg1 = Degree.objects.create(
             pk=1,
@@ -248,42 +248,12 @@ class DegreeTestCase(TestCase):
             "name": "Computer Science",
             "type": 'B',
             "slug": "computer_science_b",
-            "courses": [
-                {
-                    "course": {
-                        "pk": 1,
-                        "name": "Programming I",
-                        "cfu": 12,
-                        "wiki_link": None,
-                        "links": [
-                            {
-                                "name": "Ariel (1° ed.)",
-                                "url": "https//ariel.example.com/courses/programming_1_firsted",
-                            },
-                        ],
-                        "group": None,
-                    },
-                    "year": 1,
-                    "semester": 1,
-                },
-                {
-                    "course": {
-                        "pk": 2,
-                        "name": "Linear Algebra I",
-                        "cfu": 6,
-                        "wiki_link": "https://example.com/wiki/linear_algebra_i.php",
-                        "links": [],
-                        "group": {
-                            "id": 69420,
-                            "title": "Linear Algebra I fan club",
-                            "profile_picture": None,
-                            "invite_link": "https://example.com/join/azerty",
-                        },
-                    },
-                    "year": 1,
-                    "semester": 2,
-                },
-            ],
+            "department": {
+                "pk": 1,
+                "name": "Computer Science Department",
+                "degree_count": 2,
+                "representative_count": 0,
+            }
         })
 
 
@@ -352,14 +322,20 @@ class DepartmentTestCase(TestCase):
             {
                 "pk": 1,
                 "name": "Computer Science Department",
+                "degree_count": 2,
+                "representative_count": 0,
             },
             {
                 "pk": 2,
                 "name": "Medicine Department",
+                "degree_count": 1,
+                "representative_count": 2,
             },
             {
                 "pk": 3,
                 "name": "Physics Department",
+                "degree_count": 0,
+                "representative_count": 0,
             }
         ])
 
