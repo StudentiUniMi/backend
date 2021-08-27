@@ -60,8 +60,10 @@
             xhr.setRequestHeader("X-CSRFToken", form.csrfmiddlewaretoken.value);
             xhr.onload = function() {
                 result_paragraph.innerText = xhr.responseText;
+                form.json_data.value = "";
             }
             xhr.send(form.json_data.value);
+            result_paragraph.innerText = "Awaiting for server's response...";
         }
 	</script>
 </body>

@@ -70,6 +70,7 @@ class Course(models.Model):
     class Meta:
         verbose_name = "Course"
         verbose_name_plural = "Courses"
+        unique_together = ("name", "cfu")
 
     group = models.ForeignKey(TgGroup, on_delete=models.SET_NULL, related_name="courses", blank=True, null=True)
     degrees = models.ManyToManyField(Degree, through="CourseDegree", related_name="courses")

@@ -47,6 +47,8 @@ def import_degrees(request: HttpRequest):
         return HttpResponse("The data that was provided is not a well-formed JSON object!")
 
     unparsed = []
+    ignored = 0
+    added = 0
     for course in data:
         if len(course["dipartimento"]) == 0:
             continue
@@ -66,8 +68,9 @@ def import_degrees(request: HttpRequest):
         deg.department = dep
         try:
             deg.save()
+            added += 1
         except IntegrityError:
-            pass
+            ignored += 1
 
     if len(unparsed) > 0:
         text = "<br><br>The following JSON objects couldn't be added, please do so manually:<br>"
@@ -75,7 +78,9 @@ def import_degrees(request: HttpRequest):
             text += "&emsp;" + str(course) + "<br>"
     else:
         text = ""
-    return HttpResponse("Data has been added successfully!" + text)  # Should probably give back a proper HTML page
+    text += "\n{} degrees where already present and have been ignored.".format(ignored)
+    text += "\n{} degrees have been added to the database.".format(added)
+    return HttpResponse("Data has been added successfully!" + text)
 
 
 def import_courses(request: HttpRequest):
@@ -94,15 +99,20 @@ def import_courses(request: HttpRequest):
     except json.JSONDecodeError:
         return HttpResponse("The data that was provided is not a well-formed JSON object!")
 
+    ignored = 0
+    added = 0
     for c in data.keys():
         course = Course()
         course.name = c
         course.cfu = 0 if data[c]["cfu"] == "" else int(data[c]["cfu"])
         try:
             course.save()
+            added += 1
         except IntegrityError:
-            pass
-    return HttpResponse("Data has been added successfully!")
+            ignored += 1
+    text = "\n{} courses were already present and have been ignored.\n{} courses have been added to the database."\
+        .format(ignored, added)
+    return HttpResponse("Data has been added successfully!" + text)
 
 
 class DegreeViewSet(viewsets.ViewSet):
