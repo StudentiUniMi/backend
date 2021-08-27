@@ -40,7 +40,7 @@ def import_degrees(request: HttpRequest):
         raise PermissionDenied
 
     if request.method == "GET":
-        return render(request, 'models/degrees_json_parser.html')
+        return render(request, 'models/import_json.html', {"type": "degree"})
 
     try:
         data = json.loads(request.body)
@@ -89,7 +89,7 @@ def import_courses(request: HttpRequest):
         raise PermissionDenied
 
     if request.method == "GET":
-        return render(request, 'models/courses_json_parser.html')
+        return render(request, 'models/import_json.html', {"type": "course"})
 
     try:
         data = json.loads(request.body)

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+
+	<title>Import {{ type }} data</title>
+
+	<style>
+        body {
+            min-height: 100%;
+            margin: 20px;
+            font-family: 'Open Sans', sans-serif;
+            text-align: center;
+            background-color: #edebe9;
+            justify-content: center;
+        }
+
+        input:hover {
+            background-color: #0078d4;
+            color: white;
+        }
+
+        textarea {
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 20px;
+            border-radius: 5px;
+            width: 100px;
+            height: 50px;
+        }
+	</style>
+</head>
+
+<body>
+	<h2>Import {{ type }} data</h2>
+
+	<form action="/api/import/{{ type }}s" method="post">
+		<p>{% csrf_token %}</p>
+		<p>Insert the JSON:</p>
+		<textarea name="json_data" cols="80" rows="20">{}</textarea><br/>
+		<button type="button" onclick="submitForm()">
+			Import
+		</button>
+	</form>
+
+	<p id="result"></p>
+
+	<script>
+        const result_paragraph = document.getElementById("result");
+
+        function submitForm() {
+            let form = document.forms[0];
+            let xhr = new XMLHttpRequest();
+            xhr.open(form.method, form.action, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-CSRFToken", form.csrfmiddlewaretoken.value);
+            xhr.onload = function() {
+                result_paragraph.innerText = xhr.responseText;
+            }
+            xhr.send(form.json_data.value);
+        }
+	</script>
+</body>
+</html>
