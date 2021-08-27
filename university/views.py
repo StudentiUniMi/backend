@@ -167,16 +167,6 @@ def representatives_by_department(request):
     return Response(serializer.data)
 
 
-class DegreeViewSet(viewsets.ViewSet):
-    @staticmethod
-    def list(_):
-        return _get_all_objects(Degree, DegreeSerializer)
-      
-    @staticmethod
-    def retrieve(_, pk=None):
-        return _get_verbose_object(Department, VerboseDepartmentSerializer, pk)
-  
-  
 class DepartmentViewSet(viewsets.ViewSet):
     @staticmethod
     def list(_):
