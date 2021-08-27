@@ -60,9 +60,20 @@ class VerboseDegreeSerializer(serializers.ModelSerializer):
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
+    degree_count = serializers.SerializerMethodField()
+    representative_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Department
-        fields = ("pk", "name", )
+        fields = ("pk", "name", "degree_count", "representative_count")
+
+    @staticmethod
+    def get_degree_count(obj):
+        return obj.degrees.count()
+
+    @staticmethod
+    def get_representative_count(obj):
+        return obj.representatives.count()
 
 
 class VerboseDepartmentSerializer(serializers.ModelSerializer):
