@@ -1,6 +1,7 @@
 import json
 
 from django.core.exceptions import PermissionDenied
+from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, render
@@ -29,6 +30,7 @@ def _get_verbose_object(model, serializer, pk):
     return Response(serializer.data)
 
 
+@csrf_exempt
 def import_degrees(request: HttpRequest):
     """The data passed to this endpoint is the output of the script that can be found
     at https://github.com/StudentiUniMi/cdl-scraper
@@ -77,6 +79,7 @@ def import_degrees(request: HttpRequest):
     return HttpResponse("Data has been added successfully!" + text)  # Should probably give back a proper HTML page
 
 
+@csrf_exempt
 def import_courses(request: HttpRequest):
     """The data passed to this endpoint is the output of the script that can be found
     at https://github.com/StudentiUniMi/cdl-scraper
