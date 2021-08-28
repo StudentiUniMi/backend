@@ -107,7 +107,7 @@ def import_courses(request: HttpRequest):
             _, created = Course.objects.get_or_create(
                 name=c["title"],
                 cfu=0 if c["cfu"] == "" else int(c["cfu"]),
-                slug_unimi=c["title"]
+                slug_unimi=c["slug"]
             )
             if created:
                 added += 1
