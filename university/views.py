@@ -51,17 +51,17 @@ def import_degrees(request: HttpRequest):
     ignored = 0
     added = 0
     for course in data:
-        if len(course["dipartimento"]) == 0:
+        if len(course["department"]) == 0:
             continue
 
-        dep = Department.objects.get_or_create(defaults={"name": course["dipartimento"]})[0]
+        dep = Department.objects.get_or_create(defaults={"name": course["department"]})[0]
         deg = Degree()
-        deg.name = course["corso"]
-        if course["tipo"] == "Laurea triennale":
+        deg.name = course["degree"]
+        if course["type"] == "Laurea triennale":
             deg.type = DEGREE_TYPES[0][0]
-        elif course["tipo"] == "Laurea magistrale":
+        elif course["type"] == "Laurea magistrale":
             deg.type = DEGREE_TYPES[1][0]
-        elif course["tipo"] == "Laurea magistrale a ciclo unico":
+        elif course["type"] == "Laurea magistrale a ciclo unico":
             deg.type = DEGREE_TYPES[2][0]
         else:
             unparsed.append(course)
