@@ -1,7 +1,6 @@
 import json
 
 from django.core.exceptions import PermissionDenied
-from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, render
