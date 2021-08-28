@@ -18,7 +18,7 @@ class Department(models.Model):
 
     Example: Computer Science Department "Giovanni degli Antoni"
     """
-    name = models.CharField("name", max_length=64)
+    name = models.CharField("name", max_length=128, unique=True)
 
     def __str__(self) -> str:
         return self.name
@@ -50,6 +50,7 @@ class Degree(models.Model):
     class Meta:
         verbose_name = "Degree"
         verbose_name_plural = "Degrees"
+        unique_together = ("name", "type")
 
     name = models.CharField("name", max_length=128)
     type = models.CharField("degree type", max_length=1, choices=DEGREE_TYPES)
@@ -74,6 +75,7 @@ class Course(models.Model):
     degrees = models.ManyToManyField(Degree, through="CourseDegree", related_name="courses")
     name = models.CharField("name", max_length=128)
     cfu = models.PositiveSmallIntegerField("CFUs")
+    slug_unimi = models.CharField(max_length=200, unique=True, null=True)
     wiki_link = models.CharField("wiki link", max_length=128, blank=True, null=True)
 
     @property

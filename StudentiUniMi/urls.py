@@ -21,4 +21,3 @@ if not settings.DEBUG:
         path('', RedirectView.as_view(url="https://github.com/StudentiUniMi/backend"),
              name='github-redirect'),
     )
-

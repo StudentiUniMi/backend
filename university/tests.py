@@ -1,10 +1,14 @@
-from django.test import TestCase
+from django.contrib.auth.models import User, AnonymousUser, Permission
+from django.core.exceptions import PermissionDenied
+from django.test import TestCase, Client, RequestFactory
 from rest_framework.renderers import JSONRenderer as Renderer
 
 from telegrambot.models import (
     Group as TgGroup,
     User as TgUser,
 )
+from university import test_data
+from university import views as university_views
 from university.models import (
     Course,
     CourseDegree,
@@ -394,3 +398,63 @@ class DepartmentTestCase(TestCase):
             "degrees": [],
             "representatives": [],
         })
+
+
+class DataEntryTestCase(TestCase):
+    def setUp(self):
+        user3 = User.objects.create(username="marco", password="backend")
+        user3.user_permissions.add(Permission.objects.get(codename="add_course"))
+        self.users = [
+            (AnonymousUser(), False),  # anon user
+            (User.objects.create(username="giuseppe", password="network"), False),  # unauthorized user
+            (user3, True),  # authorized user
+        ]
+        self.factory = RequestFactory()
+
+    def _request(self, path: str, json_data: str, render_view, excepted_response: bytes):
+        request = self.factory.post(path, data=json_data, content_type="application/json")
+        for user in self.users:
+            request.user = user[0]
+            try:
+                response = render_view(request)
+                self.assertEqual(response.content, excepted_response)
+            except PermissionDenied:
+                self.assertFalse(user[1])
+
+    def test_correct_degrees_entry(self):
+        self._request(
+            path="/api/import/degrees",
+            json_data=test_data.degree_data,
+            render_view=university_views.import_degrees,
+            excepted_response=b"Data has been added successfully!"
+                              b"\n0 degrees where already present and have been ignored."
+                              b"\n74 degrees have been added to the database.",
+        )
+
+    def test_malformed_degrees_json(self):
+        self._request(
+            path="/api/import/degrees",
+            json_data="asd",
+            render_view=university_views.import_degrees,
+            excepted_response=b"The data that was provided is not a well-formed JSON object!",
+        )
+
+    def test_correct_courses_entry(self):
+        self._request(
+            path="/api/import/courses",
+            json_data=test_data.course_data,
+            render_view=university_views.import_courses,
+            excepted_response=b"Data has been added successfully!"
+                              b"\n43 courses were already present and have been ignored."
+                              b"\n5087 courses have been added to the database.",
+        )
+
+    def test_malformed_courses_json(self):
+        self._request(
+            path="/api/import/courses",
+            json_data="asd",
+            render_view=university_views.import_courses,
+            excepted_response=b"The data that was provided is not a well-formed JSON object!",
+        )
+
+    # TODO: test the actual import of the data
