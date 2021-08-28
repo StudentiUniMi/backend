@@ -443,8 +443,8 @@ class DataEntryTestCase(TestCase):
             path="/api/import/courses",
             json_data=test_data.course_data,
             render_view=university_views.import_courses,
-            excepted_response=b'Data has been added successfully!\n933 courses were already present and have been'
-                              + b' ignored.\n4197 courses have been added to the database.',
+            excepted_response=b'Data has been added successfully!\n43 courses were already present and have been'
+                              + b' ignored.\n5087 courses have been added to the database.',
         )
 
     def test_malformed_courses_json(self):
