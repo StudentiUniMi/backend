@@ -19,6 +19,8 @@ class Department(models.Model):
     Example: Computer Science Department "Giovanni degli Antoni"
     """
     name = models.CharField("name", max_length=128, unique=True)
+    slug = models.CharField("slug", max_length=64, unique=True, default="default_slug")
+    icon = models.CharField("icon", max_length=64, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.name
@@ -56,6 +58,8 @@ class Degree(models.Model):
     type = models.CharField("degree type", max_length=1, choices=DEGREE_TYPES)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="degrees")
     slug = models.CharField("slug", max_length=64, default="default_slug")  # the default is needed for migrations
+    group = models.ForeignKey(TgGroup, on_delete=models.SET_NULL, related_name="degree", null=True, blank=True)
+    icon = models.CharField("icon", max_length=64, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.name} [{''.join([t[1] if t[0] == self.type else '' for t in DEGREE_TYPES])}]"  # hacky shit

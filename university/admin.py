@@ -77,7 +77,7 @@ class RepresentativeAdmin(admin.ModelAdmin):
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    search_fields = ("name", )
+    search_fields = ("name", "slug", "icon")
     inlines = (RepresentativeInline, )
 
 
@@ -85,7 +85,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 class DegreeAdmin(admin.ModelAdmin):
     list_filter = (DegreeTypeFilter, )
     search_fields = ("name", "department", )
-    fields = ("name", "type", "department", "slug", )
+    fields = ("name", "type", "department", "slug", "group", )
     inlines = (CourseDegreeInline, )
 
 

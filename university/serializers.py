@@ -17,7 +17,7 @@ from university.models import (
 class RepresentativeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Representative
-        fields = ("tguser", "title")
+        fields = ("tguser", "title", )
 
     tguser = TgUserSerializer()
 
@@ -48,7 +48,7 @@ class CourseDegreeSerializer(serializers.ModelSerializer):
 class DegreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Degree
-        fields = ("pk", "name", "type", "slug", )
+        fields = ("pk", "name", "type", "group", "slug", )
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -57,7 +57,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ("pk", "name", "degree_count", "representative_count")
+        fields = ("pk", "name", "degree_count", "representative_count", )
 
     @staticmethod
     def get_degree_count(obj):
@@ -71,7 +71,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class VerboseDegreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Degree
-        fields = ("pk", "name", "type", "department", "slug", )
+        fields = ("pk", "name", "type", "department", "group", "slug", )
 
     department = DepartmentSerializer()
 
