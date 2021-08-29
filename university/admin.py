@@ -43,7 +43,7 @@ class DegreeTypeFilter(admin.SimpleListFilter):
 
 class CourseDegreeNameFilter(admin.SimpleListFilter):
     title = "degree name"
-    parameter_name = "degree_name"
+    parameter_name = "degree_id"
 
     def lookups(self, request, model_admin):
         degrees = Degree.objects.all()
@@ -54,7 +54,7 @@ class CourseDegreeNameFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
-        return queryset.filter(degree__in=self.value())
+        return queryset.filter(degrees__in=self.value())
 
 
 class CourseDegreeTypeFilter(admin.SimpleListFilter):
@@ -73,6 +73,8 @@ class CourseDegreeTypeFilter(admin.SimpleListFilter):
 
 @admin.register(Representative)
 class RepresentativeAdmin(admin.ModelAdmin):
+    list_display = ("tguser", "department", "title", )
+    list_editable = ("title", )
     search_fields = ("tguser__first_name", "tguser__last_name", "tguser__username", )
     fields = ("department", "tguser", "title", )
     autocomplete_fields = ("department", "tguser", )

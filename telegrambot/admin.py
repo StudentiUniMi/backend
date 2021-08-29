@@ -20,13 +20,19 @@ class GroupOwnerFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         groups = Group.objects.all()
-        return (
-            (g.pk, g.owner) for g in groups
-        )
+        result = [
+            ("no-owner", "No owner"),
+        ]
+        for g in groups:
+            if g.owner:
+                result.append((g.owner.id, str(g.owner)))
+        return list(dict.fromkeys(result))
 
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
+        if self.value() == "none":
+            return queryset.filter(owner=None)
         return queryset.filter(owner=self.value())
 
 
@@ -41,7 +47,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "owner", )
+    list_display = ("id", "title", "owner", )
     list_filter = (GroupOwnerFilter, )
     search_fields = ("title", )
     fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", "bot", "welcome_model", )
