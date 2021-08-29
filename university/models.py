@@ -103,8 +103,8 @@ class CourseDegree(models.Model):
     # https://docs.djangoproject.com/en/3.2/topics/db/models/#extra-fields-on-many-to-many-relationships
     degree = models.ForeignKey(Degree, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    year = models.PositiveSmallIntegerField("year", default=0)          # 0 = no year assigned (e.g. optional course)
-    semester = models.PositiveSmallIntegerField("semester", default=0)  # 0 = no semester assigned
+    year = models.SmallIntegerField("year", default=0)          # 0 = no year assigned (e.g. optional course)
+    semester = models.SmallIntegerField("semester", default=0)  # 0 = no semester assigned
 
     def __str__(self):
         return f"{self.course.name} ∈ {self.degree.name}"
