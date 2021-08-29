@@ -31,7 +31,7 @@ class GroupOwnerFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
-        if self.value() == "none":
+        if self.value() == "no-owner":
             return queryset.filter(owner=None)
         return queryset.filter(owner=self.value())
 
