@@ -8,12 +8,12 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from university.models import Degree, Department, Course, DEGREE_TYPES, Representative
+from university.models import Degree, Department, Course, DEGREE_TYPES, Representative, CourseDegree
 from university.serializers import (
     DegreeSerializer,
     VerboseDegreeSerializer,
     DepartmentSerializer,
-    VerboseDepartmentSerializer, CourseSerializer, RepresentativeSerializer,
+    VerboseDepartmentSerializer, CourseSerializer, RepresentativeSerializer, CourseDegreeSerializer,
 )
 
 
@@ -150,8 +150,8 @@ def courses_by_degree(request):
     if not degree_id:
         return Response({"ok": False, "error": "Please provide a deg_id (degree id)"}, status=400)
 
-    queryset = Course.objects.all().filter(degrees__in=[degree_id, ])
-    serializer = CourseSerializer(queryset, many=True)
+    queryset = CourseDegree.objects.all().filter(degree_id=degree_id)
+    serializer = CourseDegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
 
