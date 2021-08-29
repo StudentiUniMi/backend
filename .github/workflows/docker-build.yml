@@ -24,6 +24,9 @@ jobs:
         run: |
           echo "LATEST_COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+      - name: Write version file
+        run: echo "${{ env.LATEST_COMMIT_SHA }}" > version.txt
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v2.2.2
         with:
