@@ -11,6 +11,7 @@ from telegrambot.models import (
 class GroupMembershipInline(admin.TabularInline):
     model = GroupMembership
     extra = 1
+    autocomplete_fields = ("group", "user", )
 
 
 class GroupOwnerFilter(admin.SimpleListFilter):
@@ -32,8 +33,9 @@ class GroupOwnerFilter(admin.SimpleListFilter):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ("__str__", "reputation", "warn_count", "banned", "permissions_level", )
-    search_fields = ("id", "first_name", "last_name", )
-    fields = ("id", "first_name", "last_name", "username", "reputation", "warn_count", "banned", "permissions_level", "last_seen", )
+    search_fields = ("id", "first_name", "last_name", "username", )
+    fields = ("id", "first_name", "last_name", "username", "reputation", "warn_count", "banned", "permissions_level",
+              "last_seen", )
     inlines = (GroupMembershipInline, )
 
 
@@ -43,6 +45,7 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = (GroupOwnerFilter, )
     search_fields = ("title", )
     fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", "bot", "welcome_model", )
+    autocomplete_fields = ("owner", "bot", )
     inlines = (GroupMembershipInline, )
 
 
@@ -63,9 +66,11 @@ class UserPrivilegeAdmin(admin.ModelAdmin):
                        "can_promote_members", "can_superban_members", ),
         })
     )
+    autocomplete_fields = ("user", )
 
 
 @admin.register(TelegramBot)
 class TelegramBotAdmin(admin.ModelAdmin):
     list_display = ("username", "censured_token", "notes")
+    search_fields = ("username", )
     fields = ("token", "notes")
