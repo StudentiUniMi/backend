@@ -48,7 +48,9 @@ class CourseDegreeSerializer(serializers.ModelSerializer):
 class DegreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Degree
-        fields = ("pk", "name", "type", "group", "slug", )
+        fields = ("pk", "name", "type", "group", "slug", "icon", )
+
+    group = TgGroupSerializer()
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -57,7 +59,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ("pk", "name", "degree_count", "representative_count", )
+        fields = ("pk", "name", "slug", "icon", "degree_count", "representative_count", )
 
     @staticmethod
     def get_degree_count(obj):
@@ -74,12 +76,13 @@ class VerboseDegreeSerializer(serializers.ModelSerializer):
         fields = ("pk", "name", "type", "department", "group", "slug", )
 
     department = DepartmentSerializer()
+    group = TgGroupSerializer()
 
 
 class VerboseDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ("pk", "name", "representatives", "degrees", )
+        fields = ("pk", "name", "slug", "icon", "representatives", "degrees",)
 
     degrees = DegreeSerializer(many=True, read_only=True)
     representatives = RepresentativeSerializer(many=True)

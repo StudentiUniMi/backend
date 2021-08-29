@@ -156,8 +156,24 @@ class CourseTestCase(TestCase):
 
 class DegreeTestCase(TestCase):
     def setUp(self):
-        dep1 = Department.objects.create(pk=1, name="Computer Science Department")
-        dep2 = Department.objects.create(pk=2, name="Medicine Department")
+        dep1 = Department.objects.create(
+            pk=1,
+            name="Computer Science Department",
+            slug="computer_science",
+        )
+        dep2 = Department.objects.create(
+            pk=2,
+            name="Medicine Department",
+            slug="medicine",
+        )
+
+        group1 = TgGroup.objects.create(
+            id=999,
+            title="Medicine general group",
+            description="By @studenti_unimi",
+            invite_link="https://example.com/join/medicine_unimi",
+            profile_picture="/test.jpg",
+        )
 
         self.deg1 = Degree.objects.create(
             pk=1,
@@ -171,6 +187,7 @@ class DegreeTestCase(TestCase):
             name="Computer Science",
             type='M',
             slug="computer_science_m",
+            icon="computer",
             department=dep1,
         )
         self.deg3 = Degree.objects.create(
@@ -179,6 +196,7 @@ class DegreeTestCase(TestCase):
             type='C',
             slug="medicine",
             department=dep2,
+            group=group1,
         )
 
         self.course1 = Course.objects.create(
@@ -226,18 +244,29 @@ class DegreeTestCase(TestCase):
                 "name": "Computer Science",
                 "type": 'B',
                 "slug": "computer_science_b",
+                "group": None,
+                "icon": None,
             },
             {
                 "pk": 2,
                 "name": "Computer Science",
                 "type": 'M',
                 "slug": "computer_science_m",
+                "group": None,
+                "icon": "computer",
             },
             {
                 "pk": 3,
                 "name": "Medicine",
                 "type": 'C',
                 "slug": "medicine",
+                "group": {
+                    "id": 999,
+                    "title": "Medicine general group",
+                    "profile_picture": "/test.jpg",
+                    "invite_link": "https://example.com/join/medicine_unimi",
+                },
+                "icon": None,
             }
         ])
 
@@ -253,15 +282,51 @@ class DegreeTestCase(TestCase):
                 "name": "Computer Science Department",
                 "degree_count": 2,
                 "representative_count": 0,
-            }
+                "slug": "computer_science",
+                "icon": None,
+            },
+            "group": None,
+        })
+        self.assertJSONEqual(Renderer().render(VerboseDegreeSerializer(self.deg3).data), {
+            "pk": 3,
+            "name": "Medicine",
+            "type": 'C',
+            "slug": "medicine",
+            "department": {
+                "pk": 2,
+                "name": "Medicine Department",
+                "degree_count": 1,
+                "representative_count": 0,
+                "slug": "medicine",
+                "icon": None,
+            },
+            "group": {
+                "id": 999,
+                "title": "Medicine general group",
+                "profile_picture": "/test.jpg",
+                "invite_link": "https://example.com/join/medicine_unimi",
+            },
         })
 
 
 class DepartmentTestCase(TestCase):
     def setUp(self):
-        self.dep1 = Department.objects.create(pk=1, name="Computer Science Department")
-        self.dep2 = Department.objects.create(pk=2, name="Medicine Department")
-        self.dep3 = Department.objects.create(pk=3, name="Physics Department")
+        self.dep1 = Department.objects.create(
+            pk=1,
+            name="Computer Science Department",
+            slug="computer_science",
+        )
+        self.dep2 = Department.objects.create(
+            pk=2,
+            name="Medicine Department",
+            slug="medicine"
+        )
+        self.dep3 = Department.objects.create(
+            pk=3,
+            name="Physics Department",
+            slug="physics",
+            icon="meter",
+        )
 
         Degree.objects.create(
             pk=1,
@@ -324,18 +389,24 @@ class DepartmentTestCase(TestCase):
                 "name": "Computer Science Department",
                 "degree_count": 2,
                 "representative_count": 0,
+                "slug": "computer_science",
+                "icon": None,
             },
             {
                 "pk": 2,
                 "name": "Medicine Department",
                 "degree_count": 1,
                 "representative_count": 2,
+                "slug": "medicine",
+                "icon": None,
             },
             {
                 "pk": 3,
                 "name": "Physics Department",
                 "degree_count": 0,
                 "representative_count": 0,
+                "slug": "physics",
+                "icon": "meter",
             }
         ])
 
@@ -344,18 +415,24 @@ class DepartmentTestCase(TestCase):
         self.assertJSONEqual(Renderer().render(VerboseDepartmentSerializer(self.dep1).data), {
             "pk": 1,
             "name": "Computer Science Department",
+            "slug": "computer_science",
+            "icon": None,
             "degrees": [
                 {
                     "pk": 1,
                     "name": "Computer Science",
                     "type": 'B',
                     "slug": "computer_science_b",
+                    "icon": None,
+                    "group": None,
                 },
                 {
                     "pk": 2,
                     "name": "Computer Science",
                     "type": 'M',
                     "slug": "computer_science_m",
+                    "icon": None,
+                    "group": None,
                 },
             ],
             "representatives": [],
@@ -363,6 +440,8 @@ class DepartmentTestCase(TestCase):
         self.assertJSONEqual(Renderer().render(VerboseDepartmentSerializer(self.dep2).data), {
             "pk": 2,
             "name": "Medicine Department",
+            "slug": "medicine",
+            "icon": None,
             "representatives": [
                 {
                     "tguser": {
@@ -389,12 +468,16 @@ class DepartmentTestCase(TestCase):
                     "name": "Medicine",
                     "type": 'C',
                     "slug": "medicine",
+                    "icon": None,
+                    "group": None,
                 },
             ],
         })
         self.assertJSONEqual(Renderer().render(VerboseDepartmentSerializer(self.dep3).data), {
             "pk": 3,
             "name": "Physics Department",
+            "slug": "physics",
+            "icon": "meter",
             "degrees": [],
             "representatives": [],
         })

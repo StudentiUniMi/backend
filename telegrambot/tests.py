@@ -131,8 +131,8 @@ class UserPrivilegeTestCase(TestCase):
             title="Anatomy I group"
         )
 
-        dip1 = Department.objects.create(name="Computer Science Department")
-        dip2 = Department.objects.create(name="Health Department")
+        dip1 = Department.objects.create(name="Computer Science Department", slug="computer_science")
+        dip2 = Department.objects.create(name="Health Department", slug="health")
         deg1 = Degree.objects.create(
             name="Computer science",
             type='B',
