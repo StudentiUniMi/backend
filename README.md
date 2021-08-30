@@ -33,9 +33,9 @@ Here's an incomplete list of features:
   - [ ] Degrees
     - [x] List API
     - [x] Verbose details API
-    - [ ] Representatives
+    - [x] Representatives
     - [ ] External links
-    - [ ] Degree general Telegram group  
+    - [x] Degree general Telegram group  
   - [x] Courses
     - [x] List (by degree) API
     - [x] Verbose details API
@@ -88,7 +88,7 @@ Once again, here's an incomplete list of features:
     - [x] Greet the user 
     - [x] Per-group customized welcome message
     - [ ] CAPTCHA and rules acceptance for new users
-  - [ ] Moderation
+  - [x] Moderation
     - [x] Auto-ban globally banned users 
     - [x] Global ban (temporary and permanent)
     - [x] Group ban (temporary and permanent)
