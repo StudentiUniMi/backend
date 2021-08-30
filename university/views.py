@@ -151,6 +151,7 @@ def courses_by_degree(request):
         return Response({"ok": False, "error": "Please provide a deg_id (degree id)"}, status=400)
 
     queryset = CourseDegree.objects.all().filter(degree_id=degree_id)
+    queryset = sorted(queryset, key=lambda c: (c.year if c.year >= 0 else c.year + 10) * 2 + c.semester)
     serializer = CourseDegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
