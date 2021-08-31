@@ -17,7 +17,7 @@ from university.models import (
 class RepresentativeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Representative
-        fields = ("tguser", "title")
+        fields = ("tguser", "degree_name", )
 
     tguser = TgUserSerializer()
 
@@ -48,27 +48,41 @@ class CourseDegreeSerializer(serializers.ModelSerializer):
 class DegreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Degree
-        fields = ("pk", "name", "type", "slug", )
+        fields = ("pk", "name", "type", "group", "slug", "icon", )
+
+    group = TgGroupSerializer()
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    degree_count = serializers.SerializerMethodField()
+    representative_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Department
+        fields = ("pk", "name", "slug", "icon", "degree_count", "representative_count", )
+
+    @staticmethod
+    def get_degree_count(obj):
+        return obj.degrees.count()
+
+    @staticmethod
+    def get_representative_count(obj):
+        return obj.representatives.count()
 
 
 class VerboseDegreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Degree
-        fields = ("pk", "name", "type", "courses", "slug", )
+        fields = ("pk", "name", "type", "department", "group", "slug", )
 
-    courses = CourseDegreeSerializer(source="coursedegree_set", many=True, read_only=True)
-
-
-class DepartmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Department
-        fields = ("pk", "name", )
+    department = DepartmentSerializer()
+    group = TgGroupSerializer()
 
 
 class VerboseDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ("pk", "name", "representatives", "degrees", )
+        fields = ("pk", "name", "slug", "icon", "representatives", "degrees",)
 
     degrees = DegreeSerializer(many=True, read_only=True)
     representatives = RepresentativeSerializer(many=True)

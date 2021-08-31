@@ -14,11 +14,13 @@ from university.models import (
 class RepresentativeInline(admin.TabularInline):
     model = Representative
     extra = 1
+    autocomplete_fields = ("tguser", )
 
 
 class CourseDegreeInline(admin.TabularInline):
     model = CourseDegree
     extra = 1
+    autocomplete_fields = ("course", "degree", )
 
 
 class CourseLinkInline(admin.TabularInline):
@@ -41,7 +43,7 @@ class DegreeTypeFilter(admin.SimpleListFilter):
 
 class CourseDegreeNameFilter(admin.SimpleListFilter):
     title = "degree name"
-    parameter_name = "degree_name"
+    parameter_name = "degree_id"
 
     def lookups(self, request, model_admin):
         degrees = Degree.objects.all()
@@ -52,7 +54,7 @@ class CourseDegreeNameFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
-        return queryset.filter(degree__in=self.value())
+        return queryset.filter(degrees__in=self.value())
 
 
 class CourseDegreeTypeFilter(admin.SimpleListFilter):
@@ -71,21 +73,26 @@ class CourseDegreeTypeFilter(admin.SimpleListFilter):
 
 @admin.register(Representative)
 class RepresentativeAdmin(admin.ModelAdmin):
+    list_display = ("tguser", "department", "degree_name", )
+    list_editable = ("degree_name", )
     search_fields = ("tguser__first_name", "tguser__last_name", "tguser__username", )
-    fields = ("department", "tguser", "title", )
+    fields = ("department", "tguser", "degree_name", )
+    autocomplete_fields = ("department", "tguser", )
 
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
     search_fields = ("name", )
+    fields = ("name", "slug", "icon", )
     inlines = (RepresentativeInline, )
 
 
 @admin.register(Degree)
 class DegreeAdmin(admin.ModelAdmin):
     list_filter = (DegreeTypeFilter, )
-    search_fields = ("name", "department", )
-    fields = ("name", "type", "department", "slug", )
+    search_fields = ("name", "type", )
+    fields = ("name", "type", "department", "slug", "group", )
+    autocomplete_fields = ("department", "group", )
     inlines = (CourseDegreeInline, )
 
 
@@ -94,5 +101,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ("name", "cfu", "str_degrees", )
     list_filter = (CourseDegreeNameFilter, CourseDegreeTypeFilter, )
     search_fields = ("name", )
-    fields = ("name", "cfu", "group", "wiki_link", )
+    fields = ("name", "cfu", "group", "wiki_link", "slug_unimi")
+    autocomplete_fields = ("group", )
+    readonly_fields = ("slug_unimi", )
     inlines = (CourseDegreeInline, CourseLinkInline, )

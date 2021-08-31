@@ -1,0 +1,695 @@
+[
+  {
+    "faculty": "SAA",
+    "department": "Dipartimento di Scienze Agrarie e Ambientali - Produzione, Territorio, Agroenergia",
+    "year": "A.A. 2021/2022",
+    "degree": "Agrotecnologie per l'ambiente e il territorio",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/agrotecnologie-lambiente-e-il-territorio",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MV",
+    "department": "",
+    "year": "A.A. 2021/2022",
+    "degree": "Allevamento e benessere degli animali d'affezione",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/allevamento-e-benessere-degli-animali-daffezione",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "",
+    "year": "A.A. 2021/2022",
+    "degree": "Artificial Intelligence",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/artificial-intelligence",
+    "type": "Laurea triennale",
+    "language": "Inglese"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche per la Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Assistenza sanitaria",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/assistenza-sanitaria",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "K",
+    "department": "",
+    "year": "A.A. 2021/2022",
+    "degree": "Biotecnologia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/biotecnologia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Biotecnologie Mediche e Medicina Traslazionale",
+    "year": "A.A. 2021/2022",
+    "degree": "Biotecnologie mediche",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/biotecnologie-mediche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Chimica",
+    "year": "A.A. 2021/2022",
+    "degree": "Chimica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/chimica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SF",
+    "department": "Dipartimento di Scienze Farmaceutiche",
+    "year": "A.A. 2021/2022",
+    "degree": "Chimica e tecnologia farmaceutiche a ciclo unico",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/chimica-e-tecnologia-farmaceutiche-ciclo-unico",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Chimica",
+    "year": "A.A. 2021/2022",
+    "degree": "Chimica industriale",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/chimica-industriale",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Dipartimento di Scienze Sociali e Politiche",
+    "year": "A.A. 2021/2022",
+    "degree": "Comunicazione e societ\u00e0 (CES)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/comunicazione-e-societa-ces",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze della Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Dietistica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/dietistica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Dipartimento di Economia, Management e Metodi Quantitativi",
+    "year": "A.A. 2021/2022",
+    "degree": "Economia e management (EMA)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/economia-e-management-ema",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Fisiopatologia Medico-Chirurgica e dei Trapianti",
+    "year": "A.A. 2021/2022",
+    "degree": "Educazione professionale",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/educazione-professionale",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SF",
+    "department": "Dipartimento di Scienze Farmacologiche e Biomolecolari",
+    "year": "A.A. 2021/2022",
+    "degree": "Farmacia ciclo unico",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/farmacia-ciclo-unico",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SU",
+    "department": "Dipartimento di Filosofia Piero Martinetti",
+    "year": "A.A. 2021/2022",
+    "degree": "Filosofia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/filosofia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Fisica Aldo Pontremoli",
+    "year": "A.A. 2021/2022",
+    "degree": "Fisica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/fisica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze della Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Fisioterapia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/fisioterapia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "G",
+    "department": "Dipartimento di Diritto Privato e Storia del Diritto",
+    "year": "A.A. 2021/2022",
+    "degree": "Giurisprudenza a ciclo unico",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/giurisprudenza-ciclo-unico",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano, Inglese"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche, Chirurgiche ed Odontoiatriche",
+    "year": "A.A. 2021/2022",
+    "degree": "Igiene dentale",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/igiene-dentale",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche per la Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Infermieristica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/infermieristica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Fisiopatologia Medico-Chirurgica e dei Trapianti",
+    "year": "A.A. 2021/2022",
+    "degree": "Infermieristica pediatrica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/infermieristica-pediatrica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Informatica Giovanni degli Antoni",
+    "year": "A.A. 2021/2022",
+    "degree": "Informatica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/informatica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Informatica Giovanni degli Antoni",
+    "year": "A.A. 2021/2022",
+    "degree": "Informatica musicale",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/informatica-musicale",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Informatica Giovanni degli Antoni",
+    "year": "A.A. 2021/2022",
+    "degree": "Informatica per la comunicazione digitale",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/informatica-la-comunicazione-digitale",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Department of International, Legal, Historical and Politcal Studies",
+    "year": "A.A. 2021/2022",
+    "degree": "International Politics, Law and Economics (IPLE)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/international-politics-law-and-economics-iple",
+    "type": "Laurea triennale",
+    "language": "Inglese"
+  },
+  {
+    "faculty": "SU",
+    "department": "Dipartimento di Studi Letterari, Filologici e Linguistici",
+    "year": "A.A. 2021/2022",
+    "degree": "Lettere",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/lettere",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SU",
+    "department": "Dipartimento di Lingue e Letterature Straniere",
+    "year": "A.A. 2021/2022",
+    "degree": "Lingue e letterature straniere",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/lingue-e-letterature-straniere",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche e Cliniche L. Sacco",
+    "year": "A.A. 2021/2022",
+    "degree": "Logopedia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/logopedia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Dipartimento di Scienze Sociali e Politiche",
+    "year": "A.A. 2021/2022",
+    "degree": "Management delle organizzazioni e del lavoro (MOL)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/management-delle-organizzazioni-e-del-lavoro-mol",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Dipartimento di Economia, Management e Metodi Quantitativi",
+    "year": "A.A. 2021/2022",
+    "degree": "Management pubblico e della sanit\u00e0 (MAPS)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/management-pubblico-e-della-sanita-maps",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Matematica Federigo Enriques",
+    "year": "A.A. 2021/2022",
+    "degree": "Matematica (triennale)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/matematica-triennale",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SMLC",
+    "department": "Dipartimento di Scienze della Mediazione Linguistica e di Studi Interculturali",
+    "year": "A.A. 2021/2022",
+    "degree": "Mediazione linguistica e culturale applicata all'ambito economico, giuridico e sociale (MED)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/mediazione-linguistica-e-culturale-applicata-allambito-economico-giuridico-e-sociale-med",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze della Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Medicina e chirurgia  - Polo San Paolo",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/medicina-e-chirurgia-polo-san-paolo",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Department of Medical Biotechnology and Translational Medicine",
+    "year": "A.A. 2021/2022",
+    "degree": "Medicina e chirurgia - International Medical School",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/medicina-e-chirurgia-international-medical-school",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Inglese"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Cliniche e di Comunit\u00e0",
+    "year": "A.A. 2021/2022",
+    "degree": "Medicina e chirurgia - Polo Centrale",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/medicina-e-chirurgia-polo-centrale",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche e Cliniche L. Sacco",
+    "year": "A.A. 2021/2022",
+    "degree": "Medicina e chirurgia - Polo Vialba",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/medicina-e-chirurgia-polo-vialba",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MV",
+    "department": "Dipartimento di Medicina Veterinaria",
+    "year": "A.A. 2021/2022",
+    "degree": "Medicina veterinaria a ciclo unico",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/medicina-veterinaria-ciclo-unico",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche, Chirurgiche ed Odontoiatriche",
+    "year": "A.A. 2021/2022",
+    "degree": "Odontoiatria e protesi dentaria",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/odontoiatria-e-protesi-dentaria",
+    "type": "Laurea magistrale a ciclo unico",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Cliniche e di Comunit\u00e0",
+    "year": "A.A. 2021/2022",
+    "degree": "Ortottica ed assistenza oftalmologica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/ortottica-ed-assistenza-oftalmologica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Cliniche e di Comunit\u00e0",
+    "year": "A.A. 2021/2022",
+    "degree": "Ostetricia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/ostetricia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche, Chirurgiche ed Odontoiatriche",
+    "year": "A.A. 2021/2022",
+    "degree": "Podologia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/podologia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SAA",
+    "department": "Dipartimento di Scienze Agrarie e Ambientali - Produzione, Territorio, Agroenergia",
+    "year": "A.A. 2021/2022",
+    "degree": "Produzione e protezione delle piante e dei sistemi del verde",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/produzione-e-protezione-delle-piante-e-dei-sistemi-del-verde",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Bioscienze",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze biologiche",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-biologiche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SU",
+    "department": "Dipartimento di Beni Culturali e Ambientali",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze dei beni culturali",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-dei-beni-culturali",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "G",
+    "department": "Dipartimento di Scienze Giuridiche Cesare Beccaria",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze dei servizi giuridici",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-dei-servizi-giuridici",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MV",
+    "department": "Dipartimento di Medicina Veterinaria",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze delle produzioni animali ",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-delle-produzioni-animali",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Scienze e Politiche Ambientali",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze e politiche ambientali",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-e-politiche-ambientali",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SF",
+    "department": "Dipartimento di Scienze Farmacologiche e Biomolecolari",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze e sicurezza chimico-tossicologiche dell'ambiente",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-e-sicurezza-chimico-tossicologiche-dellambiente",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SAA",
+    "department": "Dipartimento di Scienze Agrarie e Ambientali - Produzione, Territorio, Agroenergia",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze e tecnologie agrarie",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-e-tecnologie-agrarie",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SAA",
+    "department": "Dipartimento di Scienze per gli Alimenti, la Nutrizione e l'Ambiente",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze e tecnologie alimentari ",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-e-tecnologie-alimentari",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SAA",
+    "department": "Dipartimento di Scienze per gli Alimenti, la Nutrizione e l'Ambiente",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze e tecnologie della ristorazione",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-e-tecnologie-della-ristorazione",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SF",
+    "department": "Dipartimento di Scienze Farmaceutiche",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze e tecnologie erboristiche ",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-e-tecnologie-erboristiche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Scienze della Terra Ardito Desio",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze e tecnologie per lo studio e la conservazione dei beni culturali e dei supporti della informazione",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-e-tecnologie-lo-studio-e-la-conservazione-dei-beni-culturali-e-dei-supporti-della",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Scienze della Terra Ardito Desio",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze geologiche",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-geologiche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Dipartimento di Studi Internazionali, Giuridici e Storico-Politici",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze internazionali e istituzioni europee (SIE)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-internazionali-e-istituzioni-europee-sie",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SM",
+    "department": "Dipartimento di Scienze Biomediche per la Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze motorie, sport e salute",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-motorie-sport-e-salute",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Scienze della Terra Ardito Desio",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze naturali",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-naturali",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Dipartimento di Scienze Sociali e Politiche",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze politiche (SPO)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-politiche-spo",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SPES",
+    "department": "Dipartimento di Scienze Sociali e Politiche",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze sociali per la globalizzazione (GLO)",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-sociali-la-globalizzazione-glo",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SU",
+    "department": "Dipartimento di Beni Culturali e Ambientali",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze umane dell'ambiente, del territorio e del paesaggio",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-umane-dellambiente-del-territorio-e-del-paesaggio",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SU",
+    "department": "Dipartimento di Studi Storici",
+    "year": "A.A. 2021/2022",
+    "degree": "Scienze umanistiche per la comunicazione",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/scienze-umanistiche-la-comunicazione",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Informatica Giovanni degli Antoni",
+    "year": "A.A. 2021/2022",
+    "degree": "Sicurezza dei sistemi e delle reti informatiche",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/sicurezza-dei-sistemi-e-delle-reti-informatiche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "ST",
+    "department": "Dipartimento di Informatica Giovanni degli Antoni",
+    "year": "A.A. 2021/2022",
+    "degree": "Sicurezza dei sistemi e delle reti informatiche online",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/sicurezza-dei-sistemi-e-delle-reti-informatiche-online",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SU",
+    "department": "Dipartimento di Studi Storici",
+    "year": "A.A. 2021/2022",
+    "degree": "Storia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/storia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche e Cliniche L. Sacco",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecnica della riabilitazione psichiatrica",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecnica-della-riabilitazione-psichiatrica",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Cliniche e di Comunit\u00e0",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche audiometriche ",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-audiometriche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Cliniche e di Comunit\u00e0",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche audioprotesiche",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-audioprotesiche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche per la Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche della prevenzione nell'ambiente e nei luoghi di lavoro",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-della-prevenzione-nellambiente-e-nei-luoghi-di-lavoro",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche, Chirurgiche ed Odontoiatriche",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche di fisiopatologia cardiocircolatoria e perfusione cardiovascolare",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-di-fisiopatologia-cardiocircolatoria-e-perfusione-cardiovascolare",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche per la Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche di laboratorio biomedico",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-di-laboratorio-biomedico",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze della Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche di neurofisiopatologia ",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-di-neurofisiopatologia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Oncologia ed Emato-Oncologia",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche di radiologia medica, per immagini e radioterapia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-di-radiologia-medica-immagini-e-radioterapia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche, Chirurgiche ed Odontoiatriche",
+    "year": "A.A. 2021/2022",
+    "degree": "Tecniche ortopediche",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/tecniche-ortopediche",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze Biomediche e Cliniche L. Sacco",
+    "year": "A.A. 2021/2022",
+    "degree": "Terapia della neuro e psicomotricit\u00e0 dell'et\u00e0 evolutiva",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/terapia-della-neuro-e-psicomotricita-delleta-evolutiva",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "MC",
+    "department": "Dipartimento di Scienze della Salute",
+    "year": "A.A. 2021/2022",
+    "degree": "Terapia occupazionale",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/terapia-occupazionale",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SAA",
+    "department": "Dipartimento di Scienze Agrarie e Ambientali - Produzione, Territorio, Agroenergia",
+    "year": "A.A. 2021/2022",
+    "degree": "Valorizzazione e tutela dell'ambiente e del territorio montano",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/valorizzazione-e-tutela-dellambiente-e-del-territorio-montano",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  },
+  {
+    "faculty": "SAA",
+    "department": "Dipartimento di Scienze Agrarie e Ambientali - Produzione, Territorio, Agroenergia",
+    "year": "A.A. 2021/2022",
+    "degree": "Viticoltura ed enologia",
+    "site": "https://unimi.it/it/corsi/corsi-di-laurea/viticoltura-ed-enologia",
+    "type": "Laurea triennale",
+    "language": "Italiano"
+  }
+]

@@ -1,4 +1,5 @@
 django
+sentry-sdk
 psycopg2-binary
 pillow  # required by django ImageField
 djangorestframework

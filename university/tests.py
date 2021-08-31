@@ -1,10 +1,14 @@
-from django.test import TestCase
+from django.contrib.auth.models import User, AnonymousUser, Permission
+from django.core.exceptions import PermissionDenied
+from django.test import TestCase, Client, RequestFactory
 from rest_framework.renderers import JSONRenderer as Renderer
 
 from telegrambot.models import (
     Group as TgGroup,
     User as TgUser,
 )
+from university import test_data
+from university import views as university_views
 from university.models import (
     Course,
     CourseDegree,
@@ -152,8 +156,24 @@ class CourseTestCase(TestCase):
 
 class DegreeTestCase(TestCase):
     def setUp(self):
-        dep1 = Department.objects.create(name="Computer Science Department")
-        dep2 = Department.objects.create(name="Medicine Department")
+        dep1 = Department.objects.create(
+            pk=1,
+            name="Computer Science Department",
+            slug="computer_science",
+        )
+        dep2 = Department.objects.create(
+            pk=2,
+            name="Medicine Department",
+            slug="medicine",
+        )
+
+        group1 = TgGroup.objects.create(
+            id=999,
+            title="Medicine general group",
+            description="By @studenti_unimi",
+            invite_link="https://example.com/join/medicine_unimi",
+            profile_picture="/test.jpg",
+        )
 
         self.deg1 = Degree.objects.create(
             pk=1,
@@ -167,6 +187,7 @@ class DegreeTestCase(TestCase):
             name="Computer Science",
             type='M',
             slug="computer_science_m",
+            icon="computer",
             department=dep1,
         )
         self.deg3 = Degree.objects.create(
@@ -175,6 +196,7 @@ class DegreeTestCase(TestCase):
             type='C',
             slug="medicine",
             department=dep2,
+            group=group1,
         )
 
         self.course1 = Course.objects.create(
@@ -222,18 +244,29 @@ class DegreeTestCase(TestCase):
                 "name": "Computer Science",
                 "type": 'B',
                 "slug": "computer_science_b",
+                "group": None,
+                "icon": None,
             },
             {
                 "pk": 2,
                 "name": "Computer Science",
                 "type": 'M',
                 "slug": "computer_science_m",
+                "group": None,
+                "icon": "computer",
             },
             {
                 "pk": 3,
                 "name": "Medicine",
                 "type": 'C',
                 "slug": "medicine",
+                "group": {
+                    "id": 999,
+                    "title": "Medicine general group",
+                    "profile_picture": "/test.jpg",
+                    "invite_link": "https://example.com/join/medicine_unimi",
+                },
+                "icon": None,
             }
         ])
 
@@ -244,50 +277,56 @@ class DegreeTestCase(TestCase):
             "name": "Computer Science",
             "type": 'B',
             "slug": "computer_science_b",
-            "courses": [
-                {
-                    "course": {
-                        "pk": 1,
-                        "name": "Programming I",
-                        "cfu": 12,
-                        "wiki_link": None,
-                        "links": [
-                            {
-                                "name": "Ariel (1° ed.)",
-                                "url": "https//ariel.example.com/courses/programming_1_firsted",
-                            },
-                        ],
-                        "group": None,
-                    },
-                    "year": 1,
-                    "semester": 1,
-                },
-                {
-                    "course": {
-                        "pk": 2,
-                        "name": "Linear Algebra I",
-                        "cfu": 6,
-                        "wiki_link": "https://example.com/wiki/linear_algebra_i.php",
-                        "links": [],
-                        "group": {
-                            "id": 69420,
-                            "title": "Linear Algebra I fan club",
-                            "profile_picture": None,
-                            "invite_link": "https://example.com/join/azerty",
-                        },
-                    },
-                    "year": 1,
-                    "semester": 2,
-                },
-            ],
+            "department": {
+                "pk": 1,
+                "name": "Computer Science Department",
+                "degree_count": 2,
+                "representative_count": 0,
+                "slug": "computer_science",
+                "icon": None,
+            },
+            "group": None,
+        })
+        self.assertJSONEqual(Renderer().render(VerboseDegreeSerializer(self.deg3).data), {
+            "pk": 3,
+            "name": "Medicine",
+            "type": 'C',
+            "slug": "medicine",
+            "department": {
+                "pk": 2,
+                "name": "Medicine Department",
+                "degree_count": 1,
+                "representative_count": 0,
+                "slug": "medicine",
+                "icon": None,
+            },
+            "group": {
+                "id": 999,
+                "title": "Medicine general group",
+                "profile_picture": "/test.jpg",
+                "invite_link": "https://example.com/join/medicine_unimi",
+            },
         })
 
 
 class DepartmentTestCase(TestCase):
     def setUp(self):
-        self.dep1 = Department.objects.create(pk=1, name="Computer Science Department")
-        self.dep2 = Department.objects.create(pk=2, name="Medicine Department")
-        self.dep3 = Department.objects.create(pk=3, name="Physics Department")
+        self.dep1 = Department.objects.create(
+            pk=1,
+            name="Computer Science Department",
+            slug="computer_science",
+        )
+        self.dep2 = Department.objects.create(
+            pk=2,
+            name="Medicine Department",
+            slug="medicine"
+        )
+        self.dep3 = Department.objects.create(
+            pk=3,
+            name="Physics Department",
+            slug="physics",
+            icon="meter",
+        )
 
         Degree.objects.create(
             pk=1,
@@ -319,7 +358,7 @@ class DepartmentTestCase(TestCase):
         Representative.objects.create(
             department=self.dep2,
             tguser=tgus1,
-            title="Representative",
+            degree_name="Representative",
         )
         tgus2 = TgUser.objects.create(
             id=108121631,
@@ -330,7 +369,7 @@ class DepartmentTestCase(TestCase):
         Representative.objects.create(
             department=self.dep2,
             tguser=tgus2,
-            title="Chad",
+            degree_name="Chad",
         )
 
     def test_str(self):
@@ -348,14 +387,26 @@ class DepartmentTestCase(TestCase):
             {
                 "pk": 1,
                 "name": "Computer Science Department",
+                "degree_count": 2,
+                "representative_count": 0,
+                "slug": "computer_science",
+                "icon": None,
             },
             {
                 "pk": 2,
                 "name": "Medicine Department",
+                "degree_count": 1,
+                "representative_count": 2,
+                "slug": "medicine",
+                "icon": None,
             },
             {
                 "pk": 3,
                 "name": "Physics Department",
+                "degree_count": 0,
+                "representative_count": 0,
+                "slug": "physics",
+                "icon": "meter",
             }
         ])
 
@@ -364,18 +415,24 @@ class DepartmentTestCase(TestCase):
         self.assertJSONEqual(Renderer().render(VerboseDepartmentSerializer(self.dep1).data), {
             "pk": 1,
             "name": "Computer Science Department",
+            "slug": "computer_science",
+            "icon": None,
             "degrees": [
                 {
                     "pk": 1,
                     "name": "Computer Science",
                     "type": 'B',
                     "slug": "computer_science_b",
+                    "icon": None,
+                    "group": None,
                 },
                 {
                     "pk": 2,
                     "name": "Computer Science",
                     "type": 'M',
                     "slug": "computer_science_m",
+                    "icon": None,
+                    "group": None,
                 },
             ],
             "representatives": [],
@@ -383,6 +440,8 @@ class DepartmentTestCase(TestCase):
         self.assertJSONEqual(Renderer().render(VerboseDepartmentSerializer(self.dep2).data), {
             "pk": 2,
             "name": "Medicine Department",
+            "slug": "medicine",
+            "icon": None,
             "representatives": [
                 {
                     "tguser": {
@@ -391,7 +450,7 @@ class DepartmentTestCase(TestCase):
                         "last_name": "Aceti",
                         "username": "acetimarco",
                     },
-                    "title": "Representative"
+                    "degree_name": "Representative"
                 },
                 {
                     "tguser": {
@@ -400,7 +459,7 @@ class DepartmentTestCase(TestCase):
                         "last_name": "Busolin",
                         "username": "davidebusolin",
                     },
-                    "title": "Chad",
+                    "degree_name": "Chad",
                 }
             ],
             "degrees": [
@@ -409,12 +468,76 @@ class DepartmentTestCase(TestCase):
                     "name": "Medicine",
                     "type": 'C',
                     "slug": "medicine",
+                    "icon": None,
+                    "group": None,
                 },
             ],
         })
         self.assertJSONEqual(Renderer().render(VerboseDepartmentSerializer(self.dep3).data), {
             "pk": 3,
             "name": "Physics Department",
+            "slug": "physics",
+            "icon": "meter",
             "degrees": [],
             "representatives": [],
         })
+
+
+class DataEntryTestCase(TestCase):
+    def setUp(self):
+        user3 = User.objects.create(username="marco", password="backend")
+        user3.user_permissions.add(Permission.objects.get(codename="add_course"))
+        self.users = [
+            (AnonymousUser(), False),  # anon user
+            (User.objects.create(username="giuseppe", password="network"), False),  # unauthorized user
+            (user3, True),  # authorized user
+        ]
+        self.factory = RequestFactory()
+
+    def _request(self, path: str, json_data: str, render_view, excepted_response: bytes):
+        request = self.factory.post(path, data=json_data, content_type="application/json")
+        for user in self.users:
+            request.user = user[0]
+            try:
+                response = render_view(request)
+                self.assertEqual(response.content, excepted_response)
+            except PermissionDenied:
+                self.assertFalse(user[1])
+
+    def test_correct_degrees_entry(self):
+        self._request(
+            path="/api/import/degrees",
+            json_data=test_data.degree_data,
+            render_view=university_views.import_degrees,
+            excepted_response=b"Data has been added successfully!"
+                              b"\n0 degrees where already present and have been ignored."
+                              b"\n74 degrees have been added to the database.",
+        )
+
+    def test_malformed_degrees_json(self):
+        self._request(
+            path="/api/import/degrees",
+            json_data="asd",
+            render_view=university_views.import_degrees,
+            excepted_response=b"The data that was provided is not a well-formed JSON object!",
+        )
+
+    def test_correct_courses_entry(self):
+        self._request(
+            path="/api/import/courses",
+            json_data=test_data.course_data,
+            render_view=university_views.import_courses,
+            excepted_response=b"Data has been added successfully!"
+                              b"\n43 courses were already present and have been ignored."
+                              b"\n5087 courses have been added to the database.",
+        )
+
+    def test_malformed_courses_json(self):
+        self._request(
+            path="/api/import/courses",
+            json_data="asd",
+            render_view=university_views.import_courses,
+            excepted_response=b"The data that was provided is not a well-formed JSON object!",
+        )
+
+    # TODO: test the actual import of the data

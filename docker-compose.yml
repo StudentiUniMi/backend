@@ -28,12 +28,14 @@ services:
     image: ghcr.io/studentiunimi/backend:latest
     container_name: studentiunimi_backend_django
     environment:
+      - SERVER_NAME=${SERVER_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DBNAME=${POSTGRES_DBNAME}
       - SECRET_KEY=${SECRET_KEY}
       - LOGGING_CHAT_ID=${LOGGING_CHAT_ID}
       - LOGGING_BOT_TOKEN=${LOGGING_BOT_TOKEN}
+      - SENTRY_DSN=${SENTRY_DSN}
     volumes:
       - static_files:/usr/src/app/static/
     depends_on:

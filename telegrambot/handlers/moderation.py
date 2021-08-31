@@ -8,6 +8,7 @@ from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
+from telegrambot.models import Group
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
@@ -76,6 +77,36 @@ def handle_ban_command(update: Update, context: CallbackContext) -> None:
         context.bot.ban_chat_member(chat_id=chat.id, user_id=dbuser.id)
         text += f"\n- {dbuser.generate_mention()}"
         logging.log(logging.MODERATION_BAN, chat=chat, target=dbuser, issuer=sender)
+
+    msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
+    tasks.delete_message(chat.id, msg.message_id)
+
+
+def handle_global_ban_command(update: Update, context: CallbackContext) -> None:
+    """Handle a global ban command, issued by an administrator.
+
+    Works like a ban_command but bans from all groups of the network
+    """
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    if not utils.can_superban(sender):
+        return
+
+    targets = utils.get_targets_of_command(message)
+    if not targets:
+        return
+
+    text = "⚫ <b>I seguenti utenti sono stati bannati da tutti i gruppi</b>:"
+    for dbuser in targets:
+        groups = Group.objects.filter(members__id=dbuser.id)
+        for group in groups:
+            context.bot.ban_chat_member(chat_id=group.id, user_id=dbuser.id)
+        text += f"\n- {dbuser.generate_mention()}"
+        dbuser.banned = True
+        dbuser.save()
+        logging.log(logging.MODERATION_SUPERBAN, chat=chat, target=dbuser, issuer=sender)
 
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
     tasks.delete_message(chat.id, msg.message_id)
@@ -156,3 +187,31 @@ def handle_free_command(update: Update, context: CallbackContext) -> None:
 
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
     tasks.delete_message(chat.id, msg.message_id)
+
+
+def handle_info_command(update: Update, _: CallbackContext) -> None:
+    """Handles the info command issued by an administrator.
+
+    The command is supposed to show information about the specified user(s).
+    """
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    if not utils.can_moderate(sender, chat):
+        return
+
+    targets = utils.get_targets_of_command(message)
+    if not targets:
+        sender.send_message("Target(s) were not specified for command `/info`!", parse_mode="markdown")
+        return
+
+    for dbuser in targets:
+        text = utils.format_user_info(dbuser)
+        if not text:
+            continue
+
+        # User must start the bot in private before he can receive messages from it
+        sender.send_message(text, parse_mode="markdown", disable_web_page_preview=True)
+
+    message.delete()

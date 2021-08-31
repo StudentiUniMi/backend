@@ -4,6 +4,8 @@ import telegram
 from django.apps import apps
 from telegram import User, Chat, TelegramError
 from telegram.ext import DispatcherHandlerStop
+import telegrambot.models as t_models
+import university.models as u_models
 
 
 # def get_bot(chat: Union[Chat, telegrambot.Group, int]) -> telegram.Bot
@@ -141,6 +143,16 @@ def can_moderate(user, chat) -> bool:
     return True
 
 
+def can_superban(user) -> bool:
+    """Return True if the user can superban other members"""
+    Privileges = apps.get_model("telegrambot.UserPrivilege")
+    try:
+        privs = Privileges.objects.get(user_id=user.id)
+    except Privileges.DoesNotExist:
+        return False
+    return privs.can_superban_members
+
+
 def get_targets_of_command(message):
     """Get the target users of a command."""
     DBUser = apps.get_model("telegrambot.User")
@@ -170,3 +182,66 @@ def get_targets_of_command(message):
             pass
 
     return targets
+
+
+def format_user_info(dbuser):
+    """Format some Telegram user information.
+
+    Used by the /info command.
+    """
+    try:
+        user = t_models.User.objects.get(id=dbuser.id)
+    except t_models.User.DoesNotExist:
+        return None
+
+    text = "👤 *Utente* [{name}](tg://user?id={id}) \[`{id}`]".format(name=user.name, id=user.id)
+    text += ("\n🔖 *Username*: @" + user.username) if user.username is not None else ""
+    text += "\n🔺 *Reputazione*: {}".format(user.reputation)
+    text += "\n🟡 *Ammonizioni*: {}".format(user.warn_count)
+    text += "\n👮‍️ *Livello dei permessi*: {}".format(user.permissions_level)
+    text += "\n🕗 *Ultimo messaggio*: {}".format(user.last_seen.strftime("%d-%m-%Y %H:%M:%S"))
+    if user.banned:
+        text += "\n⚫️ *Il membro è bannato globalmente dal network*."
+
+    privs = t_models.UserPrivilege.objects.filter(user=user.id)
+    if privs is not None:
+        text += "\n"
+        for priv in privs:
+            p_type = None
+            for x in priv.PrivilegeTypes.choices:
+                if x[0] == priv.type:
+                    p_type = x[1]
+            if p_type is None:
+                continue
+
+            text += "\n⭐ ️È *{}* ".format(p_type.lower())
+            if priv.can_restrict_members:
+                text += "(*moderatore*) "
+
+            if priv.scope == priv.PrivilegeScopes.GROUPS:
+                text += "nei seguenti gruppi:\n"
+                for group in t_models.Group.objects.filter(privileged_users__user__id=user.id):
+                    text += "➖ \[`" + str(group.id) + "`] " + group.title + "\n"
+            elif priv.scope == priv.PrivilegeScopes.DEGREES:
+                text += "dei seguenti C.d.L.:\n"
+                for degree in u_models.Degree.objects.filter(privileged_users__user_id=user.id):
+                    text += "➖ " + degree.name + "\n"
+            elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
+                text += "dei seguenti dipartimenti:\n"
+                for department in u_models.Department.objects.filter(privileged_users__user_id=user.id):
+                    text += "➖ " + department.name + "\n"
+            else:
+                text += "\n"
+
+    present_in_groups = t_models.GroupMembership.objects.filter(user__id=user.id).order_by("messages_count").reverse()
+    if present_in_groups is None:
+        return text
+
+    text += "\n👥 *È stato visto nei seguenti gruppi*:\n"
+    for group_mem in present_in_groups:
+        if not group_mem.group.invite_link:
+            text += "➖ *{}* \[`{}`]".format(group_mem.group.title, group_mem.group.id)
+        else:
+            text += "➖ *{}* \[[`{}`]({})]".format(group_mem.group.title, group_mem.group.id, group_mem.group.invite_link)
+        text += " ({}), {} msg\n".format(group_mem.status.upper(), group_mem.messages_count)
+    return text
