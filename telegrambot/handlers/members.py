@@ -3,7 +3,7 @@ from typing import List
 
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember,\
     ChatPermissions
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, DispatcherHandlerStop
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
@@ -59,6 +59,11 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
             ],
         ]),
     )
+
+    for member in members:
+        dbuser: DBUser = DBUser.objects.get(id=member.id)
+        if not dbuser.verified:
+            context.bot.restrict_chat_member(chat.id, member.id, ChatPermissions(can_send_messages=False))
     tasks.delete_message(chat.id, msg.message_id)
 
 

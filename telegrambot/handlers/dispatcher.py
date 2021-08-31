@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler, CallbackQueryHandler
 from telegram.ext.dispatcher import Dispatcher
 
-from telegrambot.handlers import messages, members, moderation, commands
+from telegrambot.handlers import messages, members, moderation
 from telegrambot.handlers.filters import NewChatMemberFilter
 
 
@@ -50,12 +50,6 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         command="free",
         callback=moderation.handle_free_command,
     ), group=2)
-
-    # Public commands
-    dispatcher.add_handler(CommandHandler(
-        command="verify",
-        callback=commands.handle_force_verification,
-    ), group=3)
 
     update = Update.de_json(json_update, bot)
     dispatcher.process_update(update)
