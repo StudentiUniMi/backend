@@ -58,6 +58,11 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
 
 
 def handle_chat_member_updates(update: Update, _: CallbackContext) -> None:
+    if not update.chat_member:
+        # Ignore update.my_chat_member for now
+        # TODO: Handle update.my_chat_member properly
+        return
+
     user: User = update.chat_member.from_user
     chat: Chat = update.chat_member.chat
     new: ChatMember = update.chat_member.new_chat_member
