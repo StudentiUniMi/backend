@@ -28,6 +28,10 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
 
     dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
 
+    # TODO: re-enable welcome messages
+    if dbgroup.bot.username == "@studentiunimibot":
+        return
+
     msg: Message = context.bot.send_message(
         chat_id=chat.id,
         text=dbgroup.generate_welcome_message(members),
