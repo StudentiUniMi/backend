@@ -73,10 +73,10 @@ class CourseDegreeTypeFilter(admin.SimpleListFilter):
 
 @admin.register(Representative)
 class RepresentativeAdmin(admin.ModelAdmin):
-    list_display = ("tguser", "department", "title", )
-    list_editable = ("title", )
+    list_display = ("tguser", "department", "degree_name", )
+    list_editable = ("degree_name", )
     search_fields = ("tguser__first_name", "tguser__last_name", "tguser__username", )
-    fields = ("department", "tguser", "title", )
+    fields = ("department", "tguser", "degree_name", )
     autocomplete_fields = ("department", "tguser", )
 
 

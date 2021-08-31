@@ -17,7 +17,7 @@ from university.models import (
 class RepresentativeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Representative
-        fields = ("tguser", "title", )
+        fields = ("tguser", "degree_name", )
 
     tguser = TgUserSerializer()
 

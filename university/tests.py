@@ -358,7 +358,7 @@ class DepartmentTestCase(TestCase):
         Representative.objects.create(
             department=self.dep2,
             tguser=tgus1,
-            title="Representative",
+            degree_name="Representative",
         )
         tgus2 = TgUser.objects.create(
             id=108121631,
@@ -369,7 +369,7 @@ class DepartmentTestCase(TestCase):
         Representative.objects.create(
             department=self.dep2,
             tguser=tgus2,
-            title="Chad",
+            degree_name="Chad",
         )
 
     def test_str(self):
@@ -450,7 +450,7 @@ class DepartmentTestCase(TestCase):
                         "last_name": "Aceti",
                         "username": "acetimarco",
                     },
-                    "title": "Representative"
+                    "degree_name": "Representative"
                 },
                 {
                     "tguser": {
@@ -459,7 +459,7 @@ class DepartmentTestCase(TestCase):
                         "last_name": "Busolin",
                         "username": "davidebusolin",
                     },
-                    "title": "Chad",
+                    "degree_name": "Chad",
                 }
             ],
             "degrees": [

@@ -38,10 +38,10 @@ class Representative(models.Model):
 
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="representatives")
     tguser = models.ForeignKey(TgUser, on_delete=models.CASCADE, related_name="representative")
-    title = models.CharField("title", max_length=64)
+    degree_name = models.CharField("degree name", max_length=64)
 
     def __str__(self) -> str:
-        return f"{str(self.tguser)}, {self.title} ({self.department.name})"
+        return f"{str(self.tguser)}, {self.degree_name} ({self.department.name})"
 
 
 class Degree(models.Model):
