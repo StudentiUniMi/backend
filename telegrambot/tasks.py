@@ -46,10 +46,10 @@ def fetch_telegram_info() -> None:
 
         for member in administrators:
             user = member.user
-            if member.status == member.CREATOR:
-                dbgroup.owner.id = user.id
-
             dbmember = DBUser.objects.get_or_create(id=user.id, first_name=user.first_name)[0]
+            if member.status == member.CREATOR:
+                dbgroup.owner = dbmember
+
             dbmembership = DBGroupMembership.objects.get_or_create(group_id=chat.id, user=dbmember)[0]
             dbmembership.status = member.status
             dbmembership.save()
