@@ -39,6 +39,9 @@ def fetch_telegram_info() -> None:
         except telegram.error.BadRequest:
             print(f"Bad chat {dbgroup.id}")
             continue
+        except telegram.error.RetryAfter as e:
+            time.sleep(e.retry_after + 10)
+            continue
 
         dbgroup.title = chat.title
         dbgroup.invite_link = chat.invite_link
@@ -55,7 +58,7 @@ def fetch_telegram_info() -> None:
             dbmembership.save()
 
         dbgroup.save()
-        time.sleep(0.3)
+        time.sleep(0.5)
 
     print("DONE\n" + '-' * 15)
 
