@@ -20,8 +20,6 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
     members: List[User] = message.new_chat_members
 
     for member in members:
-        if member.id == message.from_user.id:
-            continue
         dbuser: DBUser = utils.save_user(member, chat)
         utils.set_admin_rights(dbuser, chat)
         logging.log(logging.USER_JOINED, chat=chat, target=member)
