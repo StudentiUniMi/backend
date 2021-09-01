@@ -2,13 +2,15 @@ from datetime import datetime
 
 import telegram
 from django.apps import apps
-from django.urls import reverse
 from django.conf import settings
+from django.urls import reverse
 from telegram import User, Chat, TelegramError
 from telegram.ext import DispatcherHandlerStop
 from telegram.utils.helpers import escape
+
 import telegrambot.models as t_models
 import university.models as u_models
+from telegrambot import logging
 
 
 # def get_bot(chat: Union[Chat, telegrambot.Group, int]) -> telegram.Bot
@@ -101,10 +103,11 @@ def set_admin_rights(dbuser, chat) -> None:
             user_id=dbuser.id,
             custom_title=privileges.custom_title,
         )
-    except TelegramError:
-        # The bot has no enough rights
-        # TODO: Alert administrators
-        pass
+    except TelegramError as e:
+        if e.message == "Chat not found":
+            logging.log(logging.CHAT_DOES_NOT_EXIST, chat=chat, target=bot)
+        elif e.message == "Not enough rights":
+            logging.log(logging.NOT_ENOUGH_RIGHTS, chat=chat, target=bot)
 
 
 # def remove_admin_rights(dbuser: telegrambot.User, chat: Union[telegram.Chat, telegrambot.Chat]) -> None
