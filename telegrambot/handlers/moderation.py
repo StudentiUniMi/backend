@@ -212,6 +212,6 @@ def handle_info_command(update: Update, _: CallbackContext) -> None:
             continue
 
         # User must start the bot in private before he can receive messages from it
-        sender.send_message(text, parse_mode="markdown", disable_web_page_preview=True)
+        sender.send_message(text, parse_mode="html", disable_web_page_preview=True)
 
     message.delete()

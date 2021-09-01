@@ -121,6 +121,8 @@ if DEBUG:
         'rest_framework.renderers.BrowsableAPIRenderer',
     )
 
+REAL_HOST = 'https://api-staging.studentiunimi.it' if DEBUG else 'https://api.studentiunimi.it'
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
