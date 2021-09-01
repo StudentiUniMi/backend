@@ -78,3 +78,12 @@ def handle_chat_member_updates(update: Update, _: CallbackContext) -> None:
 
     if new.status == ChatMember.LEFT:
         logging.log(logging.USER_LEFT, chat=chat, target=user)
+
+
+def claim_command(update: Update, _: CallbackContext) -> None:
+    """Claim admin privileges"""
+    user = update.message.from_user
+    chat = update.message.chat
+    dbuser = DBUser.objects.get(id=user.id)
+
+    utils.set_admin_rights(dbuser, chat)
