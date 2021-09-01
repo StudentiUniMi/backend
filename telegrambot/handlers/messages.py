@@ -30,8 +30,7 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         # The group is not in the database; ignore all updates from it
         logging.log(logging.CHAT_DOES_NOT_EXIST, chat)
         # TODO: re-enable this line
-        if context.bot.username != "@studentiunimibot":
-            context.bot.leave_chat(chat_id=chat.id)
+        # context.bot.leave_chat(chat_id=chat.id)
         raise DispatcherHandlerStop
 
     utils.save_user(sender, chat)
