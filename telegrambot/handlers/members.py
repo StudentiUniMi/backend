@@ -67,6 +67,7 @@ def handle_chat_member_updates(update: Update, _: CallbackContext) -> None:
     chat: Chat = update.chat_member.chat
     new: ChatMember = update.chat_member.new_chat_member
 
+    utils.save_user(new.user, chat)
     GroupMembership.objects.update_or_create(
         user_id=new.user.id,
         group_id=chat.id,
