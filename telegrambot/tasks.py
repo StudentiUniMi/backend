@@ -49,7 +49,7 @@ def fetch_telegram_info() -> None:
 
         for member in administrators:
             user = member.user
-            dbmember = DBUser.objects.get_or_create(id=user.id, first_name=user.first_name)[0]
+            dbmember = DBUser.objects.get_or_create(id=user.id)[0]
             if member.status == member.CREATOR:
                 dbgroup.owner = dbmember
 

@@ -2,10 +2,15 @@ from datetime import datetime
 
 import telegram
 from django.apps import apps
+from django.conf import settings
+from django.urls import reverse
 from telegram import User, Chat, TelegramError
 from telegram.ext import DispatcherHandlerStop
+from telegram.utils.helpers import escape
+
 import telegrambot.models as t_models
 import university.models as u_models
+from telegrambot import logging
 
 
 # def get_bot(chat: Union[Chat, telegrambot.Group, int]) -> telegram.Bot
@@ -98,10 +103,11 @@ def set_admin_rights(dbuser, chat) -> None:
             user_id=dbuser.id,
             custom_title=privileges.custom_title,
         )
-    except TelegramError:
-        # The bot has no enough rights
-        # TODO: Alert administrators
-        pass
+    except TelegramError as e:
+        if e.message == "Chat not found":
+            logging.log(logging.CHAT_DOES_NOT_EXIST, chat=chat, target=bot)
+        elif e.message == "Not enough rights":
+            logging.log(logging.NOT_ENOUGH_RIGHTS, chat=chat, target=bot)
 
 
 # def remove_admin_rights(dbuser: telegrambot.User, chat: Union[telegram.Chat, telegrambot.Chat]) -> None
@@ -184,6 +190,24 @@ def get_targets_of_command(message):
     return targets
 
 
+def get_admin_url(model):
+    return settings.REAL_HOST + \
+           reverse(f"admin:{model._meta.app_label}_{model._meta.model_name}_change", args=(model.pk, ))
+
+
+def format_group_membership(dbmembership):
+    group = dbmembership.group
+    user = dbmembership.user
+
+    text = f"[<code>{group.id}</code>|"
+    text += f"<a href=\"{get_admin_url(group)}\">AG</a>|"
+    text += f"<a href=\"{get_admin_url(user)}\">AU</a>|"
+    text += f"<a href=\"{group.invite_link}\">L</a>|" if group.invite_link else ""
+    text += f"{dbmembership.status[:3].upper()}"
+    text += f"] {group.title}"
+    return text
+
+
 def format_user_info(dbuser):
     """Format some Telegram user information.
 
@@ -194,14 +218,14 @@ def format_user_info(dbuser):
     except t_models.User.DoesNotExist:
         return None
 
-    text = "👤 *Utente* [{name}](tg://user?id={id}) \[`{id}`]".format(name=user.name, id=user.id)
-    text += ("\n🔖 *Username*: @" + user.username) if user.username is not None else ""
-    text += "\n🔺 *Reputazione*: {}".format(user.reputation)
-    text += "\n🟡 *Ammonizioni*: {}".format(user.warn_count)
-    text += "\n👮‍️ *Livello dei permessi*: {}".format(user.permissions_level)
-    text += "\n🕗 *Ultimo messaggio*: {}".format(user.last_seen.strftime("%d-%m-%Y %H:%M:%S"))
+    text = f"👤 <b>Utente</b> <a href=\"tg://user?id={user.id}\">{escape(user.name)}</a>"
+    text += f"\n🔖 <b>Username</b>: @{escape(user.username)}" if user.username else ""
+    text += f"\n🔺 <b>Reputazione</b>: {user.reputation}"
+    text += f"\n🟡 <b>Ammonizioni</b>: {user.warn_count}"
+    text += f"\n👮‍ <b>Livello di permessi</b>: {user.permissions_level}"
+    text += f"\n🕗 <b>Ultimo messaggio</b>: {user.last_seen.strftime('%d-%m-%Y %H:%M:%S')}"
     if user.banned:
-        text += "\n⚫️ *Il membro è bannato globalmente dal network*."
+        text += "\n⚫️ <b>Il membro è bannato globalmente dal network</b>."
 
     privs = t_models.UserPrivilege.objects.filter(user=user.id)
     if privs is not None:
@@ -214,34 +238,31 @@ def format_user_info(dbuser):
             if p_type is None:
                 continue
 
-            text += "\n⭐ ️È *{}* ".format(p_type.lower())
+            text += f"\n⭐ ️È <b>{p_type.lower()}</b> "
             if priv.can_restrict_members:
-                text += "(*moderatore*) "
+                text += "(<b>+</b>) "
 
             if priv.scope == priv.PrivilegeScopes.GROUPS:
                 text += "nei seguenti gruppi:\n"
                 for group in t_models.Group.objects.filter(privileged_users__user__id=user.id):
-                    text += "➖ \[`" + str(group.id) + "`] " + group.title + "\n"
+                    text += f"➖ [<code>{group.id}</code>] {escape(group.title)}\n"
             elif priv.scope == priv.PrivilegeScopes.DEGREES:
                 text += "dei seguenti C.d.L.:\n"
                 for degree in u_models.Degree.objects.filter(privileged_users__user_id=user.id):
-                    text += "➖ " + degree.name + "\n"
+                    text += f"➖ {escape(degree.name)}\n"
             elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
                 text += "dei seguenti dipartimenti:\n"
                 for department in u_models.Department.objects.filter(privileged_users__user_id=user.id):
-                    text += "➖ " + department.name + "\n"
+                    text += f"➖ {escape(department.name)}\n"
             else:
-                text += "\n"
+                text += "in tutto l'Ateneo\n"
 
     present_in_groups = t_models.GroupMembership.objects.filter(user__id=user.id).order_by("messages_count").reverse()
     if present_in_groups is None:
         return text
 
-    text += "\n👥 *È stato visto nei seguenti gruppi*:\n"
-    for group_mem in present_in_groups:
-        if not group_mem.group.invite_link:
-            text += "➖ *{}* \[`{}`]".format(group_mem.group.title, group_mem.group.id)
-        else:
-            text += "➖ *{}* \[[`{}`]({})]".format(group_mem.group.title, group_mem.group.id, group_mem.group.invite_link)
-        text += " ({}), {} msg\n".format(group_mem.status.upper(), group_mem.messages_count)
+    text += "\n👥 <b>È stato visto nei seguenti gruppi</b>:\n"
+    for dbmembership in present_in_groups:
+        text += f"➖ {format_group_membership(dbmembership)}\n"
+
     return text

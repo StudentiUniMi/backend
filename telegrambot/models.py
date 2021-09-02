@@ -266,10 +266,10 @@ class UserPrivilege(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         """Save the current instance and set the proper permissions in all groups the user is in"""
+        super().save(*args, **kwargs)
         groups = self.user.member_of.all()
         for group in groups:
             utils.set_admin_rights(self.user, group)
-        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs) -> None:
         """Save the current instance and revoke all special permissions in all groups the user is in"""

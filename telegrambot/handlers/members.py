@@ -70,10 +70,16 @@ def handle_new_chat_members(update: Update, context: CallbackContext) -> None:
 
 
 def handle_chat_member_updates(update: Update, _: CallbackContext) -> None:
+    if not update.chat_member:
+        # Ignore update.my_chat_member for now
+        # TODO: Handle update.my_chat_member properly
+        return
+
     user: User = update.chat_member.from_user
     chat: Chat = update.chat_member.chat
     new: ChatMember = update.chat_member.new_chat_member
 
+    utils.save_user(new.user, chat)
     GroupMembership.objects.update_or_create(
         user_id=new.user.id,
         group_id=chat.id,
@@ -105,3 +111,12 @@ def handle_verification(update: Update, context: CallbackContext) -> None:
         # If we don't find a user it means the user is already in the group, there's no need to register him here,
         # it will happen when he'll send the first message
         pass
+
+
+def claim_command(update: Update, _: CallbackContext) -> None:
+    """Claim admin privileges"""
+    user = update.message.from_user
+    chat = update.message.chat
+    dbuser = DBUser.objects.get(id=user.id)
+
+    utils.set_admin_rights(dbuser, chat)

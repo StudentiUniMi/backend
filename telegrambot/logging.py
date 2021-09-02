@@ -15,6 +15,7 @@ class EventTypes(Enum):
     MODERATION_SUPERBAN = 7, '⚫️'
     USER_JOINED = 8, '➕'
     USER_LEFT = 9, '➖'
+    NOT_ENOUGH_RIGHTS = 10, '🔰'
 
 
 CHAT_DOES_NOT_EXIST = EventTypes.CHAT_DOES_NOT_EXIST
@@ -26,6 +27,7 @@ MODERATION_FREE = EventTypes.MODERATION_FREE
 MODERATION_SUPERBAN = EventTypes.MODERATION_SUPERBAN
 USER_JOINED = EventTypes.USER_JOINED
 USER_LEFT = EventTypes.USER_LEFT
+NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
 
 
 def _normalize_group_id(group_id) -> str:
@@ -80,6 +82,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.USER_LEFT,
         EventTypes.USER_JOINED,
+        EventTypes.NOT_ENOUGH_RIGHTS,
     ]:
         text += f"\n👤 <b>Target user</b>: {_format_user(target)}"
     if event in [
