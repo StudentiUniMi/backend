@@ -125,7 +125,8 @@ def degrees_by_department(request):
     if not department_id:
         return Response({"ok": False, "error": "Please provide a dep_id (department id)"}, status=400)
 
-    queryset = Degree.objects.all().filter(department_id=department_id)
+    queryset = Degree.objects.all().filter(department_id=department_id)\
+        .order_by("name")
     serializer = DegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
