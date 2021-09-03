@@ -1,4 +1,8 @@
+import time
+
+import telegram.error
 from django.contrib import admin
+from django.core.checks import messages
 
 from telegrambot.models import (
     User,
@@ -47,12 +51,32 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
+    @admin.action(description="Fetch and update Telegram data")
+    def fetch_telegram_info_action(self, request, queryset):
+        stats = {False: 0, True: 0}
+        for group in queryset:
+            try:
+                stats[group.update_info()] += 1
+            except telegram.error.RetryAfter as e:
+                time.sleep(e.retry_after + 1)
+        self.message_user(request, f"{stats[True]} groups updated.\n{stats[False]} groups not updated.")
+
+    def save_model(self, request, obj, form, change):
+        if not obj.update_info():
+            super(GroupAdmin, self).save_model(request, obj, form, change)
+            self.message_user(
+                request, f"The group has been saved, but the bot was not able to retrieve any data from Telegram.\n"
+                         f"Are you sure you inserted the correct chat id and selected the right bot?",
+                level=messages.WARNING,
+            )
+
     list_display = ("id", "title", "owner", )
     list_filter = (GroupOwnerFilter, )
-    search_fields = ("title", )
+    search_fields = ("id", "title", )
     fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", "bot", "welcome_model", )
     autocomplete_fields = ("owner", "bot", )
     inlines = (GroupMembershipInline, )
+    actions = [fetch_telegram_info_action, ]
 
 
 @admin.register(UserPrivilege)
