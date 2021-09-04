@@ -12,4 +12,5 @@ urlpatterns = [
     path(r"degree", views.degree_by_slug, name="api-degree"),
     path(r"courses", views.courses_by_degree, name="api-courses"),
     path(r"representatives", views.representatives_by_department, name="api-representatives"),
+    path(r"typing-degrees", views.typing_degrees, name="api-typing-degrees"),
 ]

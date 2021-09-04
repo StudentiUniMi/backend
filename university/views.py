@@ -1,15 +1,22 @@
 import json
-
+import random
 from django.core.exceptions import PermissionDenied
-from django.db.utils import IntegrityError
 from django.db.models import Count
+from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from university.models import Degree, Department, Course, DEGREE_TYPES, Representative, CourseDegree
+from university.models import (
+    DEGREE_TYPES,
+    Degree,
+    Department,
+    Course,
+    Representative,
+    CourseDegree,
+)
 from university.serializers import (
     DegreeSerializer,
     VerboseDegreeSerializer,
@@ -120,6 +127,14 @@ def import_courses(request: HttpRequest):
     text = "\n{} courses were already present and have been ignored.\n{} courses have been added to the database."\
         .format(ignored, added)
     return HttpResponse("Data has been added successfully!" + text)
+
+
+@api_view(["GET"])
+def typing_degrees(request):
+    """Return 10 random degrees"""
+    degrees = [d.name.lower() for d in Degree.objects.all().distinct("name")[:10]]
+    random.shuffle(degrees)
+    return Response(degrees)
 
 
 @api_view(["GET"])
