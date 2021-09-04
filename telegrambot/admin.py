@@ -1,8 +1,17 @@
-import time
-
+import asyncio
 import telegram.error
+import telethon.errors
+import time
+from django.conf import settings
 from django.contrib import admin
 from django.core.checks import messages
+from telethon.sync import TelegramClient
+from telethon.tl.functions.channels import (
+    EditAdminRequest,
+    CreateChannelRequest,
+    InviteToChannelRequest,
+)
+from telethon.tl.types import ChatAdminRights
 
 from telegrambot.models import (
     User,
@@ -53,6 +62,52 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
+    @staticmethod
+    def create_telegram_group(group, bot):
+        userbot: TelegramUserbot = TelegramUserbot.objects.all()\
+            .filter(active=True)\
+            .prefetch_related("user")\
+            .order_by("-last_used")\
+            .first()
+        file_path = f"media/{userbot.session_file.name}"
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        with TelegramClient(file_path, settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH) as client:
+            mtbot = client.get_input_entity(bot.username)
+
+            response = client(CreateChannelRequest(
+                title=group.title,
+                about=group.description,
+                broadcast=False,
+                megagroup=True,
+            ))
+            if len(response.chats) < 1:
+                return {"ok": False}
+
+            mtgroup = response.chats[0]
+            client(InviteToChannelRequest(
+                channel=mtgroup,
+                users=[mtbot, ]
+            ))
+            client(EditAdminRequest(
+                channel=mtgroup,
+                user_id=mtbot.user_id,
+                admin_rights=ChatAdminRights(
+                    change_info=True,
+                    delete_messages=True,
+                    ban_users=True,
+                    invite_users=True,
+                    pin_messages=True,
+                    add_admins=True,
+                    manage_call=True,
+                    other=True,
+                ),
+                rank="Bot",
+            ))
+            return int(f"-100{mtgroup.id}")
+
     @admin.action(description="Fetch and update Telegram data")
     def fetch_telegram_info_action(self, request, queryset):
         stats = {False: 0, True: 0}
@@ -63,7 +118,21 @@ class GroupAdmin(admin.ModelAdmin):
                 time.sleep(e.retry_after + 1)
         self.message_user(request, f"{stats[True]} groups updated.\n{stats[False]} groups not updated.")
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj: Group, form, change):
+        if obj.id == 0:
+            try:
+                obj.id = self.create_telegram_group(
+                    group=obj,
+                    bot=obj.bot,
+                )
+                obj.save()
+            except telethon.errors.RPCError as e:
+                self.message_user(
+                    request, f"Can't create the group. Telethon error: {e.message}",
+                    level=messages.ERROR,
+                )
+                return
+
         if not obj.update_info():
             super(GroupAdmin, self).save_model(request, obj, form, change)
             self.message_user(
@@ -112,4 +181,4 @@ class TelegramBotAdmin(admin.ModelAdmin):
 class TelegramUserbotAdmin(admin.ModelAdmin):
     list_display = ("user", "active", "group_count", "last_used")
     search_fields = ("user", "user__first_name", "user__last_name", "user__username", )
-    fields = ("user", "active", "group_count", "last_used")
+    fields = ("user", "session_file", "active", "group_count", "last_used", )

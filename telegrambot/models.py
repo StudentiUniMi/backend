@@ -342,6 +342,7 @@ class TelegramUserbot(models.Model):
         verbose_name_plural = "Telegram userbots"
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    session_file = models.FileField("telethon session file", upload_to="userbot-sessions/")
     active = models.BooleanField("active", default=False)
     group_count = models.IntegerField("group count", default=0)
     last_used = models.DateTimeField("last used", default=datetime.now)
