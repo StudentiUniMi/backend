@@ -74,8 +74,10 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
 
 def claim_command(update: Update, _: CallbackContext) -> None:
     """Claim admin privileges"""
-    user = update.message.from_user
-    chat = update.message.chat
+    message = update.message
+    user = message.from_user
+    chat = message.chat
     dbuser = DBUser.objects.get(id=user.id)
 
     utils.set_admin_rights(dbuser, chat)
+    message.delete()
