@@ -5,7 +5,6 @@ import telegram
 from telegram import ChatMember
 from django.apps import apps
 from django.db import models
-from telegram import ChatInviteLink
 
 from telegrambot.handlers import utils
 
@@ -331,3 +330,18 @@ class TelegramBot(models.Model):
 
     def __str__(self) -> str:
         return self.username
+
+
+class TelegramUserbot(models.Model):
+    """An authorized Telegram userbot worker
+
+    https://github.com/StudentiUniMi/userbot-worker
+    """
+    class Meta:
+        verbose_name = "Telegram userbot"
+        verbose_name_plural = "Telegram userbots"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    active = models.BooleanField("active", default=False)
+    group_count = models.IntegerField("group count", default=0)
+    last_used = models.DateTimeField("last used", default=datetime.now)

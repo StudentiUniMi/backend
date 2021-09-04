@@ -8,7 +8,9 @@ from telegrambot.models import (
     User,
     Group,
     GroupMembership,
-    TelegramBot, UserPrivilege,
+    TelegramBot,
+    UserPrivilege,
+    TelegramUserbot,
 )
 
 
@@ -104,3 +106,10 @@ class TelegramBotAdmin(admin.ModelAdmin):
     list_display = ("username", "censured_token", "notes")
     search_fields = ("username", )
     fields = ("token", "notes")
+
+
+@admin.register(TelegramUserbot)
+class TelegramUserbotAdmin(admin.ModelAdmin):
+    list_display = ("user", "active", "group_count", "last_used")
+    search_fields = ("user", "user__first_name", "user__last_name", "user__username", )
+    fields = ("user", "active", "group_count", "last_used")
