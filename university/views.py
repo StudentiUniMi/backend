@@ -2,6 +2,7 @@ import json
 
 from django.core.exceptions import PermissionDenied
 from django.db.utils import IntegrityError
+from django.db.models import Count
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
@@ -13,7 +14,9 @@ from university.serializers import (
     DegreeSerializer,
     VerboseDegreeSerializer,
     DepartmentSerializer,
-    VerboseDepartmentSerializer, CourseSerializer, RepresentativeSerializer, CourseDegreeSerializer,
+    VerboseDepartmentSerializer,
+    RepresentativeSerializer,
+    CourseDegreeSerializer,
 )
 
 
@@ -126,7 +129,8 @@ def degrees_by_department(request):
         return Response({"ok": False, "error": "Please provide a dep_id (department id)"}, status=400)
 
     queryset = Degree.objects.all().filter(department_id=department_id)\
-        .order_by("name")
+        .annotate(courses_count=Count("courses"))\
+        .order_by("-courses_count", "name")
     serializer = DegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
