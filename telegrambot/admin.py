@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import asyncio
 import telegram.error
 import telethon.errors
@@ -106,6 +108,10 @@ class GroupAdmin(admin.ModelAdmin):
                 ),
                 rank="Bot",
             ))
+
+            userbot.last_used = datetime.now()
+            userbot.group_count += 1
+            userbot.save()
             return int(f"-100{mtgroup.id}")
 
     @admin.action(description="Fetch and update Telegram data")
