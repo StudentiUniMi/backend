@@ -182,3 +182,4 @@ class TelegramUserbotAdmin(admin.ModelAdmin):
     list_display = ("user", "active", "group_count", "last_used")
     search_fields = ("user", "user__first_name", "user__last_name", "user__username", )
     fields = ("user", "session_file", "active", "group_count", "last_used", )
+    autocomplete_fields = ("user", )
