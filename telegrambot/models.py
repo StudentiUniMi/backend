@@ -102,7 +102,12 @@ class Group(models.Model):
         """Helper function used to generate an appropriate filename for a group profile picture"""
         return f"gropics/{self.id}_{filename}"
 
-    id = models.BigIntegerField("Telegram group ID", primary_key=True, unique=True)
+    id = models.BigIntegerField(
+        "Telegram group ID",
+        primary_key=True,
+        unique=True,
+        help_text="Set the ID to 0 if you want an userbot to actually create the group",
+    )
     title = models.CharField("title", max_length=512)
     description = models.TextField("description", max_length=2048, blank=True, null=True)
     profile_picture = models.ImageField(upload_to=_format_filename, blank=True, null=True)
