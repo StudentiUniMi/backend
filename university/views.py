@@ -2,6 +2,7 @@ import json
 import random
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
+from django.db.models.functions import Length
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, render
@@ -161,6 +162,19 @@ def degree_by_slug(request):
     except Degree.DoesNotExist:
         return Response({"ok": False, "error": "Not found"}, status=404)
     serializer = VerboseDegreeSerializer(degree)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def degrees_by_query(request):
+    query = request.query_params.get("q", None)
+    if not query:
+        return Response([])
+
+    queryset = Degree.objects.all()\
+        .filter(name__icontains=query)\
+        .order_by(Length("name").asc())
+    serializer = DegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
 
