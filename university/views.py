@@ -145,6 +145,7 @@ def degrees_by_department(request):
         return Response({"ok": False, "error": "Please provide a dep_id (department id)"}, status=400)
 
     queryset = Degree.objects.all().filter(department_id=department_id)\
+        .select_related("group")\
         .annotate(courses_count=Count("courses"))\
         .order_by("-courses_count", "name")
     serializer = DegreeSerializer(queryset, many=True)
@@ -173,6 +174,7 @@ def degrees_by_query(request):
 
     queryset = Degree.objects.all()\
         .filter(name__icontains=query)\
+        .select_related("group")\
         .order_by(Length("name").asc())
     serializer = DegreeSerializer(queryset, many=True)
     return Response(serializer.data)
@@ -185,6 +187,8 @@ def courses_by_degree(request):
         return Response({"ok": False, "error": "Please provide a deg_id (degree id)"}, status=400)
 
     queryset = CourseDegree.objects.all().filter(degree_id=degree_id)\
+        .prefetch_related("course", "course__degrees", "course__links", )\
+        .select_related("course__group")\
         .order_by("course__name")
     queryset = sorted(queryset, key=lambda c: (c.year if c.year >= 0 else c.year + 10) * 2 + c.semester)
     serializer = CourseDegreeSerializer(queryset, many=True)
@@ -197,7 +201,9 @@ def representatives_by_department(request):
     if not department_id:
         return Response({"ok": False, "error": "Please provide a dep_id (department id)"}, status=400)
 
-    queryset = Representative.objects.all().filter(department_id=department_id)
+    queryset = Representative.objects.all()\
+        .filter(department_id=department_id)\
+        .select_related("tguser")
     serializer = RepresentativeSerializer(queryset, many=True)
     return Response(serializer.data)
 
