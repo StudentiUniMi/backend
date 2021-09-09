@@ -215,3 +215,17 @@ def handle_info_command(update: Update, _: CallbackContext) -> None:
         sender.send_message(text, parse_mode="html", disable_web_page_preview=True)
 
     message.delete()
+
+
+def handle_creation_command(update: Update, context: CallbackContext) -> None:
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    if not utils.can_superban(sender):
+        return
+
+    text = utils.generate_group_creation_message(chat)
+    msg = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
+    msg.pin()
+    message.delete()

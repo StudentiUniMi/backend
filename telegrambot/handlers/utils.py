@@ -266,3 +266,36 @@ def format_user_info(dbuser):
         text += f"➖ {format_group_membership(dbmembership)}\n"
 
     return text
+
+
+def generate_group_creation_message(group: telegram.Chat) -> str:
+    dbgroup = t_models.Group.objects.get(id=group.id)
+    dbdegree = u_models.Degree.objects.get(group_id=dbgroup.id)
+    degree_type = ""
+    for t in u_models.DEGREE_TYPES:
+        if t[0] == dbdegree.type:
+            degree_type = t[1]
+
+    text = (
+        "<a href=\"https://studentiunimi.it\">📣</a> <b>BENVENUTI, e buona permanenza</b>!"
+        f"\n📍 Sei nel <b>gruppo</b> Telegram principale del CdL di {dbdegree.name} ({degree_type})."
+        "\n👥 Puoi usare questo gruppo per <b>scaricare</b> e <b>condividere</b> materiali, "
+        "<b>chiedere</b> informazioni o <b>conoscere</b> i tuoi compagni di corso."
+
+        "\n\n🎉 Scopri il nostro <b>network StudentiUniMi</b>: stiamo creando e gestendo gruppi Telegram per ogni corso "
+        "di laurea e insegnamento, in modo da facilitare la comunicazione tra gli studenti e la condivisione di "
+        f"informazioni. A <a href=\"{settings.REAL_HOST}/courses/{dbdegree.slug}\">questo link</a> puoi trovare "
+        "tutti i gruppi associati a questo corso di laurea."
+        "\n🗣 <b>Condividi</b> i gruppi ai tuoi colleghi per liberarli dai "
+        "fastidiosissimi gruppi WhatsApp ingestibili ;)"
+        "\n😬 <b>Nessuno scrive</b>? All'inizio è normale un po' di imbarazzo: "
+        "<i>sii il cambiamento che vuoi vedere nel mondo</i>."
+
+        "\n\n🌍 <b>Gruppo principale degli studenti dell'Ateneo</b>: @unimichat"
+        "\n🤘 <b>Server Discord</b>: https://discord.gg/SwPzAkv4A4"
+        "\n💻 <b>Sito web</b> del network: https://studentiunimi.it"
+        "\n📰 <b>Canale Telegram</b> del network: @studenti_unimi"
+        "\n✅ <b>Alternativa ad UNIMIA</b>, sempre online: https://unimia.studentiunimi.it"
+        "\n👮 <i>Cerchiamo amministratori e moderatori, se sei interessato/a contattaci!</i>"
+    )
+    return text

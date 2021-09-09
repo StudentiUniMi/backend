@@ -56,6 +56,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         command="claim",
         callback=members.claim_command,
     ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="creation",
+        callback=moderation.handle_creation_command,
+    ), group=2)
 
     update = Update.de_json(json_update, bot)
     dispatcher.process_update(update)
