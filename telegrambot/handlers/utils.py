@@ -284,7 +284,7 @@ def generate_group_creation_message(group: telegram.Chat) -> str:
 
         "\n\n🎉 Scopri il nostro <b>network StudentiUniMi</b>: stiamo creando e gestendo gruppi Telegram per ogni corso "
         "di laurea e insegnamento, in modo da facilitare la comunicazione tra gli studenti e la condivisione di "
-        f"informazioni. A <a href=\"{settings.REAL_HOST}/courses/{dbdegree.slug}\">questo link</a> puoi trovare "
+        f"informazioni. A <a href=\"https://studentiunimi.it/courses/{dbdegree.slug}\">questo link</a> puoi trovare "
         "tutti i gruppi associati a questo corso di laurea."
         "\n🗣 <b>Condividi</b> i gruppi ai tuoi colleghi per liberarli dai "
         "fastidiosissimi gruppi WhatsApp ingestibili ;)"
