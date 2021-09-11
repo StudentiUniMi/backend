@@ -29,7 +29,7 @@ from university.serializers import (
 
 
 def _get_all_objects(model, serializer):
-    queryset = model.objects.all()
+    queryset = model.objects.all().order_by("name")
     serializer = serializer(queryset, many=True)
     return Response(serializer.data)
 
