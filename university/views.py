@@ -176,7 +176,7 @@ def degrees_by_query(request):
     queryset = Degree.objects.all()\
         .filter(name__icontains=query)\
         .select_related("group")\
-        .order_by(Length("name").asc())
+        .order_by(Length("name").asc(), "name", "type")
     serializer = DegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
