@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('telegrambot', '0010_userprivilege_can_superban_members'),
+        ('telegrambot', '0012_telegramuserbot_session_file'),
     ]
 
     operations = [
