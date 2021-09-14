@@ -16,7 +16,7 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
     :raises: DispatcherHandlerStop if the messages comes from the bot itself or
     the group does not exists in the database.
     """
-    message: Message = update.message
+    message: Message = update.message or update.edited_message
     sender: User = message.from_user
     chat: Chat = message.chat
 

@@ -4,6 +4,7 @@ psycopg2-binary
 pillow  # required by django ImageField
 djangorestframework
 python-telegram-bot
+telethon
 django-background-tasks
 pytimeparse
 pytz

@@ -1,6 +1,8 @@
 import json
-
+import random
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
+from django.db.models.functions import Length
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, render
@@ -8,17 +10,26 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from university.models import Degree, Department, Course, DEGREE_TYPES, Representative, CourseDegree
+from university.models import (
+    DEGREE_TYPES,
+    Degree,
+    Department,
+    Course,
+    Representative,
+    CourseDegree,
+)
 from university.serializers import (
     DegreeSerializer,
     VerboseDegreeSerializer,
     DepartmentSerializer,
-    VerboseDepartmentSerializer, CourseSerializer, RepresentativeSerializer, CourseDegreeSerializer,
+    VerboseDepartmentSerializer,
+    RepresentativeSerializer,
+    CourseDegreeSerializer,
 )
 
 
 def _get_all_objects(model, serializer):
-    queryset = model.objects.all()
+    queryset = model.objects.all().order_by("name")
     serializer = serializer(queryset, many=True)
     return Response(serializer.data)
 
@@ -120,27 +131,55 @@ def import_courses(request: HttpRequest):
 
 
 @api_view(["GET"])
+def typing_degrees(request):
+    """Return 10 random degrees"""
+    pks = Degree.objects.values_list("pk", flat=True)
+    sampled_pks = random.sample(list(pks), min(len(pks), 10))
+    degrees = [d.name.lower() for d in Degree.objects.filter(pk__in=sampled_pks).distinct("name")]
+    random.shuffle(degrees)
+    return Response(degrees)
+
+
+@api_view(["GET"])
 def degrees_by_department(request):
     department_id = request.query_params.get("dep_id", None)
     if not department_id:
         return Response({"ok": False, "error": "Please provide a dep_id (department id)"}, status=400)
 
-    queryset = Degree.objects.all().filter(department_id=department_id)
+    queryset = Degree.objects.all().filter(department_id=department_id)\
+        .select_related("group")\
+        .annotate(courses_count=Count("courses"))\
+        .order_by("-courses_count", "name")
     serializer = DegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
 
 @api_view(["GET"])
-def degree_by_slug(request):
+def degree_by_slug_or_pk(request):
     slug = request.query_params.get("slug", None)
-    if not slug:
-        return Response({"ok": False, "error": "Please provide an unique slug"}, status=400)
+    pk = request.query_params.get("pk", None)
+    if not slug and not pk:
+        return Response({"ok": False, "error": "Please provide the pk or an unique slug"}, status=400)
 
     try:
-        degree = Degree.objects.get(slug=slug)
-    except Degree.DoesNotExist:
+        degree = Degree.objects.get(pk=int(pk)) if pk else Degree.objects.get(slug=slug)
+    except (Degree.DoesNotExist, TypeError):
         return Response({"ok": False, "error": "Not found"}, status=404)
     serializer = VerboseDegreeSerializer(degree)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def degrees_by_query(request):
+    query = request.query_params.get("q", None)
+    if not query:
+        return Response([])
+
+    queryset = Degree.objects.all()\
+        .filter(name__icontains=query)\
+        .select_related("group")\
+        .order_by(Length("name").asc(), "name", "type")
+    serializer = DegreeSerializer(queryset, many=True)
     return Response(serializer.data)
 
 
@@ -151,6 +190,8 @@ def courses_by_degree(request):
         return Response({"ok": False, "error": "Please provide a deg_id (degree id)"}, status=400)
 
     queryset = CourseDegree.objects.all().filter(degree_id=degree_id)\
+        .prefetch_related("course", "course__degrees", "course__links", )\
+        .select_related("course__group")\
         .order_by("course__name")
     queryset = sorted(queryset, key=lambda c: (c.year if c.year >= 0 else c.year + 10) * 2 + c.semester)
     serializer = CourseDegreeSerializer(queryset, many=True)
@@ -163,7 +204,9 @@ def representatives_by_department(request):
     if not department_id:
         return Response({"ok": False, "error": "Please provide a dep_id (department id)"}, status=400)
 
-    queryset = Representative.objects.all().filter(department_id=department_id)
+    queryset = Representative.objects.all()\
+        .filter(department_id=department_id)\
+        .select_related("tguser")
     serializer = RepresentativeSerializer(queryset, many=True)
     return Response(serializer.data)
 

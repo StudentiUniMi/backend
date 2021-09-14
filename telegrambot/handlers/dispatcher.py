@@ -5,7 +5,6 @@ from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHand
 from telegram.ext.dispatcher import Dispatcher
 
 from telegrambot.handlers import messages, members, moderation
-from telegrambot.handlers.filters import NewChatMemberFilter
 
 
 def dispatch_telegram_update(json_update: dict, token: str) -> None:
@@ -19,10 +18,6 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
     ), group=0)
 
     # Groups
-    dispatcher.add_handler(MessageHandler(
-        filters=NewChatMemberFilter(),
-        callback=members.handle_new_chat_members,
-    ), group=1)
     dispatcher.add_handler(ChatMemberHandler(
         callback=members.handle_chat_member_updates,
         chat_member_types=ChatMemberHandler.ANY_CHAT_MEMBER,
@@ -61,6 +56,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
     dispatcher.add_handler(CommandHandler(
         command="claim",
         callback=members.claim_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="creation",
+        callback=moderation.handle_creation_command,
     ), group=2)
 
     update = Update.de_json(json_update, bot)

@@ -5,7 +5,6 @@ import telegram
 from telegram import ChatMember
 from django.apps import apps
 from django.db import models
-from telegram import ChatInviteLink
 
 from telegrambot.handlers import utils
 
@@ -104,7 +103,12 @@ class Group(models.Model):
         """Helper function used to generate an appropriate filename for a group profile picture"""
         return f"gropics/{self.id}_{filename}"
 
-    id = models.BigIntegerField("Telegram group ID", primary_key=True, unique=True)
+    id = models.BigIntegerField(
+        "Telegram group ID",
+        primary_key=True,
+        unique=True,
+        help_text="Set the ID to 0 if you want an userbot to actually create the group",
+    )
     title = models.CharField("title", max_length=512)
     description = models.TextField("description", max_length=2048, blank=True, null=True)
     profile_picture = models.ImageField(upload_to=_format_filename, blank=True, null=True)
@@ -133,11 +137,34 @@ class Group(models.Model):
             title=self.title,
         )
 
-    def update_invite_link(self):
-        """Update the saved chat invite link"""
+    def update_info(self):
+        """Update Telegram info"""
+        if not self.bot:
+            return False
+
         bot = telegram.Bot(self.bot.token)
-        self.invite_link = bot.create_chat_invite_link(chat_id=self.id).invite_link
+        try:
+            chat: telegram.Chat = bot.get_chat(chat_id=self.id)
+            administrators: List[telegram.ChatMember] = bot.get_chat_administrators(chat_id=self.id)
+        except telegram.error.BadRequest:
+            print(f"Bad chat {self.id}")
+            return False
+
+        self.title = chat.title
+        self.invite_link = chat.invite_link
+        self.description = chat.description
+
+        for member in administrators:
+            user = member.user
+            dbmember = User.objects.get_or_create(id=user.id)[0]
+            if member.status == member.CREATOR:
+                self.owner = dbmember
+
+            dbmembership = GroupMembership.objects.get_or_create(group_id=chat.id, user=dbmember)[0]
+            dbmembership.status = member.status
+            dbmembership.save()
         self.save()
+        return True
 
 
 class GroupMembership(models.Model):
@@ -309,3 +336,19 @@ class TelegramBot(models.Model):
 
     def __str__(self) -> str:
         return self.username
+
+
+class TelegramUserbot(models.Model):
+    """An authorized Telegram userbot worker
+
+    https://github.com/StudentiUniMi/userbot-worker
+    """
+    class Meta:
+        verbose_name = "Telegram userbot"
+        verbose_name_plural = "Telegram userbots"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    session_file = models.FileField("telethon session file", upload_to="userbot-sessions/")
+    active = models.BooleanField("active", default=False)
+    group_count = models.IntegerField("group count", default=0)
+    last_used = models.DateTimeField("last used", default=datetime.now)

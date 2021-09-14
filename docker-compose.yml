@@ -35,9 +35,12 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - LOGGING_CHAT_ID=${LOGGING_CHAT_ID}
       - LOGGING_BOT_TOKEN=${LOGGING_BOT_TOKEN}
+      - TELEGRAM_API_ID=${TELEGRAM_API_ID}
+      - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
       - SENTRY_DSN=${SENTRY_DSN}
     volumes:
       - static_files:/usr/src/app/static/
+      - ./userbot-sessions:/usr/src/app/media/userbot-sessions
     depends_on:
       - postgres
     networks:

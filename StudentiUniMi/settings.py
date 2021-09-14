@@ -110,6 +110,7 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -132,6 +133,9 @@ REST_FRAMEWORK = {
 
 LOGGING_CHAT_ID = os.environ.get("LOGGING_CHAT_ID", 0)
 LOGGING_BOT_TOKEN = os.environ.get("LOGGING_BOT_TOKEN", "")
+
+TELEGRAM_API_ID = os.environ.get("TELEGRAM_API_ID", None)
+TELEGRAM_API_HASH = os.environ.get("TELEGRAM_API_HASH", None)
 
 
 if not DEBUG and len(os.environ.get("SENTRY_DSN", '')) > 0:

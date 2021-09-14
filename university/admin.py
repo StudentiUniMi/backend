@@ -91,7 +91,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 class DegreeAdmin(admin.ModelAdmin):
     list_filter = (DegreeTypeFilter, )
     search_fields = ("name", "type", )
-    fields = ("name", "type", "department", "slug", "group", )
+    fields = ("name", "type", "department", "slug", "icon", "group", )
     autocomplete_fields = ("department", "group", )
     inlines = (CourseDegreeInline, )
 
