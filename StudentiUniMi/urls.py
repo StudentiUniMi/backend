@@ -12,6 +12,8 @@ from django.views.generic import RedirectView
 import telegrambot.urls
 import university.urls
 
+admin.site.site_header = "Network StudentiUniMi - administration"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(university.urls)),
