@@ -227,8 +227,9 @@ def handle_global_free_command(update: Update, context: CallbackContext) -> None
                     can_pin_messages=True,
                 )
             )
-            text += f"\n- {dbuser.generate_mention()}"
-            logging.log(logging.MODERATION_FREE, chat=chat, target=dbuser, issuer=sender)
+            log_chat = context.bot.getChat(group.id)
+            logging.log(logging.MODERATION_FREE, chat=log_chat, target=dbuser, issuer=sender)
+        text += f"\n- {dbuser.generate_mention()}"
         dbuser.banned = False
         dbuser.save()
 
