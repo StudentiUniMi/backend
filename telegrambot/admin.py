@@ -56,7 +56,6 @@ class GroupOwnerFilter(admin.SimpleListFilter):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ("name", "id", "reputation", "warn_count", "banned", "verified", "permissions_level", )
-    search_fields = ("id", "first_name", "last_name", "username", )
     fields = ("id", "first_name", "last_name", "username", "reputation", "warn_count", "banned", "permissions_level",
               "last_seen", "verified", )
     search_fields = ("id", "first_name", "last_name", "username", )
