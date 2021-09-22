@@ -80,6 +80,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
         EventTypes.MODERATION_BAN,
         EventTypes.MODERATION_MUTE,
         EventTypes.MODERATION_SUPERBAN,
+        EventTypes.MODERATION_FREE,
         EventTypes.USER_LEFT,
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
@@ -91,6 +92,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
         EventTypes.MODERATION_BAN,
         EventTypes.MODERATION_MUTE,
         EventTypes.MODERATION_SUPERBAN,
+        EventTypes.MODERATION_FREE,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
     if event in [

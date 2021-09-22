@@ -112,3 +112,10 @@ def claim_command(update: Update, _: CallbackContext) -> None:
 
     utils.set_admin_rights(dbuser, chat)
     message.delete()
+
+
+def handle_left_chat_member_updates(update: Update, _: CallbackContext):
+    """Delete 'user has left the group' status messages"""
+    if not update.message or not update.message.left_chat_member:
+        return
+    update.message.delete()

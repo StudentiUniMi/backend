@@ -23,6 +23,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         chat_member_types=ChatMemberHandler.ANY_CHAT_MEMBER,
     ), group=1)
     dispatcher.add_handler(CallbackQueryHandler(members.handle_verification, pattern="^verify$"))
+    dispatcher.add_handler(MessageHandler(
+        filters=Filters.status_update,
+        callback=members.handle_left_chat_member_updates,
+    ), group=1)
 
     # Admin commands
     dispatcher.add_handler(CommandHandler(
