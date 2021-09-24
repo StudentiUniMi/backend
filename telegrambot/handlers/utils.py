@@ -4,7 +4,7 @@ import telegram
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
-from telegram import User, Chat, TelegramError
+from telegram import User, Chat, TelegramError, Message
 from telegram.ext import DispatcherHandlerStop
 from telegram.utils.helpers import escape
 
@@ -159,7 +159,7 @@ def can_superban(user) -> bool:
     return privs.can_superban_members
 
 
-def get_targets_of_command(message):
+def get_targets_of_command(message: Message):
     """Get the target users of a command."""
     DBUser = apps.get_model("telegrambot.User")
 
@@ -183,6 +183,14 @@ def get_targets_of_command(message):
     if message.reply_to_message:
         try:
             dbuser = DBUser.objects.get(id=message.reply_to_message.from_user.id)
+            targets.append(dbuser)
+        except DBUser.DoesNotExist:
+            pass
+
+    # Target from IDs
+    for p_target in message.text.split(" "):
+        try:
+            dbuser = DBUser.objects.get(id=p_target)
             targets.append(dbuser)
         except DBUser.DoesNotExist:
             pass
