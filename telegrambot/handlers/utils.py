@@ -188,7 +188,7 @@ def get_targets_of_command(message: Message):
             pass
 
     # Target from IDs
-    for p_target in message.text.split(" ")[1:]:
+    for p_target in message.text.split(" "):
         try:
             dbuser = DBUser.objects.get(id=p_target)
             targets.append(dbuser)
