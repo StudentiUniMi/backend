@@ -299,3 +299,9 @@ def generate_group_creation_message(group: telegram.Chat) -> str:
         "\n👮 <i>Cerchiamo amministratori e moderatori, se sei interessato/a contattaci!</i>"
     )
     return text
+
+
+def generate_admin_tagging_notification(sender, chat) -> str:
+    name = sender.username if sender.username else sender.first_name
+    return f"{escape(name)}[<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]"\
+           f" tagged admins in {escape(chat.title)}[<a href=\"{chat.invite_link}\">{chat.id}</a>]"

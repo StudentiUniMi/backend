@@ -26,6 +26,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         filters=Filters.status_update,
         callback=members.handle_left_chat_member_updates,
     ), group=1)
+    dispatcher.add_handler(MessageHandler(
+        filters=Filters.chat_type.groups,
+        callback=messages.handle_admin_tagging,
+    ), group=1)
 
     # Admin commands
     dispatcher.add_handler(CommandHandler(

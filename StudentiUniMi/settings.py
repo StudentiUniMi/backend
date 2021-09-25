@@ -137,6 +137,8 @@ LOGGING_BOT_TOKEN = os.environ.get("LOGGING_BOT_TOKEN", "")
 TELEGRAM_API_ID = os.environ.get("TELEGRAM_API_ID", None)
 TELEGRAM_API_HASH = os.environ.get("TELEGRAM_API_HASH", None)
 
+TELEGRAM_ADMIN_GROUP_ID = os.environ.get("TELEGRAM_ADMIN_GROUP_ID", 0)
+
 
 if not DEBUG and len(os.environ.get("SENTRY_DSN", '')) > 0:
     with open("version.txt", "r+") as f:
