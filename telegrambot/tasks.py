@@ -33,6 +33,8 @@ def fetch_telegram_info() -> None:
                 print(f"Bad chat {dbgroup.id}")
         except telegram.error.RetryAfter as e:
             time.sleep(e.retry_after + 10)
+        except telegram.error.Unauthorized:
+            print(f"Bot is not member of chat {dbgroup.id}")
     print("DONE\n" + '-' * 15)
 
 
