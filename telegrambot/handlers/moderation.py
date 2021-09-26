@@ -189,6 +189,54 @@ def handle_free_command(update: Update, context: CallbackContext) -> None:
     tasks.delete_message(chat.id, msg.message_id)
 
 
+def handle_global_free_command(update: Update, context: CallbackContext) -> None:
+    """Handles superfree command issued by an administrator."""
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    if not utils.can_moderate(sender, chat):
+        return
+    if not utils.can_superban(sender):
+        return
+
+    targets = utils.get_targets_of_command(message)
+    if not targets:
+        return
+
+    text = f"✳️ <b>I seguenti utenti sono stati liberati dalle restrizioni da tutti i gruppi</b>:"
+    for dbuser in targets:
+        groups = Group.objects.filter(members__id=dbuser.id)
+        for group in groups:
+            context.bot.unban_chat_member(
+                chat_id=group.id,
+                user_id=dbuser.id,
+                only_if_banned=True,
+            )
+            context.bot.restrict_chat_member(
+                chat_id=group.id,
+                user_id=dbuser.id,
+                permissions=ChatPermissions(
+                    can_send_messages=True,
+                    can_send_media_messages=True,
+                    can_send_polls=True,
+                    can_send_other_messages=True,
+                    can_add_web_page_previews=True,
+                    can_change_info=True,
+                    can_invite_users=True,
+                    can_pin_messages=True,
+                )
+            )
+            log_chat = context.bot.getChat(group.id)
+            logging.log(logging.MODERATION_SUPERFREE, chat=log_chat, target=dbuser, issuer=sender)
+        text += f"\n- {dbuser.generate_mention()}"
+        dbuser.banned = False
+        dbuser.save()
+
+    msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
+    tasks.delete_message(chat.id, msg.message_id)
+
+
 def handle_info_command(update: Update, _: CallbackContext) -> None:
     """Handles the info command issued by an administrator.
 

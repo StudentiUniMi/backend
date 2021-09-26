@@ -53,6 +53,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         callback=moderation.handle_free_command,
     ), group=2)
     dispatcher.add_handler(CommandHandler(
+        command="superfree",
+        callback=moderation.handle_global_free_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
         command="info",
         callback=moderation.handle_info_command,
     ), group=2)

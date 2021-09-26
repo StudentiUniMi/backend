@@ -13,6 +13,7 @@ class EventTypes(Enum):
     MODERATION_MUTE = 4, '🟠'
     MODERATION_FREE = 6, '🟢'
     MODERATION_SUPERBAN = 7, '⚫️'
+    MODERATION_SUPERFREE = 11, '✳️'
     USER_JOINED = 8, '➕'
     USER_LEFT = 9, '➖'
     NOT_ENOUGH_RIGHTS = 10, '🔰'
@@ -25,6 +26,7 @@ MODERATION_BAN = EventTypes.MODERATION_BAN
 MODERATION_MUTE = EventTypes.MODERATION_MUTE
 MODERATION_FREE = EventTypes.MODERATION_FREE
 MODERATION_SUPERBAN = EventTypes.MODERATION_SUPERBAN
+MODERATION_SUPERFREE = EventTypes.MODERATION_SUPERFREE
 USER_JOINED = EventTypes.USER_JOINED
 USER_LEFT = EventTypes.USER_LEFT
 NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
@@ -79,8 +81,9 @@ def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
         EventTypes.MODERATION_KICK,
         EventTypes.MODERATION_BAN,
         EventTypes.MODERATION_MUTE,
-        EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_FREE,
+        EventTypes.MODERATION_SUPERBAN,
+        EventTypes.MODERATION_SUPERFREE,
         EventTypes.USER_LEFT,
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
@@ -91,8 +94,9 @@ def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
         EventTypes.MODERATION_KICK,
         EventTypes.MODERATION_BAN,
         EventTypes.MODERATION_MUTE,
-        EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_FREE,
+        EventTypes.MODERATION_SUPERBAN,
+        EventTypes.MODERATION_SUPERFREE,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
     if event in [
