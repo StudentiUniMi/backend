@@ -204,7 +204,7 @@ def handle_global_free_command(update: Update, context: CallbackContext) -> None
     if not targets:
         return
 
-    text = f"🟢 <b>I seguenti utenti sono stati liberati dalle restrizioni</b>:"
+    text = f"✳️ <b>I seguenti utenti sono stati liberati dalle restrizioni da tutti i gruppi</b>:"
     for dbuser in targets:
         groups = Group.objects.filter(members__id=dbuser.id)
         for group in groups:
@@ -228,7 +228,7 @@ def handle_global_free_command(update: Update, context: CallbackContext) -> None
                 )
             )
             log_chat = context.bot.getChat(group.id)
-            logging.log(logging.MODERATION_FREE, chat=log_chat, target=dbuser, issuer=sender)
+            logging.log(logging.MODERATION_SUPERFREE, chat=log_chat, target=dbuser, issuer=sender)
         text += f"\n- {dbuser.generate_mention()}"
         dbuser.banned = False
         dbuser.save()
