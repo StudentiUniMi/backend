@@ -17,6 +17,7 @@ class EventTypes(Enum):
     USER_JOINED = 8, '➕'
     USER_LEFT = 9, '➖'
     NOT_ENOUGH_RIGHTS = 10, '🔰'
+    TELEGRAM_ERROR = 12, '❗️'
 
 
 CHAT_DOES_NOT_EXIST = EventTypes.CHAT_DOES_NOT_EXIST
@@ -30,6 +31,7 @@ MODERATION_SUPERFREE = EventTypes.MODERATION_SUPERFREE
 USER_JOINED = EventTypes.USER_JOINED
 USER_LEFT = EventTypes.USER_LEFT
 NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
+TELEGRAM_ERROR = EventTypes.TELEGRAM_ERROR
 
 
 def _normalize_group_id(group_id) -> str:
@@ -104,6 +106,10 @@ def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
     ] and kwargs.get("until_date", False):
         until_date: datetime = kwargs["until_date"]
         text += f"\n⏳ <b>Until date</b>: {until_date.strftime('%d/%m/%Y %H:%M')}"
+    if event in [
+        EventTypes.TELEGRAM_ERROR
+    ] and kwargs.get("error_message", False):
+        text += f"\n💬 <b>Error message</b>: {kwargs['error_message']}"
 
     bot = telegram.Bot(settings.LOGGING_BOT_TOKEN)
     bot.send_message(chat_id=settings.LOGGING_CHAT_ID, text=text, parse_mode="html")

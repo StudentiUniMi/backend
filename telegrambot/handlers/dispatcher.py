@@ -4,12 +4,13 @@ from telegram import Update
 from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler
 from telegram.ext.dispatcher import Dispatcher
 
-from telegrambot.handlers import messages, members, moderation
+from telegrambot.handlers import messages, members, moderation, errors
 
 
 def dispatch_telegram_update(json_update: dict, token: str) -> None:
     bot = telegram.Bot(token=token)
     dispatcher = Dispatcher(bot, None, workers=0)
+    dispatcher.add_error_handler(errors.telegram_error_handler)
 
     # Pre-processing
     dispatcher.add_handler(MessageHandler(
