@@ -79,9 +79,9 @@ Once again, here's an incomplete list of features:
     - [x] Gather and update general information
     - [x] Update sent message count
     - [x] Update group membership
-  - [ ] Groups
+  - [x] Groups
     - [x] Update, if different, chat title 
-    - [ ] Periodically update chat photo, description, ...
+    - [x] Periodically update chat photo, description, ...
 
 - [ ] Groups
   - [ ] Welcome messages
@@ -101,7 +101,7 @@ Once again, here's an incomplete list of features:
     - [x] Recognize special users permissions scope
     - [x] Automatically set special user permissions and custom titles
   - [x] Auto-delete welcome and moderation messages
-  - [ ] Automatic group creation
+  - [x] Automatic group creation
   - ...
 
 ## Deployment
