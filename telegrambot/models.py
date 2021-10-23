@@ -66,7 +66,10 @@ class User(models.Model):
             return group_privileges[0]
 
         Degree = apps.get_model("university", "Degree")  # Avoid circular imports
-        degrees = Degree.objects.filter(courses__group__id=chat.id)
+        degrees = [
+            *Degree.objects.filter(courses__group__id=chat.id),
+            *Degree.objects.filter(group__id=chat.id),
+        ]
 
         if degree_privileges := self.privileges.filter(
                 scope=UserPrivilege.PrivilegeScopes.DEGREES,
