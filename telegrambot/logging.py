@@ -2,6 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 import telegram
+from telegram import Message
 from django.conf import settings
 
 
@@ -65,13 +66,14 @@ def _format_user(user) -> str:
     return f"{text} {_normalize_user_id(getattr(user, 'id'))}"
 
 
-def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
+def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None,  **kwargs) -> None:
     """Log an event to the log chat.
 
     :param event: must be an instance of `telegrambot.logging.EventTypes`
     :param chat: the chat where the event was generated
     :param target: the target user
     :param issuer: the command issuer (only for moderation events)
+    :param msg: used only with warn to log the message that prompted a warn
     :return: None
     """
 
@@ -110,6 +112,8 @@ def log(event: EventTypes, chat, target=None, issuer=None, **kwargs) -> None:
         EventTypes.TELEGRAM_ERROR
     ] and kwargs.get("error_message", False):
         text += f"\n💬 <b>Error message</b>: {kwargs['error_message']}"
+    if event is EventTypes.MODERATION_WARN and msg is not None:
+        text += f"\nMessage: {msg.text}"
 
     bot = telegram.Bot(settings.LOGGING_BOT_TOKEN)
     bot.send_message(chat_id=settings.LOGGING_CHAT_ID, text=text, parse_mode="html")

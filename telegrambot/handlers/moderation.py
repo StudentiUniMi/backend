@@ -16,6 +16,7 @@ def handle_warn_command(update: Update, context: CallbackContext) -> None:
     message: Message = update.message
     sender: User = message.from_user
     chat: Chat = message.chat
+    reply_to: Message = message.reply_to_message
 
     if not utils.can_moderate(sender, chat):
         return
@@ -30,7 +31,7 @@ def handle_warn_command(update: Update, context: CallbackContext) -> None:
         dbuser.save()
         warn_count = dbuser.warn_count
         text += f"\n- {dbuser.generate_mention()} [{warn_count}{' ⚠' if warn_count >= 3 else ''}]"
-        logging.log(logging.MODERATION_WARN, chat=chat, target=dbuser, issuer=sender)
+        logging.log(logging.MODERATION_WARN, chat=chat, target=dbuser, issuer=sender, msg=reply_to)
 
     msg = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
     tasks.delete_message(chat.id, msg.id)
