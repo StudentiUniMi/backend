@@ -34,6 +34,7 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
 
     if new.status == ChatMember.LEFT:
         logging.log(logging.USER_LEFT, chat=chat, target=user)
+        update.message.delete()
 
     if new.status == ChatMember.MEMBER:
         dbuser: DBUser = utils.save_user(new.user, chat)
@@ -69,6 +70,7 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
                 ],
             ]),
         )
+        update.message.delete()
         tasks.delete_message(chat.id, msg.message_id)
 
 
