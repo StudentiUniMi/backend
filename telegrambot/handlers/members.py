@@ -9,6 +9,7 @@ from telegrambot.models import (
     User as DBUser,
     Group as DBGroup,
     GroupMembership,
+    BotWhitelist,
 )
 
 
@@ -41,6 +42,12 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
         logging.log(logging.USER_JOINED, chat=chat, target=new.user)
 
         dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
+
+        if new.user.is_bot:
+            whitelisted = BotWhitelist.objects.filter(username=new.user.username)
+            if len(whitelisted) == 0:
+                context.bot.kickChatMember(chat.id, new.user.username)
+                return
 
         # TODO: re-enable welcome messages
         if dbgroup.bot.username == "@studentiunimibot":
