@@ -70,7 +70,6 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
                 ],
             ]),
         )
-        update.message.delete()
         tasks.delete_message(chat.id, msg.message_id)
 
 
