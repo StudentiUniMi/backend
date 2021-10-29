@@ -363,4 +363,4 @@ class BotWhitelist(models.Model):
         verbose_name_plural = "Whitelist'd bots"
 
     username = models.CharField("username", max_length=64, null=False, unique=True)
-    whitelisted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    whitelisted_by = models.ForeignKey(User, on_delete=models.SET_NULL, to_field="id", null=True)

@@ -8,7 +8,7 @@ from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
-from telegrambot.models import Group, BotWhitelist
+from telegrambot.models import Group, BotWhitelist, User as DBUser
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
@@ -287,10 +287,17 @@ def handle_whitelisting_command(update: Update, context: CallbackContext) -> Non
     if not utils.can_superban(sender):
         return
 
-    for bot in message.parse_entities():
-        if bot.user.is_bot:
-            to_whitelist = BotWhitelist()
-            to_whitelist.username = bot.user.username
-            to_whitelist.whitelisted_by = sender.id
-            to_whitelist.save()
-            logging.log(logging.WHITELIST_BOT, chat, issuer=sender, bot=bot)
+    entities = message.parse_entities()
+
+    for bot in entities:
+        if bot.type != bot.MENTION:
+            continue
+        if entities[bot][-3:] != "bot":
+            continue
+        dbuser = DBUser.objects.get(id=sender.id)
+        to_whitelist = BotWhitelist()
+        to_whitelist.username = entities[bot]
+        to_whitelist.whitelisted_by = dbuser
+        to_whitelist.save()
+        logging.log(logging.WHITELIST_BOT, chat, issuer=sender, bot=bot)
+    message.delete()

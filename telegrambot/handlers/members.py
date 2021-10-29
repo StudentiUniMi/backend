@@ -37,17 +37,17 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
         logging.log(logging.USER_LEFT, chat=chat, target=user)
 
     if new.status == ChatMember.MEMBER:
-        dbuser: DBUser = utils.save_user(new.user, chat)
-        utils.set_admin_rights(dbuser, chat)
-        logging.log(logging.USER_JOINED, chat=chat, target=new.user)
+        if not new.user.is_bot:
+            dbuser: DBUser = utils.save_user(new.user, chat)
+            utils.set_admin_rights(dbuser, chat)
+            logging.log(logging.USER_JOINED, chat=chat, target=new.user)
+        else:
+            whitelisted = BotWhitelist.objects.filter(username=new.user.first_name)
+            if len(whitelisted) == 0:
+                context.bot.kickChatMember(chat.id, new.user.id)
+                return
 
         dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
-
-        if new.user.is_bot:
-            whitelisted = BotWhitelist.objects.filter(username=new.user.username)
-            if len(whitelisted) == 0:
-                context.bot.kickChatMember(chat.id, new.user.username)
-                return
 
         # TODO: re-enable welcome messages
         if dbgroup.bot.username == "@studentiunimibot":
