@@ -22,6 +22,7 @@ from telegrambot.models import (
     TelegramBot,
     UserPrivilege,
     TelegramUserbot,
+    BotWhitelist,
 )
 
 
@@ -189,3 +190,9 @@ class TelegramUserbotAdmin(admin.ModelAdmin):
     search_fields = ("user", "user__first_name", "user__last_name", "user__username", )
     fields = ("user", "session_file", "active", "group_count", "last_used", )
     autocomplete_fields = ("user", )
+
+
+@admin.register(BotWhitelist)
+class BotWhitelistAdmin(admin.ModelAdmin):
+    list_display = ("username", "whitelisted_by")
+    search_fields = ("username", "whitelisted_by")
