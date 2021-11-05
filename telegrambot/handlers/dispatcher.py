@@ -1,15 +1,16 @@
 import telegram
 import telegram.ext
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler
+from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler, CallbackQueryHandler
 from telegram.ext.dispatcher import Dispatcher
 
-from telegrambot.handlers import messages, members, moderation
+from telegrambot.handlers import messages, members, moderation, errors, memes
 
 
 def dispatch_telegram_update(json_update: dict, token: str) -> None:
     bot = telegram.Bot(token=token)
     dispatcher = Dispatcher(bot, None, workers=0)
+    dispatcher.add_error_handler(errors.telegram_error_handler)
 
     # Pre-processing
     dispatcher.add_handler(MessageHandler(
@@ -57,6 +58,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         callback=moderation.handle_free_command,
     ), group=2)
     dispatcher.add_handler(CommandHandler(
+        command="superfree",
+        callback=moderation.handle_global_free_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
         command="info",
         callback=moderation.handle_info_command,
     ), group=2)
@@ -68,6 +73,16 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         command="creation",
         callback=moderation.handle_creation_command,
     ), group=2)
+
+    # User commands
+    dispatcher.add_handler(CommandHandler(
+        command="respects",
+        callback=memes.init_respects
+    ), group=3)
+    dispatcher.add_handler(CallbackQueryHandler(
+        callback=memes.add_respect,
+        pattern="^press_f$",
+    ), group=3)
 
     update = Update.de_json(json_update, bot)
     dispatcher.process_update(update)
