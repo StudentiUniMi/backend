@@ -38,6 +38,7 @@ services:
       - TELEGRAM_API_ID=${TELEGRAM_API_ID}
       - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
       - SENTRY_DSN=${SENTRY_DSN}
+      - TELEGRAM_ADMIN_GROUP_ID=${TELEGRAM_ADMIN_GROUP_ID}
     volumes:
       - static_files:/usr/src/app/static/
       - ./userbot-sessions:/usr/src/app/media/userbot-sessions
