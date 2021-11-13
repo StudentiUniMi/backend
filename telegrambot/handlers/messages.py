@@ -1,14 +1,22 @@
-import telegram
+import logging as logg
+
 from telegram import Update, User, Message, Chat
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 from django.conf import settings
+from django.db.models import Q
 
 from telegrambot import logging
 from telegrambot.handlers import utils
 from telegrambot.models import (
     Group as DBGroup,
     User as DBUser,
+    UserPrivilege,
 )
+from university.models import Degree
+
+
+logg.basicConfig(level=logg.INFO)
+LOG = logg.getLogger(__name__)
 
 
 def handle_group_messages(update: Update, context: CallbackContext) -> None:
@@ -54,21 +62,30 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
         if targets[target][1:] == "admin":
             found = True
     if not found:
-        raise DispatcherHandlerStop
+        return
 
-    try:
-        dbgroup = DBGroup.objects.get(id=chat.id)
-    except DBGroup.DoesNotExist:
-        # The group is not in the database; ignore all updates from it
-        logging.log(logging.CHAT_DOES_NOT_EXIST, chat)
-        # TODO: re-enable this line
-        # context.bot.leave_chat(chat_id=chat.id)
-        raise DispatcherHandlerStop
+    dbgroup = DBGroup.objects.filter(id=chat.id)
+    if len(dbgroup) == 0:
+        return
+    dbgroup = dbgroup[0]
 
     try:
         dbuser = DBUser.objects.get(id=sender.id)
     except DBUser.DoesNotExist:
         dbuser = utils.save_user(sender, chat)
 
-    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup)
+    # Get privs
+    degrees = [
+        *Degree.objects.filter(courses__group__id=chat.id),
+        *Degree.objects.filter(group__id=chat.id)
+    ]
+    privs = UserPrivilege.objects.filter(
+        Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__in=degrees) |
+        Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id__in=[chat.id, ]) |
+        Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__in=degrees) |
+        Q(scope=UserPrivilege.PrivilegeScopes.ALL)
+    )
+    LOG.info(privs)
+
+    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs)
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)

@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging as logg
 
 import telegram
 from django.apps import apps
@@ -11,6 +12,9 @@ from telegram.utils.helpers import escape
 import telegrambot.models as t_models
 import university.models as u_models
 from telegrambot import logging
+
+
+LOG = logg.getLogger(__name__)
 
 
 # def get_bot(chat: Union[Chat, telegrambot.Group, int]) -> telegram.Bot
@@ -311,8 +315,14 @@ def generate_group_creation_message(group: telegram.Chat) -> str:
     return text
 
 
-def generate_admin_tagging_notification(sender, chat) -> str:
+def generate_admin_tagging_notification(sender, chat, privileges) -> str:
+    admins = ""
+    for priv in privileges:
+        admins += f"<a href='tg://user?id={priv.user.id}'>"\
+                  f"{'@'+str(priv.user.username) if priv.user.username != '' and priv.user.username is not None else priv.user.first_name}</a> "
+        LOG.info(priv.user.username)
     name = sender.username if sender.username else sender.first_name
-    return f"👤User: {escape(name)}[<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]\n"\
-           f"tagged admins in\n"\
-           f"👥Group: {escape(chat.title)}[<a href=\"{chat.invite_link}\">{chat.id}</a>]"
+    return f"A user has tagged @admin\n"\
+           f"👤User: {escape(name)}[<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]\n"\
+           f"👥Group: {escape(chat.title)}[<a href=\"{chat.invite_link}\">{chat.id}</a>]\n"\
+           f"👮Please respond {admins}"
