@@ -268,7 +268,13 @@ def handle_info_command(update: Update, _: CallbackContext) -> None:
             continue
 
         # User must start the bot in private before he can receive messages from it
-        sender.send_message(text, parse_mode="html", disable_web_page_preview=True)
+        if len(text) > 4096:  # 4096 is the max size for messages on telegram
+            offset = 0
+            while offset < len(text):
+                sender.send_message(text[offset:offset+4096], parse_mode="html", disable_web_page_preview=True)
+                offset += 4096
+        else:
+            sender.send_message(text, parse_mode="html", disable_web_page_preview=True)
 
     message.delete()
 
