@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import logging as logg
 
 import pytz
 from django.conf import settings
@@ -9,6 +10,9 @@ from telegram.ext import CallbackContext
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
 from telegrambot.models import Group
+
+
+LOG = logg.getLogger(__name__)
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
@@ -268,6 +272,7 @@ def handle_info_command(update: Update, _: CallbackContext) -> None:
             continue
 
         # User must start the bot in private before he can receive messages from it
+        LOG.info(len(text))
         if len(text) > 4096:  # 4096 is the max size for messages on telegram
             offset = 0
             while offset < len(text):
