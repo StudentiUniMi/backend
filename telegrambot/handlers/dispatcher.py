@@ -27,6 +27,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         filters=Filters.status_update,
         callback=members.handle_left_chat_member_updates,
     ), group=1)
+    dispatcher.add_handler(MessageHandler(
+        filters=Filters.chat_type.groups,
+        callback=messages.handle_admin_tagging,
+    ), group=1)
 
     # Admin commands
     dispatcher.add_handler(CommandHandler(
@@ -79,11 +83,6 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         callback=memes.add_respect,
         pattern="^press_f$",
     ), group=3)
-
-    dispatcher.add_handler(MessageHandler(
-        filters=Filters.chat_type.groups,
-        callback=messages.handle_admin_tagging,
-    ), group=4)
 
     update = Update.de_json(json_update, bot)
     dispatcher.process_update(update)
