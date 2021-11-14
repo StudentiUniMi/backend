@@ -315,14 +315,17 @@ def generate_group_creation_message(group: telegram.Chat) -> str:
     return text
 
 
-def generate_admin_tagging_notification(sender, chat, privileges) -> str:
+def generate_admin_tagging_notification(sender, chat, privileges, reply_to: Message) -> str:
     admins = ""
     for priv in privileges:
         admins += f"<a href='tg://user?id={priv.user.id}'>"\
                   f"{'@'+str(priv.user.username) if priv.user.username != '' and priv.user.username is not None else priv.user.first_name}</a> "
         LOG.info(priv.user.username)
     name = sender.username if sender.username else sender.first_name
-    return f"A user has tagged @admin\n"\
+    text = f"A user has tagged @admin\n"\
            f"👤User: {escape(name)}[<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]\n"\
            f"👥Group: {escape(chat.title)}[<a href=\"{chat.invite_link}\">{chat.id}</a>]\n"\
            f"👮Please respond {admins}"
+    if reply_to is not None:
+        text += f"\nMessage: {reply_to.text}[<a href='https://t.me/c/1{str(reply_to.chat.id)[5:]}/{reply_to.message_id}'>{reply_to.message_id}</a>]"
+    return text
