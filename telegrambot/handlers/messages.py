@@ -52,6 +52,7 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     message: Message = update.message or update.edited_message
     sender: User = message.from_user
     chat: Chat = message.chat
+    reply_to: Message = message.reply_to_message
 
     if sender.id == context.bot.id:
         raise DispatcherHandlerStop
@@ -87,5 +88,5 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     )
     LOG.info(privs)
 
-    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs)
+    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs, reply_to)
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)
