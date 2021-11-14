@@ -3,7 +3,7 @@ import logging as logg
 from telegram import Update, User, Message, Chat
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from telegrambot import logging
 from telegrambot.handlers import utils
@@ -84,7 +84,7 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
         Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id__in=[chat.id, ]) |
         Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__in=degrees) |
         Q(scope=UserPrivilege.PrivilegeScopes.ALL)
-    )
+    ).filter(type__istartswith="A").annotate(u_count=Count("user"))  # Gets only users with type "Amministratore"
     LOG.info(privs)
 
     caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs, reply_to)
