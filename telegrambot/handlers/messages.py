@@ -15,7 +15,6 @@ from telegrambot.models import (
 from university.models import Degree
 
 
-logg.basicConfig(level=logg.INFO)
 LOG = logg.getLogger(__name__)
 
 
