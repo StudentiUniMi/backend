@@ -19,6 +19,7 @@ class EventTypes(Enum):
     USER_LEFT = 9, '➖'
     NOT_ENOUGH_RIGHTS = 10, '🔰'
     TELEGRAM_ERROR = 12, '❗️'
+    USER_CALLED_ADMIN = 13, '🧑‍⚖️'
 
 
 CHAT_DOES_NOT_EXIST = EventTypes.CHAT_DOES_NOT_EXIST
@@ -33,6 +34,7 @@ USER_JOINED = EventTypes.USER_JOINED
 USER_LEFT = EventTypes.USER_LEFT
 NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
 TELEGRAM_ERROR = EventTypes.TELEGRAM_ERROR
+USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
 
 
 def _normalize_group_id(group_id) -> str:
@@ -91,6 +93,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None, 
         EventTypes.USER_LEFT,
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
+        EventTypes.USER_CALLED_ADMIN,
     ]:
         text += f"\n👤 <b>Target user</b>: {_format_user(target)}"
     if event in [
@@ -112,8 +115,8 @@ def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None, 
         EventTypes.TELEGRAM_ERROR
     ] and kwargs.get("error_message", False):
         text += f"\n💬 <b>Error message</b>: {kwargs['error_message']}"
-    if event is EventTypes.MODERATION_WARN and msg is not None:
-        text += f"\nMessage: {msg.text}"
+    if msg is not None:
+        text += f"\n📜 <b>Message</b>: {msg.text}[<a href='https://t.me/c/1{str(msg.chat.id)[5:]}/{msg.message_id}'>{msg.message_id}</a>]"
 
     bot = telegram.Bot(settings.LOGGING_BOT_TOKEN)
     bot.send_message(chat_id=settings.LOGGING_CHAT_ID, text=text, parse_mode="html")

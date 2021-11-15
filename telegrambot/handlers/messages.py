@@ -12,6 +12,7 @@ from telegrambot.models import (
     User as DBUser,
     UserPrivilege,
 )
+from telegrambot import logging
 from university.models import Degree
 
 
@@ -86,6 +87,8 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
         Q(scope=UserPrivilege.PrivilegeScopes.ALL)
     ).filter(type__istartswith="A").annotate(u_count=Count("user"))  # Gets only users with type "Amministratore"
     LOG.info(privs)
+
+    logging.log(logging.USER_CALLED_ADMIN, chat, target=dbuser, msg=reply_to)
 
     caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs, reply_to)
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)
