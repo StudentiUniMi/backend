@@ -69,6 +69,8 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     if len(dbgroup) == 0:
         return
     dbgroup = dbgroup[0]
+    if dbgroup.ignore_admin_tagging:
+        return
 
     try:
         dbuser = DBUser.objects.get(id=sender.id)

@@ -296,3 +296,18 @@ def handle_creation_command(update: Update, context: CallbackContext) -> None:
     msg = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
     msg.pin()
     message.delete()
+
+
+def handle_toggle_admin_tagging(update: Update, context: CallbackContext) -> None:
+    message: Message = update.message
+    chat: Chat = message.chat
+
+    try:
+        dbgroup = Group.objects.get(id=chat.id)
+    except Group.DoesNotExist:
+        message.delete()
+        return
+    dbgroup.ignore_admin_tagging = not dbgroup.ignore_admin_tagging
+    dbgroup.save()
+
+    message.delete()

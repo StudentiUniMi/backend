@@ -3,7 +3,9 @@ from telegram.ext import CallbackContext, DispatcherHandlerStop
 
 
 def init_respects(update: Update, context: CallbackContext) -> None:
-    chat = update.message.chat
+    message = update.message
+    chat = message.chat
+
     chat.send_message(
         "Press F to pay respects.\n0 users have paid their respects",
         disable_notification=True,
@@ -16,6 +18,7 @@ def init_respects(update: Update, context: CallbackContext) -> None:
             ]
         ])
     )
+    message.delete()
 
 
 def add_respect(update: Update, context: CallbackContext) -> None:
