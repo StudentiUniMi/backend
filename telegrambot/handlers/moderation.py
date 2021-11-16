@@ -9,7 +9,10 @@ from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
-from telegrambot.models import Group, User as DBUser
+from telegrambot.models import (
+    Group as DBGroup,
+    User as DBUser,
+)
 
 
 LOG = logg.getLogger(__name__)
@@ -47,6 +50,7 @@ def handle_kick_command(update: Update, context: CallbackContext) -> None:
     message: Message = update.message
     sender: User = message.from_user
     chat: Chat = message.chat
+    reply_to: Message = message.reply_to_message
 
     if not utils.can_moderate(sender, chat):
         return
@@ -59,7 +63,7 @@ def handle_kick_command(update: Update, context: CallbackContext) -> None:
     for dbuser in targets:
         context.bot.unban_chat_member(chat_id=chat.id, user_id=dbuser.id)
         text += f"\n- {dbuser.generate_mention()}"
-        logging.log(logging.MODERATION_KICK, chat=chat, target=dbuser, issuer=sender)
+        logging.log(logging.MODERATION_KICK, chat=chat, target=dbuser, issuer=sender, msg=reply_to)
 
     message.delete()
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
@@ -71,6 +75,7 @@ def handle_ban_command(update: Update, context: CallbackContext) -> None:
     message: Message = update.message
     sender: User = message.from_user
     chat: Chat = message.chat
+    reply_to: Message = message.reply_to_message
 
     if not utils.can_moderate(sender, chat):
         return
@@ -83,7 +88,7 @@ def handle_ban_command(update: Update, context: CallbackContext) -> None:
     for dbuser in targets:
         context.bot.ban_chat_member(chat_id=chat.id, user_id=dbuser.id)
         text += f"\n- {dbuser.generate_mention()}"
-        logging.log(logging.MODERATION_BAN, chat=chat, target=dbuser, issuer=sender)
+        logging.log(logging.MODERATION_BAN, chat=chat, target=dbuser, issuer=sender, msg=reply_to)
 
     message.delete()
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
@@ -98,6 +103,7 @@ def handle_global_ban_command(update: Update, context: CallbackContext) -> None:
     message: Message = update.message
     sender: User = message.from_user
     chat: Chat = message.chat
+    reply_to: Message = message.reply_to_message
 
     if not utils.can_superban(sender):
         return
@@ -108,13 +114,13 @@ def handle_global_ban_command(update: Update, context: CallbackContext) -> None:
 
     text = "⚫ <b>I seguenti utenti sono stati bannati da tutti i gruppi</b>:"
     for dbuser in targets:
-        groups = Group.objects.filter(members__id=dbuser.id)
+        groups = DBGroup.objects.filter(members__id=dbuser.id)
         for group in groups:
             context.bot.ban_chat_member(chat_id=group.id, user_id=dbuser.id)
         text += f"\n- {dbuser.generate_mention()}"
         dbuser.banned = True
         dbuser.save()
-        logging.log(logging.MODERATION_SUPERBAN, chat=chat, target=dbuser, issuer=sender)
+        logging.log(logging.MODERATION_SUPERBAN, chat=chat, target=dbuser, issuer=sender, msg=reply_to)
 
     message.delete()
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
@@ -126,6 +132,7 @@ def handle_mute_command(update: Update, context: CallbackContext) -> None:
     message: Message = update.message
     sender: User = message.from_user
     chat: Chat = message.chat
+    reply_to: Message = message.reply_to_message
 
     if not utils.can_moderate(sender, chat):
         return
@@ -151,7 +158,7 @@ def handle_mute_command(update: Update, context: CallbackContext) -> None:
         )
         text += f"\n- {dbuser.generate_mention()}"
         logging.log(logging.MODERATION_MUTE, chat=chat, target=dbuser, issuer=sender,
-                    until_date=until_date if duration else None)
+                    until_date=until_date if duration else None, msg=reply_to)
 
     message.delete()
     msg: Message = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
@@ -217,7 +224,7 @@ def handle_global_free_command(update: Update, context: CallbackContext) -> None
 
     text = f"✳️ <b>I seguenti utenti sono stati liberati dalle restrizioni da tutti i gruppi</b>:"
     for dbuser in targets:
-        groups = Group.objects.filter(members__id=dbuser.id)
+        groups = DBGroup.objects.filter(members__id=dbuser.id)
         for group in groups:
             context.bot.unban_chat_member(
                 chat_id=group.id,
@@ -307,11 +314,34 @@ def handle_toggle_admin_tagging(update: Update, context: CallbackContext) -> Non
         return
 
     try:
-        dbgroup = Group.objects.get(id=chat.id)
-    except Group.DoesNotExist:
+        dbgroup = DBGroup.objects.get(id=chat.id)
+    except DBGroup.DoesNotExist:
         message.delete()
         return
     dbgroup.ignore_admin_tagging = not dbgroup.ignore_admin_tagging
     dbgroup.save()
 
+    if dbgroup.ignore_admin_tagging:
+        new_msg = chat.send_message("@admin are now ignored in this group")
+    else:
+        new_msg = chat.send_message("@admin are now not ignored in this group")
+    tasks.delete_message(chat_id=chat.id, message_id=new_msg.message_id)
+    message.delete()
+
+
+def handle_delete_command(update: Update, context: CallbackContext) -> None:
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+    reply_to: Message = message.reply_to_message
+
+    if not utils.can_moderate(sender, chat):
+        return
+    if message.reply_to_message is None:
+        return
+
+    dbuser = DBUser.objects.get(id=reply_to.from_user.id)
+
+    logging.log(logging.MODERATION_ERASED_MESSAGE, chat=chat, target=dbuser, issuer=sender, msg=reply_to)
+    reply_to.delete()
     message.delete()

@@ -20,6 +20,7 @@ class EventTypes(Enum):
     NOT_ENOUGH_RIGHTS = 10, '🔰'
     TELEGRAM_ERROR = 12, '❗️'
     USER_CALLED_ADMIN = 13, '🧑‍⚖️'
+    MODERATION_ERASED_MESSAGE = 14, '✏️'
 
 
 CHAT_DOES_NOT_EXIST = EventTypes.CHAT_DOES_NOT_EXIST
@@ -35,6 +36,7 @@ USER_LEFT = EventTypes.USER_LEFT
 NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
 TELEGRAM_ERROR = EventTypes.TELEGRAM_ERROR
 USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
+MODERATION_ERASED_MESSAGE = EventTypes.MODERATION_ERASED_MESSAGE
 
 
 def _normalize_group_id(group_id) -> str:
@@ -90,6 +92,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None, 
         EventTypes.MODERATION_FREE,
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_SUPERFREE,
+        EventTypes.MODERATION_ERASED_MESSAGE,
         EventTypes.USER_LEFT,
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
@@ -104,6 +107,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None, 
         EventTypes.MODERATION_FREE,
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_SUPERFREE,
+        EventTypes.MODERATION_ERASED_MESSAGE,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
     if event in [
