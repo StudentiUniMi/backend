@@ -9,7 +9,7 @@ from telegram.ext import CallbackContext
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
-from telegrambot.models import Group
+from telegrambot.models import Group, User as DBUser
 
 
 LOG = logg.getLogger(__name__)
@@ -300,7 +300,11 @@ def handle_creation_command(update: Update, context: CallbackContext) -> None:
 
 def handle_toggle_admin_tagging(update: Update, context: CallbackContext) -> None:
     message: Message = update.message
+    sender: User = message.from_user
     chat: Chat = message.chat
+
+    if not utils.can_moderate(sender, chat):
+        return
 
     try:
         dbgroup = Group.objects.get(id=chat.id)
