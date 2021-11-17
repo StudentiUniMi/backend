@@ -58,11 +58,7 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
         raise DispatcherHandlerStop
 
     targets = message.parse_entities()
-    found = False
-    for target in targets:
-        if targets[target][1:] == "admin":
-            found = True
-    if not found:
+    if not any([targets[target][1:] == "admin" for target in targets]):
         return
 
     dbgroup = DBGroup.objects.filter(id=chat.id)
