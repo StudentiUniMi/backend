@@ -1,10 +1,10 @@
 import telegram
 import telegram.ext
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler
+from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler, CallbackQueryHandler
 from telegram.ext.dispatcher import Dispatcher
 
-from telegrambot.handlers import messages, members, moderation, errors
+from telegrambot.handlers import messages, members, moderation, errors, memes
 
 
 def dispatch_telegram_update(json_update: dict, token: str) -> None:
@@ -26,6 +26,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
     dispatcher.add_handler(MessageHandler(
         filters=Filters.status_update,
         callback=members.handle_left_chat_member_updates,
+    ), group=1)
+    dispatcher.add_handler(MessageHandler(
+        filters=Filters.chat_type.groups,
+        callback=messages.handle_admin_tagging,
     ), group=1)
 
     # Admin commands
@@ -73,6 +77,24 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         command="whitelistbot",
         callback=moderation.handle_whitelisting_command,
     ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="ignore_admin",
+        callback=moderation.handle_toggle_admin_tagging,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="delete",
+        callback=moderation.handle_delete_command,
+    ), group=2)
+
+    # User commands
+    dispatcher.add_handler(CommandHandler(
+        command="respects",
+        callback=memes.init_respects,
+    ), group=3)
+    dispatcher.add_handler(CallbackQueryHandler(
+        callback=memes.add_respect,
+        pattern="^press_f$",
+    ), group=3)
 
     update = Update.de_json(json_update, bot)
     dispatcher.process_update(update)

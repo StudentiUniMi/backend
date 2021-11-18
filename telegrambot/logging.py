@@ -2,6 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 import telegram
+from telegram import Message
 from django.conf import settings
 
 
@@ -18,7 +19,9 @@ class EventTypes(Enum):
     USER_LEFT = 9, '➖'
     NOT_ENOUGH_RIGHTS = 10, '🔰'
     TELEGRAM_ERROR = 12, '❗️'
-    WHITELIST_BOT = 13, '⚪'
+    USER_CALLED_ADMIN = 13, '🧑‍⚖️'
+    MODERATION_ERASED_MESSAGE = 14, '✏️'
+    WHITELIST_BOT = 15, '⚪'
 
 
 CHAT_DOES_NOT_EXIST = EventTypes.CHAT_DOES_NOT_EXIST
@@ -34,6 +37,8 @@ USER_LEFT = EventTypes.USER_LEFT
 NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
 TELEGRAM_ERROR = EventTypes.TELEGRAM_ERROR
 WHITELIST_BOT = EventTypes.WHITELIST_BOT
+USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
+MODERATION_ERASED_MESSAGE = EventTypes.MODERATION_ERASED_MESSAGE
 
 
 def _normalize_group_id(group_id) -> str:
@@ -67,7 +72,7 @@ def _format_user(user) -> str:
     return f"{text} {_normalize_user_id(getattr(user, 'id'))}"
 
 
-def log(event: EventTypes, chat, target=None, issuer=None, bot=None, **kwargs) -> None:
+def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Message = None,  **kwargs) -> None:
     """Log an event to the log chat.
 
     :param event: must be an instance of `telegrambot.logging.EventTypes`
@@ -75,6 +80,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, **kwargs) -
     :param target: the target user
     :param issuer: the command issuer (only for moderation events)
     :param bot: like target but when the target is not a user but a bot
+    :param msg: used only with warn to log the message that prompted a warn
     :return: None
     """
 
@@ -89,9 +95,11 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, **kwargs) -
         EventTypes.MODERATION_FREE,
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_SUPERFREE,
+        EventTypes.MODERATION_ERASED_MESSAGE,
         EventTypes.USER_LEFT,
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
+        EventTypes.USER_CALLED_ADMIN,
     ]:
         text += f"\n👤 <b>Target user</b>: {_format_user(target)}"
     if event[0] == EventTypes.WHITELIST_BOT[0]:
@@ -107,6 +115,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, **kwargs) -
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_SUPERFREE,
         EventTypes.WHITELIST_BOT,
+        EventTypes.MODERATION_ERASED_MESSAGE,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
     if event in [
@@ -118,6 +127,8 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, **kwargs) -
         EventTypes.TELEGRAM_ERROR
     ] and kwargs.get("error_message", False):
         text += f"\n💬 <b>Error message</b>: {kwargs['error_message']}"
+    if msg is not None:
+        text += f"\n📜 <b>Message</b>: {msg.text}[<a href='https://t.me/c/1{str(msg.chat.id)[5:]}/{msg.message_id}'>{msg.message_id}</a>]"
 
     bot = telegram.Bot(settings.LOGGING_BOT_TOKEN)
     bot.send_message(chat_id=settings.LOGGING_CHAT_ID, text=text, parse_mode="html")
