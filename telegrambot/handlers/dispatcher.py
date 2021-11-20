@@ -74,6 +74,10 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         callback=moderation.handle_creation_command,
     ), group=2)
     dispatcher.add_handler(CommandHandler(
+        command="whitelistbot",
+        callback=moderation.handle_whitelisting_command,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
         command="ignore_admin",
         callback=moderation.handle_toggle_admin_tagging,
     ), group=2)

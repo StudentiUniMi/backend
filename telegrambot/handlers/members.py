@@ -9,6 +9,7 @@ from telegrambot.models import (
     User as DBUser,
     Group as DBGroup,
     GroupMembership,
+    BotWhitelist,
 )
 
 
@@ -37,9 +38,15 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
         update.message.delete()
 
     if new.status == ChatMember.MEMBER:
-        dbuser: DBUser = utils.save_user(new.user, chat)
-        utils.set_admin_rights(dbuser, chat)
-        logging.log(logging.USER_JOINED, chat=chat, target=new.user)
+        if not new.user.is_bot:
+            dbuser: DBUser = utils.save_user(new.user, chat)
+            utils.set_admin_rights(dbuser, chat)
+            logging.log(logging.USER_JOINED, chat=chat, target=new.user)
+        else:
+            whitelisted = BotWhitelist.objects.filter(username=f"@{new.user.username}")
+            if len(whitelisted) == 0:
+                context.bot.kickChatMember(chat.id, new.user.id)
+                return
 
         dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
 

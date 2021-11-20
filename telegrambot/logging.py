@@ -21,6 +21,7 @@ class EventTypes(Enum):
     TELEGRAM_ERROR = 12, '❗️'
     USER_CALLED_ADMIN = 13, '🧑‍⚖️'
     MODERATION_ERASED_MESSAGE = 14, '✏️'
+    WHITELIST_BOT = 15, '⚪'
 
 
 CHAT_DOES_NOT_EXIST = EventTypes.CHAT_DOES_NOT_EXIST
@@ -35,6 +36,7 @@ USER_JOINED = EventTypes.USER_JOINED
 USER_LEFT = EventTypes.USER_LEFT
 NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
 TELEGRAM_ERROR = EventTypes.TELEGRAM_ERROR
+WHITELIST_BOT = EventTypes.WHITELIST_BOT
 USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
 MODERATION_ERASED_MESSAGE = EventTypes.MODERATION_ERASED_MESSAGE
 
@@ -70,13 +72,14 @@ def _format_user(user) -> str:
     return f"{text} {_normalize_user_id(getattr(user, 'id'))}"
 
 
-def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None,  **kwargs) -> None:
+def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Message = None,  **kwargs) -> None:
     """Log an event to the log chat.
 
     :param event: must be an instance of `telegrambot.logging.EventTypes`
     :param chat: the chat where the event was generated
     :param target: the target user
     :param issuer: the command issuer (only for moderation events)
+    :param bot: like target but when the target is not a user but a bot
     :param msg: used only with warn to log the message that prompted a warn
     :return: None
     """
@@ -99,6 +102,10 @@ def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None, 
         EventTypes.USER_CALLED_ADMIN,
     ]:
         text += f"\n👤 <b>Target user</b>: {_format_user(target)}"
+    if event[0] == EventTypes.WHITELIST_BOT[0]:
+        if not bot:
+            return
+        text += f"\n👤 <b>Target bot</b>: {bot.user.username}"  # bot is an object of the telegram library
     if event in [
         EventTypes.MODERATION_WARN,
         EventTypes.MODERATION_KICK,
@@ -107,6 +114,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, msg: Message = None, 
         EventTypes.MODERATION_FREE,
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_SUPERFREE,
+        EventTypes.WHITELIST_BOT,
         EventTypes.MODERATION_ERASED_MESSAGE,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"

@@ -355,3 +355,13 @@ class TelegramUserbot(models.Model):
     active = models.BooleanField("active", default=False)
     group_count = models.IntegerField("group count", default=0)
     last_used = models.DateTimeField("last used", default=datetime.now)
+
+
+class BotWhitelist(models.Model):
+    """A list of bots that won't be autokicked upon joining a group of the network"""
+    class Meta:
+        verbose_name = "Whitelist'd bot"
+        verbose_name_plural = "Whitelist'd bots"
+
+    username = models.CharField("username", max_length=64, null=False, unique=True)
+    whitelisted_by = models.ForeignKey(User, on_delete=models.SET_NULL, to_field="id", null=True)

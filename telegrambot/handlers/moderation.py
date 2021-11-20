@@ -14,6 +14,7 @@ from telegrambot.handlers import utils
 from telegrambot.models import (
     Group as DBGroup,
     User as DBUser,
+    BotWhitelist
 )
 
 
@@ -303,6 +304,30 @@ def handle_creation_command(update: Update, context: CallbackContext) -> None:
     text = utils.generate_group_creation_message(chat)
     msg = context.bot.send_message(chat_id=chat.id, text=text, parse_mode="html")
     msg.pin()
+    message.delete()
+
+
+def handle_whitelisting_command(update: Update, context: CallbackContext) -> None:
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    if not utils.can_superban(sender):
+        return
+
+    entities = message.parse_entities()
+
+    for bot in entities:
+        if bot.type != bot.MENTION:
+            continue
+        if entities[bot][-3:] != "bot":
+            continue
+        dbuser = DBUser.objects.get(id=sender.id)
+        to_whitelist = BotWhitelist()
+        to_whitelist.username = entities[bot]
+        to_whitelist.whitelisted_by = dbuser
+        to_whitelist.save()
+        logging.log(logging.WHITELIST_BOT, chat, issuer=sender, bot=bot)
     message.delete()
 
 
