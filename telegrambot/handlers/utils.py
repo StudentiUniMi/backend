@@ -222,15 +222,46 @@ def format_group_membership(dbmembership):
     return text
 
 
+def add_priv(text, priv):
+    p_type = None
+    for x in priv.PrivilegeTypes.choices:
+        if x[0] == priv.type:
+            p_type = x[1]
+    if p_type is None:
+        return text
+
+    text += f"\n⭐ ️È <b>{p_type.lower()}</b> "
+    if priv.can_restrict_members:
+        text += "(<b>+</b>) "
+
+    if priv.scope == priv.PrivilegeScopes.GROUPS:
+        text += "nei seguenti gruppi:\n"
+        for group in t_models.Group.objects.filter(privileged_users__user__id=user.id):
+            text += f"➖ [<code>{group.id}</code>] {escape(group.title)}\n"
+    elif priv.scope == priv.PrivilegeScopes.DEGREES:
+        text += "dei seguenti C.d.L.:\n"
+        for degree in u_models.Degree.objects.filter(privileged_users__user_id=user.id):
+            text += f"➖ {escape(degree.name)}\n"
+    elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
+        text += "dei seguenti dipartimenti:\n"
+        for department in u_models.Department.objects.filter(privileged_users__user_id=user.id):
+            text += f"➖ {escape(department.name)}\n"
+    else:
+        text += "in tutto l'Ateneo\n"
+    return text
+
+
 def format_user_info(dbuser):
     """Format some Telegram user information.
 
     Used by the /info command.
     """
+    result = []
+
     try:
         user = t_models.User.objects.get(id=dbuser.id)
     except t_models.User.DoesNotExist:
-        return None
+        return result
 
     text = f"👤 <b>Utente</b> <a href=\"tg://user?id={user.id}\">{escape(user.name)}</a>"
     text += f"\n🔖 <b>Username</b>: @{escape(user.username)}" if user.username else ""
@@ -245,41 +276,29 @@ def format_user_info(dbuser):
     if privs is not None:
         text += "\n"
         for priv in privs:
-            p_type = None
-            for x in priv.PrivilegeTypes.choices:
-                if x[0] == priv.type:
-                    p_type = x[1]
-            if p_type is None:
-                continue
-
-            text += f"\n⭐ ️È <b>{p_type.lower()}</b> "
-            if priv.can_restrict_members:
-                text += "(<b>+</b>) "
-
-            if priv.scope == priv.PrivilegeScopes.GROUPS:
-                text += "nei seguenti gruppi:\n"
-                for group in t_models.Group.objects.filter(privileged_users__user__id=user.id):
-                    text += f"➖ [<code>{group.id}</code>] {escape(group.title)}\n"
-            elif priv.scope == priv.PrivilegeScopes.DEGREES:
-                text += "dei seguenti C.d.L.:\n"
-                for degree in u_models.Degree.objects.filter(privileged_users__user_id=user.id):
-                    text += f"➖ {escape(degree.name)}\n"
-            elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
-                text += "dei seguenti dipartimenti:\n"
-                for department in u_models.Department.objects.filter(privileged_users__user_id=user.id):
-                    text += f"➖ {escape(department.name)}\n"
+            if len(add_priv(text, priv)) <= 4096:
+                text = add_priv(text, priv)
             else:
-                text += "in tutto l'Ateneo\n"
+                result.append(text)
+                text = ""
+                text = add_priv(text, priv)
 
     present_in_groups = t_models.GroupMembership.objects.filter(user__id=user.id).order_by("messages_count").reverse()
     if present_in_groups is None:
-        return text
+        return result
 
+    if len(text + "\n👥 <b>È stato visto nei seguenti gruppi</b>:\n") > 4096:
+        result.append(text)
+        text = ""
     text += "\n👥 <b>È stato visto nei seguenti gruppi</b>:\n"
     for dbmembership in present_in_groups:
+        if len(text + f"{format_group_membership(dbmembership)}") > 4096:
+            result.append(text)
+            text = ""
         text += f"➖ {format_group_membership(dbmembership)}\n"
 
-    return text
+    result.append(text)
+    return result
 
 
 def generate_group_creation_message(group: telegram.Chat) -> str:

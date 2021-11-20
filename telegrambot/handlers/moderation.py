@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
 import logging as logg
+from time import sleep
 
 import pytz
 from django.conf import settings
 from pytimeparse import timeparse
 from telegram import Update, Message, User, Chat, ChatPermissions
 from telegram.ext import CallbackContext
+from telegram.error import RetryAfter, TelegramError
 
 from telegrambot import tasks, logging
 from telegrambot.handlers import utils
@@ -16,6 +18,7 @@ from telegrambot.models import (
 
 
 LOG = logg.getLogger(__name__)
+logg.basicConfig(level=logg.INFO)
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
@@ -274,19 +277,18 @@ def handle_info_command(update: Update, _: CallbackContext) -> None:
         return
 
     for dbuser in targets:
-        text = utils.format_user_info(dbuser)
-        if not text:
+        texts = utils.format_user_info(dbuser)
+        if len(texts) == 0:
             continue
 
         # User must start the bot in private before he can receive messages from it
-        LOG.info(len(text))
-        if len(text) > 4096:  # 4096 is the max size for messages on telegram
-            offset = 0
-            while offset < len(text):
-                sender.send_message(text[offset:offset+4096], parse_mode="html", disable_web_page_preview=True)
-                offset += 4096
-        else:
-            sender.send_message(text, parse_mode="html", disable_web_page_preview=True)
+        for text in texts:
+            while True:
+                try:
+                    sender.send_message(text, parse_mode="html", disable_web_page_preview=True)
+                    break
+                except RetryAfter as e:
+                    sleep(e.retry_after)
 
     message.delete()
 
