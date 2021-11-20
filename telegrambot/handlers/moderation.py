@@ -327,6 +327,7 @@ def handle_whitelisting_command(update: Update, context: CallbackContext) -> Non
         to_whitelist.whitelisted_by = dbuser
         to_whitelist.save()
         logging.log(logging.WHITELIST_BOT, chat, issuer=sender, bot=bot)
+    message.delete()
 
 
 def handle_toggle_admin_tagging(update: Update, context: CallbackContext) -> None:

@@ -43,7 +43,7 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
             utils.set_admin_rights(dbuser, chat)
             logging.log(logging.USER_JOINED, chat=chat, target=new.user)
         else:
-            whitelisted = BotWhitelist.objects.filter(username=new.user.first_name)
+            whitelisted = BotWhitelist.objects.filter(username=f"@{new.user.username}")
             if len(whitelisted) == 0:
                 context.bot.kickChatMember(chat.id, new.user.id)
                 return
