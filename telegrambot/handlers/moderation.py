@@ -18,7 +18,6 @@ from telegrambot.models import (
 
 
 LOG = logg.getLogger(__name__)
-logg.basicConfig(level=logg.INFO)
 
 
 def handle_warn_command(update: Update, context: CallbackContext) -> None:
