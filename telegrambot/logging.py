@@ -102,7 +102,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Messag
         EventTypes.USER_CALLED_ADMIN,
     ]:
         text += f"\n👤 <b>Target user</b>: {_format_user(target)}"
-    if event[0] == EventTypes.WHITELIST_BOT[0]:
+    if event in [EventTypes.WHITELIST_BOT, ]:
         if not bot:
             return
         text += f"\n👤 <b>Target bot</b>: {bot.user.username}"  # bot is an object of the telegram library
