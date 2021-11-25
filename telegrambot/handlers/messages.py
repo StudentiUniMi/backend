@@ -72,6 +72,13 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
         dbuser = DBUser.objects.get(id=sender.id)
     except DBUser.DoesNotExist:
         dbuser = utils.save_user(sender, chat)
+    if reply_to is not None:
+        try:
+            dbtarget = DBUser.objects.get(id=reply_to.from_user.id)
+        except DBUser.DoesNotExist:
+            dbtarget = utils.save_user(reply_to.from_user, chat)
+    else:
+        dbtarget = None
 
     # Get privs
     degrees = [
@@ -86,7 +93,7 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     ).filter(type__istartswith="A").annotate(u_count=Count("user"))  # Gets only users with type "Amministratore"
     LOG.info(privs)
 
-    logging.log(logging.USER_CALLED_ADMIN, chat, target=dbuser, msg=reply_to)
+    logging.log(logging.USER_CALLED_ADMIN, chat, target=dbtarget, issuer=dbuser, msg=reply_to)
 
     caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs, reply_to)
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)
