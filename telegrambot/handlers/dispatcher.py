@@ -1,15 +1,16 @@
-import telegram
-import telegram.ext
+import logging as logg
+
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler, CallbackQueryHandler
-from telegram.ext.dispatcher import Dispatcher
+from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler, CallbackQueryHandler, Updater
 
 from telegrambot.handlers import messages, members, moderation, errors, memes
 
 
-def dispatch_telegram_update(json_update: dict, token: str) -> None:
-    bot = telegram.Bot(token=token)
-    dispatcher = Dispatcher(bot, None, workers=0)
+LOG = logg.getLogger(__name__)
+dispatchers = {}
+
+
+def setup_dispatcher(dispatcher):
     dispatcher.add_error_handler(errors.telegram_error_handler)
 
     # Pre-processing
@@ -96,5 +97,12 @@ def dispatch_telegram_update(json_update: dict, token: str) -> None:
         pattern="^press_f$",
     ), group=3)
 
-    update = Update.de_json(json_update, bot)
-    dispatcher.process_update(update)
+
+# Tokens that are sent to this function have been already checked againts the DB
+def dispatch_telegram_update(json_update: dict, token: str) -> None:
+    if token not in dispatchers.keys():
+        dispatchers[token] = Updater(token=token).dispatcher
+        setup_dispatcher(dispatchers[token])
+
+    update = Update.de_json(json_update, dispatchers[token].bot)
+    dispatchers[token].process_update(update)

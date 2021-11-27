@@ -12,7 +12,6 @@ from telegrambot.models import (
     User as DBUser,
     UserPrivilege,
 )
-from telegrambot import logging
 from university.models import Degree
 
 
