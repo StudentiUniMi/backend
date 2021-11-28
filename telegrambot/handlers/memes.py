@@ -29,6 +29,7 @@ def add_respect(update: Update, context: CallbackContext) -> None:
     count += 1
 
     try:
+        update.callback_query.answer("You have paid your respects!")
         message.edit_text(
             f"Press F to pay respects.\n{count} users have paid their respects",
             reply_markup=InlineKeyboardMarkup([
