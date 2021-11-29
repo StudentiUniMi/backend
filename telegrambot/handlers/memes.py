@@ -32,14 +32,7 @@ def add_respect(update: Update, context: CallbackContext) -> None:
         update.callback_query.answer("You have paid your respects!")
         message.edit_text(
             f"Press F to pay respects.\n{count} users have paid their respects",
-            reply_markup=InlineKeyboardMarkup([
-                [
-                    InlineKeyboardButton(
-                        text="🇫",
-                        callback_data="press_f",
-                    )
-                ]
-            ])
+            reply_markup=message.reply_markup
         )
     except TelegramError:
         # Should probably resend the request with the updated counter
