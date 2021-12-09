@@ -1,7 +1,7 @@
 import json
 import random
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import Length
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpRequest
@@ -26,6 +26,10 @@ from university.serializers import (
     RepresentativeSerializer,
     CourseDegreeSerializer,
 )
+from telegrambot.models import (
+    UserPrivilege
+)
+from telegrambot.serializers import UserSerializer
 
 
 def _get_all_objects(model, serializer):
@@ -180,6 +184,27 @@ def degrees_by_query(request):
         .select_related("group")\
         .order_by(Length("name").asc(), "name", "type")
     serializer = DegreeSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def admin_by_degree(request):
+    slug = request.query_params.get("slug", None)
+    pk = request.query_params.get("pk", None)
+    if not slug and not pk:
+        return Response({"ok": False, "error": "Please provide the pk or an unique slug"})
+
+    try:
+        degree = Degree.objects.get(pk=int(pk)) if pk else Degree.objects.get(slug=slug)
+    except (Degree.DoesNotExist, TypeError):
+        return Response({"ok": False, "error": "Not found"}, status=404)
+    admins = UserPrivilege.objects.filter(
+        Q(scope=UserPrivilege.PrivilegeScopes.ALL) |
+        Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__slug__in=[degree.slug]) |
+        Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__slug__in=[degree.slug]) |
+        Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id=degree.group.id)
+    )
+    serializer = UserSerializer([admin.user for admin in admins], many=True)
     return Response(serializer.data)
 
 
