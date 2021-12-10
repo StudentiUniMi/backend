@@ -203,7 +203,7 @@ def admin_by_degree(request):
         Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__slug__in=[degree.slug]) |
         Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__slug__in=[degree.slug]) |
         Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id=degree.group.id)
-    )
+    ).filter(type__in=[UserPrivilege.PrivilegeTypes.ADMIN])
     serializer = UserSerializer([admin.user for admin in admins], many=True)
     return Response(serializer.data)
 
