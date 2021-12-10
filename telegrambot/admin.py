@@ -175,7 +175,7 @@ class UserPrivilegeAdmin(admin.ModelAdmin):
                        "can_promote_members", "can_superban_members", ),
         })
     )
-    autocomplete_fields = ("user", )
+    autocomplete_fields = ("user", "authorized_groups", "authorized_degrees", "authorized_departments", )
 
 
 @admin.register(TelegramBot)
