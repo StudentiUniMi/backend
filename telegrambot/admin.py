@@ -160,7 +160,7 @@ class GroupAdmin(admin.ModelAdmin):
 
 @admin.register(UserPrivilege)
 class UserPrivilegeAdmin(admin.ModelAdmin):
-    list_display = ("user", "type", "scope", )
+    list_display = ("user", "type", "custom_title", "scope", )
     fieldsets = (
         (None, {
             "fields": ("user", "type", )
