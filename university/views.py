@@ -200,10 +200,10 @@ def admin_by_degree(request):
         return Response({"ok": False, "error": "Not found"}, status=404)
     admins = UserPrivilege.objects.filter(
         Q(scope=UserPrivilege.PrivilegeScopes.ALL) |
-        Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__slug__in=[degree.slug]) |
-        Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__slug__in=[degree.slug]) |
+        Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__slug=degree.slug) |
+        Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__slug=degree.slug) |
         Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id=degree.group.id)
-    ).filter(type__in=[UserPrivilege.PrivilegeTypes.ADMIN])
+    ).filter(type=UserPrivilege.PrivilegeTypes.ADMIN).annotate(u_count=Count("user"))
     serializer = UserSerializer([admin.user for admin in admins], many=True)
     return Response(serializer.data)
 

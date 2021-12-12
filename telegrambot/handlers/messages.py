@@ -86,10 +86,10 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     ]
     privs = UserPrivilege.objects.filter(
         Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__in=degrees) |
-        Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id__in=[chat.id, ]) |
+        Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id=chat.id) |
         Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__in=degrees) |
         Q(scope=UserPrivilege.PrivilegeScopes.ALL)
-    ).filter(type__istartswith="A").annotate(u_count=Count("user"))  # Gets only users with type "Amministratore"
+    ).filter(type=UserPrivilege.PrivilegeTypes.ADMIN).annotate(u_count=Count("user"))  # Gets only users with type "Amministratore"
     LOG.info(privs)
 
     logging.log(logging.USER_CALLED_ADMIN, chat, target=dbtarget, issuer=dbuser, msg=reply_to)
