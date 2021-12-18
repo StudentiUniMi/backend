@@ -1,7 +1,15 @@
 import logging as logg
 
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler, CallbackQueryHandler, Updater
+from telegram.ext import (
+    MessageHandler,
+    Filters,
+    CommandHandler,
+    ChatMemberHandler,
+    CallbackQueryHandler,
+    Updater,
+    ChatJoinRequestHandler
+)
 
 from telegrambot.handlers import messages, members, moderation, errors, memes
 
@@ -20,6 +28,13 @@ def setup_dispatcher(dispatcher):
     ), group=0)
 
     # Groups
+    dispatcher.add_handler(ChatJoinRequestHandler(
+        callback=members.handle_join_request,
+    ), group=1)
+    dispatcher.add_handler(CallbackQueryHandler(
+        callback=members.handle_join_approval,
+        pattern="^join_chat="
+    ))
     dispatcher.add_handler(ChatMemberHandler(
         callback=members.handle_chat_member_updates,
         chat_member_types=ChatMemberHandler.ANY_CHAT_MEMBER,

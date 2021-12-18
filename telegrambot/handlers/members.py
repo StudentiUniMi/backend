@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging as logg
 
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember
 from telegram.ext import CallbackContext
@@ -54,31 +55,6 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
         if dbgroup.bot.username == "@studentiunimibot":
             return
 
-        msg: Message = context.bot.send_message(
-            chat_id=chat.id,
-            text=dbgroup.generate_welcome_message([new.user, ]),
-            parse_mode="html",
-            reply_markup=InlineKeyboardMarkup([
-                [
-                    InlineKeyboardButton(
-                        text="↗️ Visita studentiunimi.it",
-                        url="https://studentiunimi.it/",
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        text="📣 Canale notizie",
-                        url="https://t.me/studenti_unimi",
-                    ),
-                    InlineKeyboardButton(
-                        text="👥 Gruppo generale",
-                        url="https://t.me/unimichat",
-                    ),
-                ],
-            ]),
-        )
-        tasks.delete_message(chat.id, msg.message_id)
-
 
 def claim_command(update: Update, _: CallbackContext) -> None:
     """Claim admin privileges"""
@@ -96,3 +72,46 @@ def handle_left_chat_member_updates(update: Update, _: CallbackContext):
     if not update.message or not update.message.left_chat_member:
         return
     update.message.delete()
+
+
+def handle_join_request(update: Update, context: CallbackContext):
+    join_request = update.chat_join_request
+    sender = join_request.from_user
+    chat = join_request.chat
+
+    group = DBGroup.objects.get(id=chat.id)
+
+    sender.send_message(
+        text=group.generate_welcome_message([sender, ]),
+        parse_mode="html",
+        reply_markup=InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(
+                    text="↗️ Visita studentiunimi.it",
+                    url="https://studentiunimi.it/",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📣 Canale notizie",
+                    url="https://t.me/studenti_unimi",
+                ),
+                InlineKeyboardButton(
+                    text="👥 Gruppo generale",
+                    url="https://t.me/unimichat",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="Accetto le regole ✔️",
+                    callback_data=f"join_chat={chat.id}",
+                )
+            ],
+        ]),
+    )
+
+
+def handle_join_approval(update: Update, context: CallbackContext):
+    callback_query = update.callback_query
+    chat = callback_query.data.split("=")[1]
+    callback_query.from_user.approve_join_request(chat)
