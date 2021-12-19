@@ -342,10 +342,9 @@ def generate_admin_tagging_notification(sender, chat, privileges, reply_to: Mess
         LOG.info(priv.user.username)
     name = sender.username if sender.username else sender.first_name
     text = f"A user has tagged @admin\n"\
-           f"👤 <b>Issuer</b>: {escape(name)} [<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]\n"\
-           f"👥 <b>Group</b>: {escape(chat.title)} [<a href=\"{chat.invite_link}\">{chat.id}</a>]\n"\
+           f"👤 <b>User</b>: {escape(name)}[<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]\n"\
+           f"👥 <b>Group</b>: {escape(chat.title)}[<a href=\"{chat.invite_link}\">{chat.id}</a>]\n"\
            f"👮 <b>Please respond</b> {admins}"
     if reply_to is not None:
-        text += f"\n<b>Target</b>: {escape(reply_to.from_user.name)} [<a href=\"tg://user?id={reply_to.from_user.id}\">{reply_to.from_user.id}</a>]"
         text += f"\n📜 <b>Message</b>: {reply_to.text}[<a href='https://t.me/c/1{str(reply_to.chat.id)[5:]}/{reply_to.message_id}'>{reply_to.message_id}</a>]"
     return text
