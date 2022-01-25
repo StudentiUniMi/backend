@@ -100,7 +100,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Messag
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
         EventTypes.USER_CALLED_ADMIN,
-    ]:
+    ] and target is not None:
         text += f"\n👤 <b>Target user</b>: {_format_user(target)}"
     if event in [EventTypes.WHITELIST_BOT, ]:
         if not bot:
@@ -116,6 +116,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Messag
         EventTypes.MODERATION_SUPERFREE,
         EventTypes.WHITELIST_BOT,
         EventTypes.MODERATION_ERASED_MESSAGE,
+        EventTypes.USER_CALLED_ADMIN,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
     if event in [
