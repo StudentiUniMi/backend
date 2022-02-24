@@ -75,7 +75,6 @@ def handle_left_chat_member_updates(update: Update, _: CallbackContext):
 
 
 def handle_join_request(update: Update, context: CallbackContext):
-    """Sends the user info like rules of the channel and e markup keyboard with an accept rules button"""
     join_request = update.chat_join_request
     sender = join_request.from_user
     chat = join_request.chat
@@ -116,21 +115,3 @@ def handle_join_approval(update: Update, context: CallbackContext):
     callback_query = update.callback_query
     chat = callback_query.data.split("=")[1]
     callback_query.from_user.approve_join_request(chat)
-    callback_query.message.edit_reply_markup(InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton(
-                text="↗️ Visita studentiunimi.it",
-                url="https://studentiunimi.it/",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                text="📣 Canale notizie",
-                url="https://t.me/studenti_unimi",
-            ),
-            InlineKeyboardButton(
-                text="👥 Gruppo generale",
-                url="https://t.me/unimichat",
-            ),
-        ],
-    ]))
