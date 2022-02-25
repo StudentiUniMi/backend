@@ -24,6 +24,15 @@ class User(models.Model):
             models.Index(fields=["first_name", "last_name"], name="name_idx"),
         ]
 
+    class Gender(models.TextChoices):
+        MALE = "M", "Male"
+        FEMALE = "F", "Female"
+        OTHER = "O", "Other"
+
+    class Language(models.TextChoices):
+        ITALIAN = "IT", "Italian"
+        ENGLISH = "EN", "English"
+
     id = models.PositiveBigIntegerField("Telegram user ID", primary_key=True, unique=True)
     first_name = models.CharField("first name", max_length=256)
     last_name = models.CharField("last name", max_length=256, blank=True, null=True)
@@ -33,6 +42,12 @@ class User(models.Model):
     banned = models.BooleanField("banned?", default=False)
     permissions_level = models.IntegerField("permission level", default=0)
     last_seen = models.DateTimeField(default=datetime.now)
+
+    # Additional attributes
+    rules_accepted = models.BooleanField("has accepted rules?", default=False)
+    language = models.CharField("language", choices=Language.choices, max_length=2, default=Language.ITALIAN)
+    gender = models.CharField("gender", choices=Gender.choices, max_length=1, null=True, blank=True)
+    degree = models.ForeignKey("university.Degree", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.first_name}{f' {self.last_name}' if self.last_name else ''} [{self.id}]"

@@ -1,5 +1,4 @@
 import logging as logg
-
 from telegram import Update
 from telegram.ext import (
     MessageHandler,
@@ -8,11 +7,18 @@ from telegram.ext import (
     ChatMemberHandler,
     CallbackQueryHandler,
     Updater,
-    ChatJoinRequestHandler
+    ChatJoinRequestHandler,
 )
 
-from telegrambot.handlers import messages, members, moderation, errors, memes
-
+from telegrambot.handlers import (
+    messages,
+    members,
+    moderation,
+    errors,
+    memes,
+    welcome,
+    settings,
+)
 
 LOG = logg.getLogger(__name__)
 dispatchers = {}
@@ -22,19 +28,18 @@ def setup_dispatcher(dispatcher):
     dispatcher.add_error_handler(errors.telegram_error_handler)
 
     # Pre-processing
+    ## All group messages
     dispatcher.add_handler(MessageHandler(
         filters=Filters.chat_type.groups,
         callback=messages.handle_group_messages,
     ), group=0)
 
-    # Groups
+    ## Group join requests
     dispatcher.add_handler(ChatJoinRequestHandler(
-        callback=members.handle_join_request,
+        callback=welcome.handle_join_request,
     ), group=1)
-    dispatcher.add_handler(CallbackQueryHandler(
-        callback=members.handle_join_approval,
-        pattern="^join_chat="
-    ))
+
+    ## Status updates
     dispatcher.add_handler(ChatMemberHandler(
         callback=members.handle_chat_member_updates,
         chat_member_types=ChatMemberHandler.ANY_CHAT_MEMBER,
@@ -43,10 +48,13 @@ def setup_dispatcher(dispatcher):
         filters=Filters.status_update,
         callback=members.handle_left_chat_member_updates,
     ), group=1)
+
+    ## Admin tagging
     dispatcher.add_handler(MessageHandler(
         filters=Filters.chat_type.groups,
         callback=messages.handle_admin_tagging,
     ), group=1)
+
 
     # Admin commands
     dispatcher.add_handler(CommandHandler(
@@ -102,6 +110,7 @@ def setup_dispatcher(dispatcher):
         callback=moderation.handle_delete_command,
     ), group=2)
 
+
     # User commands
     dispatcher.add_handler(CommandHandler(
         command="respects",
@@ -111,6 +120,47 @@ def setup_dispatcher(dispatcher):
         callback=memes.add_respect,
         pattern="^press_f$",
     ), group=3)
+
+
+    # Private chat callback
+    ## Language setting
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^ask_language$",
+        callback=settings.ask_language,
+    ), group=4)
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^set_language@",
+        callback=settings.set_language,
+    ), group=4)
+
+    ## Gender setting
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^ask_gender$",
+        callback=settings.ask_gender,
+    ), group=4)
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^set_gender@",
+        callback=settings.set_gender,
+    ), group=4)
+
+    ## Degree selection
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^ask_degree_type$",
+        callback=settings.ask_degree_type,
+    ), group=4)
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^ask_degree@",
+        callback=settings.ask_degree,
+    ), group=4)
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^set_degree@",
+        callback=settings.set_degree,
+    ), group=4)
+    dispatcher.add_handler(CallbackQueryHandler(
+        pattern=r"^accept_rules$",
+        callback=welcome.accept_rules,
+    ), group=4)
+
 
 
 # Tokens that are sent to this function have been already checked againts the DB
