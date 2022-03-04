@@ -1,4 +1,4 @@
-name: "Docker build and push (image: backend)"
+name: "Docker build and push (image: backend-tasks)"
 
 on:
   push:
@@ -33,23 +33,8 @@ jobs:
         uses: docker/build-push-action@v2.2.2
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile-tasks
           tags: |
-            ghcr.io/studentiunimi/backend:${{ env.LATEST_COMMIT_SHA }}
-            ghcr.io/studentiunimi/backend:latest
+            ghcr.io/studentiunimi/backend-tasks:${{ env.LATEST_COMMIT_SHA }}
+            ghcr.io/studentiunimi/backend-tasks:latest
           push: true
-
-      - uses: actions/checkout@v2
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-        with:
-          environment: production
-          version: ${{ env.LATEST_COMMIT_SHA }}
-          set_commits: auto
-          finalize: true
-          ignore_missing: true
-          ignore_empty: true

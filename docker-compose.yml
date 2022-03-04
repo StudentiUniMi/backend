@@ -67,3 +67,25 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.studunimi-backend.loadbalancer.server.port=8000"
+
+  tasks:
+    image: ghcr.io/studentiunimi/backend-tasks:latest
+    environment:
+      - SERVER_NAME=${SERVER_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DBNAME=${POSTGRES_DBNAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - LOGGING_CHAT_ID=${LOGGING_CHAT_ID}
+      - LOGGING_BOT_TOKEN=${LOGGING_BOT_TOKEN}
+      - TELEGRAM_API_ID=${TELEGRAM_API_ID}
+      - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - TELEGRAM_ADMIN_GROUP_ID=${TELEGRAM_ADMIN_GROUP_ID}
+    volumes:
+      - studunimi-backend_userbot-sessions:/usr/src/app/media/userbot-sessions
+    depends_on:
+      - postgres
+      - django
+    networks:
+      - db_net
