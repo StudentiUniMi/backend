@@ -7,21 +7,28 @@ from django.conf import settings
 
 
 class EventTypes(Enum):
-    CHAT_DOES_NOT_EXIST = 0, '❗️'
-    MODERATION_WARN = 1, '🟡'
-    MODERATION_KICK = 2, '⚪'
-    MODERATION_BAN = 3, '🔴'
-    MODERATION_MUTE = 4, '🟠'
-    MODERATION_FREE = 6, '🟢'
-    MODERATION_SUPERBAN = 7, '⚫️'
-    MODERATION_SUPERFREE = 11, '✳️'
-    USER_JOINED = 8, '➕'
-    USER_LEFT = 9, '➖'
-    NOT_ENOUGH_RIGHTS = 10, '🔰'
-    TELEGRAM_ERROR = 12, '❗️'
-    USER_CALLED_ADMIN = 13, '🧑‍⚖️'
-    MODERATION_ERASED_MESSAGE = 14, '✏️'
-    WHITELIST_BOT = 15, '⚪'
+    CHAT_DOES_NOT_EXIST = 0, '❗️', None
+    MODERATION_INFO = 1, 'ℹ️', None
+    MODERATION_WARN = 1, '🟡', "ammonito"
+    MODERATION_KICK = 2, '⚪', "espulso dal gruppo"
+    MODERATION_BAN = 3, '🔴', "espulso permanentemente dal gruppo"
+    MODERATION_MUTE = 4, '🟠', "mutato nel gruppo"
+    MODERATION_FREE = 6, '🟢', "riammesso nel gruppo"
+    MODERATION_SUPERBAN = 7, '⚫️', "espulso permanentemente da tutti i gruppi"
+    MODERATION_SUPERFREE = 11, '✳️', "riammesso in tutti i gruppi"
+    USER_JOINED = 8, '➕', None
+    USER_LEFT = 9, '➖', None
+    NOT_ENOUGH_RIGHTS = 10, '🔰', None
+    TELEGRAM_ERROR = 12, '❗️', None
+    USER_CALLED_ADMIN = 13, '🧑‍⚖️', None
+    MODERATION_DEL = 14, '✏️', None
+    WHITELIST_BOT = 15, '⚪', None
+
+    @property
+    def command(self) -> str:
+        if "MODERATION_" not in self.name:
+            return ''
+        return '_'.join(self.name.split("_")[1:]).lower()
 
 
 CHAT_DOES_NOT_EXIST = EventTypes.CHAT_DOES_NOT_EXIST
@@ -38,7 +45,7 @@ NOT_ENOUGH_RIGHTS = EventTypes.NOT_ENOUGH_RIGHTS
 TELEGRAM_ERROR = EventTypes.TELEGRAM_ERROR
 WHITELIST_BOT = EventTypes.WHITELIST_BOT
 USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
-MODERATION_ERASED_MESSAGE = EventTypes.MODERATION_ERASED_MESSAGE
+MODERATION_DEL = EventTypes.MODERATION_DEL
 
 
 def _normalize_group_id(group_id) -> str:
@@ -67,18 +74,19 @@ def _format_user(user) -> str:
     if getattr(user, "last_name"):
         text += f" {user.last_name}"
     if getattr(user, "username"):
-        text += f" [{'@' if user.username[0] is not '@' else ''}{user.username}]"
+        text += f" [{'@' if user.username[0] != '@' else ''}{user.username}]"
 
     return f"{text} {_normalize_user_id(getattr(user, 'id'))}"
 
 
-def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Message = None,  **kwargs) -> None:
+def log(event: EventTypes, chat, target=None, issuer=None, reason=None, bot=None, msg: Message = None,  **kwargs) -> None:
     """Log an event to the log chat.
 
     :param event: must be an instance of `telegrambot.logging.EventTypes`
     :param chat: the chat where the event was generated
     :param target: the target user
     :param issuer: the command issuer (only for moderation events)
+    :param reason: admin-specified reason for the action (only for moderation events)
     :param bot: like target but when the target is not a user but a bot
     :param msg: used only with warn to log the message that prompted a warn
     :return: None
@@ -95,7 +103,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Messag
         EventTypes.MODERATION_FREE,
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_SUPERFREE,
-        EventTypes.MODERATION_ERASED_MESSAGE,
+        EventTypes.MODERATION_DEL,
         EventTypes.USER_LEFT,
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
@@ -115,7 +123,7 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Messag
         EventTypes.MODERATION_SUPERBAN,
         EventTypes.MODERATION_SUPERFREE,
         EventTypes.WHITELIST_BOT,
-        EventTypes.MODERATION_ERASED_MESSAGE,
+        EventTypes.MODERATION_DEL,
         EventTypes.USER_CALLED_ADMIN,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
@@ -128,6 +136,8 @@ def log(event: EventTypes, chat, target=None, issuer=None, bot=None, msg: Messag
         EventTypes.TELEGRAM_ERROR
     ] and kwargs.get("error_message", False):
         text += f"\n💬 <b>Error message</b>: {kwargs['error_message']}"
+    if reason:
+        text += f"\n💬 <b>Reason</b>: {reason}"
     if msg is not None:
         text += f"\n📜 <b>Message</b>: {msg.text}[<a href='https://t.me/c/1{str(msg.chat.id)[5:]}/{msg.message_id}'>{msg.message_id}</a>]"
 

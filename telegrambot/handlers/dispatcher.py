@@ -35,36 +35,18 @@ def setup_dispatcher(dispatcher):
 
     # Admin commands
     dispatcher.add_handler(CommandHandler(
-        command="warn",
-        callback=moderation.handle_warn_command,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="kick",
-        callback=moderation.handle_kick_command,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="ban",
-        callback=moderation.handle_ban_command,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="superban",
-        callback=moderation.handle_global_ban_command,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="mute",
-        callback=moderation.handle_mute_command,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="free",
-        callback=moderation.handle_free_command,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="superfree",
-        callback=moderation.handle_global_free_command,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="info",
-        callback=moderation.handle_info_command,
+        command=[
+            "info",
+            "warn",
+            "kick",
+            "ban",
+            "mute",
+            "free",
+            "superban",
+            "superfree",
+            "del",
+        ],
+        callback=moderation.handle_moderation_command,
     ), group=2)
     dispatcher.add_handler(CommandHandler(
         command="claim",
@@ -81,10 +63,6 @@ def setup_dispatcher(dispatcher):
     dispatcher.add_handler(CommandHandler(
         command="ignore_admin",
         callback=moderation.handle_toggle_admin_tagging,
-    ), group=2)
-    dispatcher.add_handler(CommandHandler(
-        command="delete",
-        callback=moderation.handle_delete_command,
     ), group=2)
 
     # User commands
