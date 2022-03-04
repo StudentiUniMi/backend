@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 import telegram
-from telegram import Message
+from telegram import Message, Chat
 from django.conf import settings
 
 
@@ -79,7 +79,31 @@ def _format_user(user) -> str:
     return f"{text} {_normalize_user_id(getattr(user, 'id'))}"
 
 
-def log(event: EventTypes, chat, target=None, issuer=None, reason=None, bot=None, msg: Message = None,  **kwargs) -> None:
+def prepare(msg: Message = None) -> Message:
+    """Prepare a log entry before executing an action.
+    Useful for commands like /del to log the deleted message before it disappears.
+
+    :param msg: the message that prompted the action
+    :return: a message to pass to log
+    """
+    bot = telegram.Bot(settings.LOGGING_BOT_TOKEN)
+    sent_msg: Message = bot.send_message(chat_id=settings.LOGGING_CHAT_ID, text="...", parse_mode="html")
+
+    if msg:
+        msg.forward(chat_id=settings.LOGGING_CHAT_ID)
+    return sent_msg
+
+
+def log(event: EventTypes,
+        chat: Chat,
+        target=None,
+        issuer=None,
+        reason=None,
+        bot=None,
+        msg: Message = None,
+        prepared_entry: Message = None,
+        **kwargs
+    ) -> None:
     """Log an event to the log chat.
 
     :param event: must be an instance of `telegrambot.logging.EventTypes`
@@ -88,7 +112,8 @@ def log(event: EventTypes, chat, target=None, issuer=None, reason=None, bot=None
     :param issuer: the command issuer (only for moderation events)
     :param reason: admin-specified reason for the action (only for moderation events)
     :param bot: like target but when the target is not a user but a bot
-    :param msg: used only with warn to log the message that prompted a warn
+    :param msg: the message that prompted the action
+    :param prepared_entry: the output of the logging.prepare function
     :return: None
     """
 
@@ -138,8 +163,14 @@ def log(event: EventTypes, chat, target=None, issuer=None, reason=None, bot=None
         text += f"\n💬 <b>Error message</b>: {kwargs['error_message']}"
     if reason:
         text += f"\n💬 <b>Reason</b>: {reason}"
-    if msg is not None:
-        text += f"\n📜 <b>Message</b>: {msg.text}[<a href='https://t.me/c/1{str(msg.chat.id)[5:]}/{msg.message_id}'>{msg.message_id}</a>]"
+    if msg:
+        text += f"\n📜 <b>Message</b>: <i>see below</i>"
 
     bot = telegram.Bot(settings.LOGGING_BOT_TOKEN)
-    bot.send_message(chat_id=settings.LOGGING_CHAT_ID, text=text, parse_mode="html")
+    if not prepared_entry:
+        bot.send_message(chat_id=settings.LOGGING_CHAT_ID, text=text, parse_mode="html")
+    else:
+        prepared_entry.edit_text(text=text, parse_mode="html")
+
+    if msg and not prepared_entry:
+        msg.forward(chat_id=settings.LOGGING_CHAT_ID)
