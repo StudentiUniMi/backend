@@ -1,14 +1,16 @@
 version: '3'
 
 volumes:
-  studentiunimi_backend_postgres:
+  studunimi-backend_postgres:
+    external: true
+  studunimi-backend_userbot-sessions:
     external: true
   static_files:
 
 networks:
   db_net:
   django_net:
-  nginx_net:
+  traefik_net:
     external: true
 
 services:
@@ -20,9 +22,11 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DBNAME}
     volumes:
-      - studentiunimi_backend_postgres:/var/lib/postgresql/data
+      - studunimi-backend_postgres:/var/lib/postgresql/data
     networks:
       - db_net
+    deploy:
+      replicas: 1
 
   django:
     image: ghcr.io/studentiunimi/backend:latest
@@ -41,7 +45,7 @@ services:
       - TELEGRAM_ADMIN_GROUP_ID=${TELEGRAM_ADMIN_GROUP_ID}
     volumes:
       - static_files:/usr/src/app/static/
-      - ./userbot-sessions:/usr/src/app/media/userbot-sessions
+      - studunimi-backend_userbot-sessions:/usr/src/app/media/userbot-sessions
     depends_on:
       - postgres
     networks:
@@ -56,6 +60,10 @@ services:
       - static_files:/static
     networks:
       - django_net
-      - nginx_net
+      - traefik_net
     depends_on:
       - django
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.studunimi-backend.loadbalancer.server.port=8000"

@@ -105,8 +105,10 @@ Once again, here's an incomplete list of features:
   - ...
 
 ## Deployment
-We use Docker and docker-compose to deploy the project. Tune your settings by editing `.env` and 
-`docker-compose.yml` files. It's highly recommended using a reverse proxy to host the application in production.
+We use Docker Swarm to deploy this project on our systems. Tune your settings by editing `.env` and 
+`docker-compose.yml` files, then run `./deploy.sh`. 
+It's highly recommended using a reverse proxy to run the application in production, like 
+[Traefik](https://github.com/traefik/traefik).
 
 You can use the automatically updated 
 [`ghcr.io/studentiunimi/backend:latest`](https://github.com/StudentiUniMi/backend/pkgs/container/backend)
