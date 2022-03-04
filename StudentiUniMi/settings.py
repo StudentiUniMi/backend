@@ -24,6 +24,7 @@ DEBUG = bool(os.environ.get("DEBUG", False))
 
 ALLOWED_HOSTS = [
     'django',
+    '127.0.0.1',
 ]
 
 INSTALLED_APPS = [

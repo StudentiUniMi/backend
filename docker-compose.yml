@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 volumes:
   studunimi-backend_postgres:
@@ -25,6 +25,12 @@ services:
       - studunimi-backend_postgres:/var/lib/postgresql/data
     networks:
       - db_net
+    healthcheck:
+      test: pg_isready || exit 1
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
     deploy:
       replicas: 1
 
@@ -63,6 +69,12 @@ services:
       - traefik_net
     depends_on:
       - django
+    healthcheck:
+      test: curl http://127.0.0.1:8000/healthcheck || exit 1
+      interval: 1m
+      timeout: 10s
+      start_period: 60s
+      retries: 3
     deploy:
       labels:
         - "traefik.enable=true"
