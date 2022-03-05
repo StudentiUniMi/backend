@@ -205,7 +205,7 @@ class ModerationCommand:
         for group in DBGroup.objects.filter(members__id=self.target.id):
             self.free(group.id)
 
-        self.target.banned = True
+        self.target.banned = False
         self.target.save()
 
 

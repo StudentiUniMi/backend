@@ -94,7 +94,8 @@ def prepare(msg: Message = None) -> Message:
     return sent_msg
 
 
-def log(event: EventTypes,
+def log(
+        event: EventTypes,
         chat: Chat,
         target=None,
         issuer=None,
@@ -103,7 +104,7 @@ def log(event: EventTypes,
         msg: Message = None,
         prepared_entry: Message = None,
         **kwargs
-    ) -> None:
+) -> None:
     """Log an event to the log chat.
 
     :param event: must be an instance of `telegrambot.logging.EventTypes`
