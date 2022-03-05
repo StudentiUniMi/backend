@@ -35,7 +35,8 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
 
     if new.status == ChatMember.LEFT:
         logging.log(logging.USER_LEFT, chat=chat, target=user)
-        update.message.delete()
+        if update.message:
+            update.message.delete()
 
     if new.status == ChatMember.MEMBER:
         if not new.user.is_bot:

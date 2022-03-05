@@ -44,7 +44,7 @@ class User(models.Model):
 
     def generate_mention(self):
         """Generate an HTML mention of the user"""
-        return f"<a href=\"tg://user?id={self.id}\">{self.name}</a>"
+        return f"<a href=\"tg://user?id={self.id}\">{f'@{self.username}' if self.username else self.name}</a>"
 
     def get_privileges(self, chat):
         """Return the UserPrivilege object associated with the user.
