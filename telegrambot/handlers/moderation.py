@@ -240,7 +240,8 @@ def handle_moderation_command(update: Update, context: CallbackContext) -> None:
             and not utils.can_superban(issuer):
         return
 
-    prepared_entry: Message = logging.prepare(msg=command.target_message)
+    if command.event != EventTypes.MODERATION_INFO:
+        prepared_entry: Message = logging.prepare(msg=command.target_message)
 
     command.dispatch()
     message.delete()
