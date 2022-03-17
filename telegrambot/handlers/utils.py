@@ -263,7 +263,7 @@ def format_user_info(dbuser):
     except t_models.User.DoesNotExist:
         return result
 
-    text = f"👤 <b>Utente</b> <a href=\"tg://user?id={user.id}\">{escape(user.name)}</a>"
+    text = f"👤 <b>Utente</b> <a href=\"tg://user?id={user.id}\">{escape(user.name)}</a> [{user.id}]"
     text += f"\n🔖 <b>Username</b>: @{escape(user.username)}" if user.username else ""
     text += f"\n🔺 <b>Reputazione</b>: {user.reputation}"
     text += f"\n🟡 <b>Ammonizioni</b>: {user.warn_count}"
