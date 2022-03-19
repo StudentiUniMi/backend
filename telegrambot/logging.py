@@ -23,6 +23,7 @@ class EventTypes(Enum):
     USER_CALLED_ADMIN = 13, '🧑‍⚖️', None
     MODERATION_DEL = 14, '✏️', None
     WHITELIST_BOT = 15, '⚪', None
+    BROADCAST = 16, '📡', None
 
     @property
     def command(self) -> str:
@@ -46,6 +47,7 @@ TELEGRAM_ERROR = EventTypes.TELEGRAM_ERROR
 WHITELIST_BOT = EventTypes.WHITELIST_BOT
 USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
 MODERATION_DEL = EventTypes.MODERATION_DEL
+BROADCAST = EventTypes.BROADCAST
 
 
 def _normalize_group_id(group_id) -> str:
@@ -96,7 +98,7 @@ def prepare(msg: Message = None) -> Message:
 
 def log(
         event: EventTypes,
-        chat: Chat,
+        chat: Chat | None,
         target=None,
         issuer=None,
         reason=None,
@@ -119,7 +121,8 @@ def log(
     """
 
     text = f"{event.value[1]} #{event.name}"
-    text += f"\n👥 <b>Group</b>: {_format_chat(chat)}"
+    if chat is not None:
+        text += f"\n👥 <b>Group</b>: {_format_chat(chat)}"
 
     if event in [
         EventTypes.MODERATION_WARN,
@@ -151,6 +154,7 @@ def log(
         EventTypes.WHITELIST_BOT,
         EventTypes.MODERATION_DEL,
         EventTypes.USER_CALLED_ADMIN,
+        EventTypes.BROADCAST,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
     if event in [

@@ -134,6 +134,7 @@ def handle_broadcast_confirm(update: Update, context: CallbackContext):
     for group in DBGroup.objects.all():
         bot.send_message(group.id, message.text_markdown_v2, parse_mode="markdown")
 
+    logging.log(logging.BROADCAST, None, issuer=update.callback_query.from_user, msg=message)
     message.delete()
 
 
