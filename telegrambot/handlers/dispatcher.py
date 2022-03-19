@@ -66,7 +66,15 @@ def setup_dispatcher(dispatcher):
     ), group=2)
     dispatcher.add_handler(CommandHandler(
         command="broadcast",
-        callback=messages.broadcast_message,
+        callback=messages.request_broadcast_message,
+    ), group=2)
+    dispatcher.add_handler(CallbackQueryHandler(
+        callback=messages.handle_broadcast_confirm,
+        pattern="^broadcast_send$"
+    ), group=2)
+    dispatcher.add_handler(CallbackQueryHandler(
+        callback=messages.handle_broadcast_discard,
+        pattern="^broadcast_discard$"
     ), group=2)
 
     # User commands

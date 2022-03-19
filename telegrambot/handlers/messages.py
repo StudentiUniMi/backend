@@ -1,6 +1,6 @@
 import logging as logg
 
-from telegram import Update, User, Message, Chat
+from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 from django.conf import settings
 from django.db.models import Q, Count
@@ -98,14 +98,44 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)
 
 
-def broadcast_message(update: Update, context: CallbackContext):
+def request_broadcast_message(update: Update, context: CallbackContext):
     """Command handler for /broadcast used to broadcast a message to all groups of the network"""
-    message = update.message.text[11:]
+    message = update.message
     issuer = update.message.from_user
-    bot = context.bot
 
     if not utils.can_superban(issuer):
         return
 
+    issuer.send_message(
+        message.text_markdown_v2[11:],
+        reply_markup=InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(
+                    text="Send",
+                    callback_data="broadcast_send"
+                ),
+                InlineKeyboardButton(
+                    text="❌",
+                    callback_data="broadcast_discard"
+                )
+            ]
+        ]),
+        parse_mode="markdown"
+    )
+    message.delete()
+
+
+def handle_broadcast_confirm(update: Update, context: CallbackContext):
+    bot = context.bot
+    message = update.callback_query.message
+
+    message.edit_text(message.text_markdown_v2)
+
     for group in DBGroup.objects.all():
-        bot.send_message(group.id, message)
+        bot.send_message(group.id, message.text_markdown_v2, parse_mode="markdown")
+
+    message.delete()
+
+
+def handle_broadcast_discard(update: Update, context: CallbackContext):
+    update.callback_query.message.delete()
