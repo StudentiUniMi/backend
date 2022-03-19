@@ -64,6 +64,10 @@ def setup_dispatcher(dispatcher):
         command="ignore_admin",
         callback=moderation.handle_toggle_admin_tagging,
     ), group=2)
+    dispatcher.add_handler(CommandHandler(
+        command="broadcast",
+        callback=messages.broadcast_message,
+    ), group=2)
 
     # User commands
     dispatcher.add_handler(CommandHandler(

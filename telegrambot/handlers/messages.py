@@ -96,3 +96,16 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
 
     caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs, reply_to)
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)
+
+
+def broadcast_message(update: Update, context: CallbackContext):
+    """Command handler for /broadcast used to broadcast a message to all groups of the network"""
+    message = update.message.text[11:]
+    issuer = update.message.from_user
+    bot = context.bot
+
+    if not utils.can_superban(issuer):
+        return
+
+    for group in DBGroup.objects.all():
+        bot.send_message(group.id, message)
