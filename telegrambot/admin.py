@@ -23,6 +23,7 @@ from telegrambot.models import (
     UserPrivilege,
     TelegramUserbot,
     BotWhitelist,
+    TelegramLog,
 )
 
 
@@ -197,3 +198,32 @@ class TelegramUserbotAdmin(admin.ModelAdmin):
 class BotWhitelistAdmin(admin.ModelAdmin):
     list_display = ("username", "whitelisted_by")
     search_fields = ("username", "whitelisted_by")
+
+
+@admin.register(TelegramLog)
+class TelegramLogAdmin(admin.ModelAdmin):
+    list_display = ("id", "event", "chat", "target", "issuer", "timestamp")
+    search_fields = [
+        "issuer__id",
+        "issuer__username",
+        "issuer__first_name",
+        "issuer__last_name",
+        "target__id",
+        "target__username",
+        "target__first_name",
+        "target__last_name",
+        "chat__title",
+        "chat__id",
+    ]
+    list_filter = ("event", )
+    date_hierarchy = "timestamp"
+    ordering = ["-timestamp"]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
