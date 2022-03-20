@@ -5,6 +5,9 @@ import telegram
 from telegram import Message, Chat
 from django.conf import settings
 
+import logging as logg
+LOG = logg.getLogger(__name__)
+
 
 class EventTypes(Enum):
     CHAT_DOES_NOT_EXIST = 0, '❗️', None
@@ -125,14 +128,16 @@ def log(
         Group as DBGroup,
     )  # Circular import
 
+    logg.warning(issuer)
     db_log = TelegramLog()
     db_log.event = event.value[0]
+    db_log.timestamp = datetime.now()
     if chat:
         db_log.chat = DBGroup.objects.get(id=chat.id)
     if target:
         db_log.target = DBUser.objects.get(id=target.id)
     if issuer:
-        db_log.target = DBUser.objects.get(id=issuer.id)
+        db_log.issuer = DBUser.objects.get(id=issuer.id)
     if reason:
         db_log.reason = reason
     if msg:
