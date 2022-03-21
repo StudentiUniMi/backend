@@ -8,7 +8,7 @@ from django.conf import settings
 
 class EventTypes(Enum):
     CHAT_DOES_NOT_EXIST = 0, '❗️', None
-    MODERATION_INFO = 1, 'ℹ️', None
+    MODERATION_INFO = 5, 'ℹ️', None
     MODERATION_WARN = 1, '🟡', "ammonito"
     MODERATION_KICK = 2, '⚪', "espulso dal gruppo"
     MODERATION_BAN = 3, '🔴', "espulso permanentemente dal gruppo"
@@ -96,6 +96,37 @@ def prepare(msg: Message = None) -> Message:
     return sent_msg
 
 
+def log_db_save(
+        event: EventTypes,
+        chat: Chat | None,
+        target=None,
+        issuer=None,
+        reason=None,
+        msg: Message = None,
+) -> None:
+    """Save event onto DB"""
+    from telegrambot.models import (
+        TelegramLog,
+        User as DBUser,
+        Group as DBGroup,
+    )  # Circular import
+
+    db_log = TelegramLog()
+    db_log.event = event.value[0]
+    db_log.timestamp = datetime.now()
+    if chat:
+        db_log.chat = DBGroup.objects.get(id=chat.id)
+    if target:
+        db_log.target = DBUser.objects.get(id=target.id)
+    if issuer:
+        db_log.issuer = DBUser.objects.get(id=issuer.id)
+    if reason:
+        db_log.reason = reason
+    if msg:
+        db_log.message = msg.text_markdown_v2
+    db_log.save()
+
+
 def log(
         event: EventTypes,
         chat: Chat | None,
@@ -119,6 +150,7 @@ def log(
     :param prepared_entry: the output of the logging.prepare function
     :return: None
     """
+    log_db_save(event, chat, target=target, issuer=issuer, reason=reason, msg=msg)
 
     text = f"{event.value[1]} #{event.name}"
     if chat is not None:

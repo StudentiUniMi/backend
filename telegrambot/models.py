@@ -5,6 +5,7 @@ import telegram
 from telegram import ChatMember
 from django.apps import apps
 from django.db import models
+from django.utils.translation import gettext_lazy
 
 from telegrambot.handlers import utils
 
@@ -365,3 +366,34 @@ class BotWhitelist(models.Model):
 
     username = models.CharField("username", max_length=64, null=False, unique=True)
     whitelisted_by = models.ForeignKey(User, on_delete=models.SET_NULL, to_field="id", null=True)
+
+
+class TelegramLog(models.Model):
+    """Logs for various things like joined/left channel or moderation commands"""
+    class Events(models.IntegerChoices):
+        CHAT_DOES_NOT_EXIST = 0, gettext_lazy("CHAT_DOES_NOT_EXIST")
+        MODERATION_INFO = 5, gettext_lazy("MODERATION_INFO")
+        MODERATION_WARN = 1, gettext_lazy("MODERATION_WARN")
+        MODERATION_KICK = 2, gettext_lazy("MODERATION_KICK")
+        MODERATION_BAN = 3, gettext_lazy("MODERATION_BAN")
+        MODERATION_MUTE = 4, gettext_lazy("MODERATION_MUTE")
+        MODERATION_FREE = 6, gettext_lazy("MODERATION_FREE")
+        MODERATION_SUPERBAN = 7, gettext_lazy("MODERATION_SUPERBAN")
+        MODERATION_SUPERFREE = 11, gettext_lazy("MODERATION_SUPERFREE")
+        USER_JOINED = 8, gettext_lazy("USER_JOINED")
+        USER_LEFT = 9, gettext_lazy("USER_LEFT")
+        NOT_ENOUGH_RIGHTS = 10, gettext_lazy("NOT_ENOUGH_RIGHTS")
+        TELEGRAM_ERROR = 12, gettext_lazy("TELEGRAM_ERROR")
+        USER_CALLED_ADMIN = 13, gettext_lazy("USER_CALLED_ADMIN")
+        MODERATION_DEL = 14, gettext_lazy("MODERATION_DEL")
+        WHITELIST_BOT = 15, gettext_lazy("WHITELIST_BOT")
+        BROADCAST = 16, gettext_lazy("BROADCAST")
+
+    id = models.BigAutoField(primary_key=True)
+    event = models.IntegerField(choices=Events.choices)
+    chat = models.ForeignKey(Group, null=True, on_delete=models.SET_NULL)
+    target = models.ForeignKey(User, related_name="log_as_target", null=True, on_delete=models.RESTRICT)
+    issuer = models.ForeignKey(User, related_name="log_as_issuer", null=True, on_delete=models.RESTRICT)
+    reason = models.TextField(null=True, blank=True)
+    message = models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(null=False)

@@ -88,7 +88,7 @@ def setup_dispatcher(dispatcher):
     ), group=3)
 
 
-# Tokens that are sent to this function have been already checked againts the DB
+# Tokens that are sent to this function have already been checked againts the DB
 def dispatch_telegram_update(json_update: dict, token: str) -> None:
     if token not in dispatchers.keys():
         dispatchers[token] = Updater(token=token).dispatcher
