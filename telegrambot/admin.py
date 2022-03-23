@@ -155,7 +155,6 @@ class GroupAdmin(admin.ModelAdmin):
     fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", "bot", "welcome_model",
               "ignore_admin_tagging", )
     autocomplete_fields = ("owner", "bot", )
-    inlines = (GroupMembershipInline, )
     actions = [fetch_telegram_info_action, ]
 
 
