@@ -397,3 +397,12 @@ class TelegramLog(models.Model):
     reason = models.TextField(null=True, blank=True)
     message = models.TextField(null=True, blank=True)
     timestamp = models.DateTimeField(null=False)
+
+    def __str__(self):
+        text = ""
+        if self.issuer:
+            text += f"{self.issuer.__str__()} -> "
+        text += f"{self.Events(self.event).name}"
+        if self.target:
+            text += f" -> {self.target.__str__()}"
+        return text
