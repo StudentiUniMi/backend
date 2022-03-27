@@ -21,6 +21,7 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
 
     user: User = update.chat_member.from_user
     chat: Chat = update.chat_member.chat
+    old: ChatMember = update.chat_member.old_chat_member
     new: ChatMember = update.chat_member.new_chat_member
 
     utils.save_user(new.user, chat)
@@ -39,6 +40,9 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
             update.message.delete()
 
     if new.status == ChatMember.MEMBER:
+        if old.status == ChatMember.ADMINISTRATOR:
+            return
+
         if not new.user.is_bot:
             dbuser: DBUser = utils.save_user(new.user, chat)
             utils.set_admin_rights(dbuser, chat)
