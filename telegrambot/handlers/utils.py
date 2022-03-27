@@ -4,6 +4,7 @@ import logging as logg
 import telegram
 from django.apps import apps
 from django.conf import settings
+from django.db.models import Q, QuerySet
 from django.urls import reverse
 from telegram import User, Chat, TelegramError, Message
 from telegram.ext import DispatcherHandlerStop
@@ -11,8 +12,9 @@ from telegram.utils.helpers import escape
 
 import telegrambot.models as t_models
 import university.models as u_models
+from roles.models import BaseRole
 from telegrambot import logging
-
+from telegrambot.logging import EventTypes
 
 LOG = logg.getLogger(__name__)
 
@@ -77,36 +79,30 @@ def save_user(user: User, chat: Chat):
 
 
 # def set_admin_rights(dbuser: telegrambot.User, chat: Union[telegram.Chat, telegrambot.Chat]) -> None
-def set_admin_rights(dbuser, chat) -> None:
+def set_admin_rights(user, chat, force=False) -> None:
     """Try to set chat admin rights in a chat if the user has privileges.
 
-    :param dbuser: the telegrambot.User to promote
+    :param user: the telegrambot.User to promote
     :param chat: the considered Telegram chat
+    :param force: force privileges setting (use this to remove privileges)
     :return: None
     """
-    privileges = dbuser.get_privileges(chat)
-    if not privileges:
-        return
+    _, telegram_permissions, custom_title = get_permissions(user.id, chat.id)
 
     bot = get_bot(chat)
     try:
-        bot.promote_chat_member(
-            chat_id=chat.id,
-            user_id=dbuser.id,
-            can_change_info=privileges.can_change_info,
-            can_delete_messages=privileges.can_delete_messages,
-            can_invite_users=privileges.can_invite_users,
-            can_restrict_members=privileges.can_restrict_members,
-            can_pin_messages=privileges.can_pin_messages,
-            can_promote_members=privileges.can_promote_members,
-            can_manage_chat=privileges.can_manage_chat,
-            can_manage_voice_chats=privileges.can_manage_voice_chats,
-        )
-        bot.set_chat_administrator_custom_title(
-            chat_id=chat.id,
-            user_id=dbuser.id,
-            custom_title=privileges.custom_title,
-        )
+        if force or any([telegram_permissions[k] for k in telegram_permissions]):
+            bot.promote_chat_member(
+                chat_id=chat.id,
+                user_id=user.id,
+                **telegram_permissions,
+            )
+            if custom_title:
+                bot.set_chat_administrator_custom_title(
+                    chat_id=chat.id,
+                    user_id=user.id,
+                    custom_title=custom_title,
+                )
     except TelegramError as e:
         if e.message == "Chat not found":
             logging.log(logging.CHAT_DOES_NOT_EXIST, chat=chat, target=bot)
@@ -140,6 +136,27 @@ def remove_admin_rights(dbuser, chat) -> None:
         # The bot has no enough rights
         # TODO: Alert administrators
         pass
+
+
+def get_permissions(user_id: int, chat_id: int) -> tuple[list[EventTypes | None], dict[str, bool], str | None]:
+    group_degrees: QuerySet[u_models.Degree] = u_models.Degree.objects.filter(
+        Q(courses__degrees__group_id=chat_id) | Q(group__id=chat_id)
+    )
+    roles: QuerySet[BaseRole] = BaseRole.objects.filter(
+        Q(tg_user=user_id) & (Q(degrees__in=group_degrees) | Q(all_groups=True))
+    )
+
+    permissions: list[EventTypes | None] = []
+    telegram_permissions: dict[str, bool] = {}
+    custom_title = None
+    for role in roles:
+        permissions.extend(role.permissions())
+        telegram_permissions = {
+            **telegram_permissions,
+            **role.telegram_permissions(),
+        }
+        custom_title = role.custom_title()
+    return permissions, telegram_permissions, custom_title
 
 
 def can_moderate(user, chat) -> bool:

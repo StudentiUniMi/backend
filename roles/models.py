@@ -1,5 +1,7 @@
 from django.db import models
 from polymorphic.models import PolymorphicModel
+
+from telegrambot.handlers import utils
 from telegrambot.logging import (
     EventTypes,
     MODERATION_INFO,
@@ -118,14 +120,14 @@ class BaseRole(PolymorphicModel):
 
     def telegram_permissions(self) -> dict[str, bool]:
         return {
-            "can_change_info:": self.can_change_info,
-            "can_invite_users": self.can_invite_users,
-            "can_pin_messages": self.can_pin_messages,
-            "can_manage_chat": self.can_manage_chat,
-            "can_delete_messages": self.can_delete_messages,
-            "can_manage_voice_chats": self.can_manage_voice_chats,
-            "can_restrict_members": self.can_restrict_members,
-            "can_promote_members": self.can_promote_members,
+            "can_change_info": self.can_change_info if self.can_change_info is not None else False,
+            "can_invite_users": self.can_invite_users if self.can_invite_users is not None else False,
+            "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else False,
+            "can_manage_chat": self.can_manage_chat if self.can_manage_chat is not None else False,
+            "can_delete_messages": self.can_delete_messages if self.can_delete_messages is not None else False,
+            "can_manage_voice_chats": self.can_manage_voice_chats if self.can_manage_voice_chats is not None else False,
+            "can_restrict_members": self.can_restrict_members if self.can_restrict_members is not None else False,
+            "can_promote_members": self.can_promote_members if self.can_restrict_members is not None else False,
         }
 
     @staticmethod
@@ -138,6 +140,18 @@ class BaseRole(PolymorphicModel):
 
     def __str__(self) -> str:
         return f"{self.polymorphic_type()} {self.tg_user.name}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        groups = self.tg_user.member_of.all()
+        for group in groups:
+            utils.set_admin_rights(self.tg_user, group, force=True)
+
+    def delete(self, *args, **kwargs):
+        groups = self.tg_user.member_of.all()
+        super().delete(*args, **kwargs)
+        for group in groups:
+            utils.set_admin_rights(self.tg_user, group, force=True)
 
 
 class Representative(BaseRole):
@@ -257,8 +271,14 @@ class SuperAdministrator(BaseRole):
     def telegram_permissions(self) -> dict[str, bool]:
         return {
             **super().telegram_permissions(),
-            "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else True,
             "can_change_info": self.can_change_info if self.can_change_info is not None else True,
+            "can_invite_users": self.can_invite_users if self.can_invite_users is not None else True,
+            "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else True,
+            "can_manage_chat": self.can_manage_chat if self.can_manage_chat is not None else True,
+            "can_delete_messages": self.can_delete_messages if self.can_delete_messages is not None else True,
+            "can_manage_voice_chats": self.can_manage_voice_chats if self.can_manage_voice_chats is not None else True,
+            "can_restrict_members": self.can_restrict_members if self.can_restrict_members is not None else True,
+            "can_promote_members": self.can_promote_members if self.can_restrict_members is not None else True,
         }
 
     @staticmethod

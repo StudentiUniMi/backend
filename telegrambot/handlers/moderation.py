@@ -42,6 +42,9 @@ class ModerationCommand:
         if self.event == logging.EventTypes.MODERATION_DEL and not self.target_message:
             raise NoTargetsInCommand()
 
+        if not self._check_permissions():
+            raise PermissionError()
+
     @property
     def _chat_id(self):
         return self._message.chat.id
@@ -105,6 +108,10 @@ class ModerationCommand:
                 pass
 
         raise NoTargetsInCommand()
+
+    def _check_permissions(self) -> bool:
+        permissions, _, __ = utils.get_permissions(self.issuer.id, self._chat_id)
+        return self.event in permissions
 
     def dispatch(self):
         match self.event:
@@ -215,9 +222,6 @@ def handle_moderation_command(update: Update, context: CallbackContext) -> None:
     chat: Chat = message.chat
     bot: Bot = context.bot
 
-    if not utils.can_moderate(issuer, chat):
-        return
-
     try:
         command: ModerationCommand = ModerationCommand(bot, message)
     except NoTargetsInCommand:
@@ -235,11 +239,11 @@ def handle_moderation_command(update: Update, context: CallbackContext) -> None:
             parse_mode="html",
         )
         return
-
-    if command.event in [EventTypes.MODERATION_SUPERBAN, EventTypes.MODERATION_SUPERFREE] \
-            and not utils.can_superban(issuer):
+    except PermissionError:
+        # Insufficient permissions
         return
 
+    prepared_entry = None
     if command.event != EventTypes.MODERATION_INFO:
         prepared_entry: Message = logging.prepare(msg=command.target_message)
 
