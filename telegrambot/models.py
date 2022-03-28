@@ -3,11 +3,8 @@ from typing import List
 
 import telegram
 from telegram import ChatMember
-from django.apps import apps
 from django.db import models
 from django.utils.translation import gettext_lazy
-
-from telegrambot.handlers import utils
 
 
 class User(models.Model):
@@ -46,48 +43,6 @@ class User(models.Model):
     def generate_mention(self):
         """Generate an HTML mention of the user"""
         return f"<a href=\"tg://user?id={self.id}\">{f'@{self.username}' if self.username else self.name}</a>"
-
-    def get_privileges(self, chat):
-        """Return the UserPrivilege object associated with the user.
-        If the user has more UserPrivilege objects associated, the most specific one is returned.
-
-        Example: if an user is both Representative in a whole department and Tutor in a group,
-        in that group the proper privilege is Tutor.
-
-        :param chat: the chat in which to check privileges
-        :return: the correct UserPrivilege object
-        """
-        if self.privileges.count() == 0:
-            return False
-
-        if group_privileges := self.privileges.filter(
-                scope=UserPrivilege.PrivilegeScopes.GROUPS,
-                authorized_groups__id__in=[chat.id, ]
-        ):
-            return group_privileges[0]
-
-        Degree = apps.get_model("university", "Degree")  # Avoid circular imports
-        degrees = [
-            *Degree.objects.filter(courses__group__id=chat.id),
-            *Degree.objects.filter(group__id=chat.id),
-        ]
-
-        if degree_privileges := self.privileges.filter(
-                scope=UserPrivilege.PrivilegeScopes.DEGREES,
-                authorized_degrees__in=degrees,
-        ):
-            return degree_privileges[0]
-
-        if department_privileges := self.privileges.filter(
-                scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS,
-                authorized_departments__degrees__in=degrees,
-        ):
-            return department_privileges[0]
-
-        if privileges := self.privileges.filter(scope=UserPrivilege.PrivilegeScopes.ALL):
-            return privileges[0]
-
-        return False
 
 
 class Group(models.Model):
@@ -203,17 +158,19 @@ class GroupMembership(models.Model):
 
 
 class UserPrivilege(models.Model):
-    """User privileges.
+    """User privileges (deprecated).
     This model allows you to set granular permissions and custom titles to special users
     (such as representatives, professors, tutor, etc...).
 
     An user can have multiple instances of this class associated.
     In case of multiple associations the most specific one is considered, based on scope field.
+
+    TODO: remove this model
     """
 
     class Meta:
-        verbose_name = "User privilege"
-        verbose_name_plural = "User privileges"
+        verbose_name = "User privilege (deprecated)"
+        verbose_name_plural = "User privileges (deprecated)"
 
     class PrivilegeTypes(models.TextChoices):
         ADMIN = 'A', "Amministratore"
@@ -298,15 +255,15 @@ class UserPrivilege(models.Model):
     def save(self, *args, **kwargs) -> None:
         """Save the current instance and set the proper permissions in all groups the user is in"""
         super().save(*args, **kwargs)
-        groups = self.user.member_of.all()
-        for group in groups:
-            utils.set_admin_rights(self.user, group)
+        # groups = self.user.member_of.all()
+        # for group in groups:
+        #     utils.set_admin_rights(self.user, group)
 
     def delete(self, *args, **kwargs) -> None:
         """Save the current instance and revoke all special permissions in all groups the user is in"""
-        groups = self.user.member_of.all()
-        for group in groups:
-            utils.remove_admin_rights(self.user, group)
+        # groups = self.user.member_of.all()
+        # for group in groups:
+        #     utils.remove_admin_rights(self.user, group)
         super().delete(*args, **kwargs)
 
 

@@ -12,7 +12,6 @@ from telegram.utils.helpers import escape
 
 import telegrambot.models as t_models
 import university.models as u_models
-from roles.models import BaseRole
 from telegrambot import logging
 from telegrambot.logging import EventTypes
 
@@ -110,35 +109,8 @@ def set_admin_rights(user, chat, force=False) -> None:
             logging.log(logging.NOT_ENOUGH_RIGHTS, chat=chat, target=bot)
 
 
-# def remove_admin_rights(dbuser: telegrambot.User, chat: Union[telegram.Chat, telegrambot.Chat]) -> None
-def remove_admin_rights(dbuser, chat) -> None:
-    """Remove all admin rights of an user in a chat.
-
-    :param dbuser: the telegrambot.User to demote
-    :param chat: the considered Telegram chat
-    :return: None
-    """
-    bot = get_bot(chat)
-    try:
-        bot.promote_chat_member(
-            chat_id=chat.id,
-            user_id=dbuser.id,
-            can_change_info=False,
-            can_delete_messages=False,
-            can_invite_users=False,
-            can_restrict_members=False,
-            can_pin_messages=False,
-            can_promote_members=False,
-            can_manage_chat=False,
-            can_manage_voice_chats=False,
-        )
-    except TelegramError:
-        # The bot has no enough rights
-        # TODO: Alert administrators
-        pass
-
-
 def get_permissions(user_id: int, chat_id: int) -> tuple[list[EventTypes | None], dict[str, bool], str | None]:
+    BaseRole = apps.get_model("roles.BaseRole")
     group_degrees: QuerySet[u_models.Degree] = u_models.Degree.objects.filter(
         Q(courses__degrees__group_id=chat_id) | Q(group__id=chat_id)
     )
@@ -159,25 +131,10 @@ def get_permissions(user_id: int, chat_id: int) -> tuple[list[EventTypes | None]
     return permissions, telegram_permissions, custom_title
 
 
-def can_moderate(user, chat) -> bool:
-    """Return True if the user can restrict other members"""
-    DBUser = apps.get_model("telegrambot.User")
-
-    dbuser: DBUser = DBUser.objects.get(id=user.id)
-    privileges = dbuser.get_privileges(chat)
-    if not privileges or not privileges.can_restrict_members:
-        return False
-    return True
-
-
-def can_superban(user) -> bool:
-    """Return True if the user can superban other members"""
-    Privileges = apps.get_model("telegrambot.UserPrivilege")
-    try:
-        privs = Privileges.objects.get(user_id=user.id)
-    except Privileges.DoesNotExist:
-        return False
-    return privs.can_superban_members
+def is_superadmin(user) -> bool:
+    """Return True if the user is a SuperAdministrator"""
+    SuperAdministrator = apps.get_model("roles.SuperAdministrator")
+    return SuperAdministrator.objects.filter(Q(tg_user=user.id) & Q(all_groups=True)).count() > 0
 
 
 def get_targets_of_command(message: Message):
@@ -239,35 +196,6 @@ def format_group_membership(dbmembership):
     return text
 
 
-def add_priv(text, priv):
-    p_type = None
-    for x in priv.PrivilegeTypes.choices:
-        if x[0] == priv.type:
-            p_type = x[1]
-    if p_type is None:
-        return text
-
-    text += f"\n⭐ ️È <b>{p_type.lower()}</b> "
-    if priv.can_restrict_members:
-        text += "(<b>+</b>) "
-
-    if priv.scope == priv.PrivilegeScopes.GROUPS:
-        text += "nei seguenti gruppi:\n"
-        for group in t_models.Group.objects.filter(privileged_users__user__id=user.id):
-            text += f"➖ [<code>{group.id}</code>] {escape(group.title)}\n"
-    elif priv.scope == priv.PrivilegeScopes.DEGREES:
-        text += "dei seguenti C.d.L.:\n"
-        for degree in u_models.Degree.objects.filter(privileged_users__user_id=user.id):
-            text += f"➖ {escape(degree.name)}\n"
-    elif priv.scope == priv.PrivilegeScopes.DEPARTMENTS:
-        text += "dei seguenti dipartimenti:\n"
-        for department in u_models.Department.objects.filter(privileged_users__user_id=user.id):
-            text += f"➖ {escape(department.name)}\n"
-    else:
-        text += "in tutto l'Ateneo\n"
-    return text
-
-
 def format_user_info(dbuser):
     """Format some Telegram user information.
 
@@ -288,17 +216,6 @@ def format_user_info(dbuser):
     text += f"\n🕗 <b>Ultimo messaggio</b>: {user.last_seen.strftime('%d-%m-%Y %H:%M:%S')}"
     if user.banned:
         text += "\n⚫️ <b>Il membro è bannato globalmente dal network</b>."
-
-    privs = t_models.UserPrivilege.objects.filter(user=user.id)
-    if privs is not None:
-        text += "\n"
-        for priv in privs:
-            if len(add_priv(text, priv)) <= 4096:
-                text = add_priv(text, priv)
-            else:
-                result.append(text)
-                text = ""
-                text = add_priv(text, priv)
 
     present_in_groups = t_models.GroupMembership.objects.filter(user__id=user.id).order_by("messages_count").reverse()
     if present_in_groups is None:
@@ -351,12 +268,10 @@ def generate_group_creation_message(group: telegram.Chat) -> str:
     return text
 
 
-def generate_admin_tagging_notification(sender, chat, privileges, reply_to: Message) -> str:
+def generate_admin_tagging_notification(sender, chat, roles, reply_to: Message) -> str:
     admins = ""
-    for priv in privileges:
-        admins += f"<a href='tg://user?id={priv.user.id}'>"\
-                  f"{'@'+str(priv.user.username) if priv.user.username != '' and priv.user.username is not None else priv.user.first_name}</a> "
-        LOG.info(priv.user.username)
+    for admin in {role.tg_user for role in roles}:
+        admins += f"{admin.generate_mention()} "
     name = sender.username if sender.username else sender.first_name
     text = f"A user has tagged @admin\n"\
            f"👤 <b>Issuer</b>: {escape(name)} [<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]\n"\

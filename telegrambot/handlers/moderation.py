@@ -290,7 +290,7 @@ def handle_creation_command(update: Update, context: CallbackContext) -> None:
     sender: User = message.from_user
     chat: Chat = message.chat
 
-    if not utils.can_superban(sender):
+    if not utils.is_superadmin(sender):
         return
 
     text = utils.generate_group_creation_message(chat)
@@ -304,7 +304,7 @@ def handle_whitelisting_command(update: Update, _: CallbackContext) -> None:
     sender: User = message.from_user
     chat: Chat = message.chat
 
-    if not utils.can_superban(sender):
+    if not utils.is_superadmin(sender):
         return
 
     entities = message.parse_entities()
@@ -328,7 +328,7 @@ def handle_toggle_admin_tagging(update: Update, _: CallbackContext) -> None:
     sender: User = message.from_user
     chat: Chat = message.chat
 
-    if not utils.can_moderate(sender, chat):
+    if not utils.is_superadmin(sender):
         return
 
     try:

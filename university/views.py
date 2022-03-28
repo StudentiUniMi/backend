@@ -6,10 +6,17 @@ from django.db.models.functions import Length
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, render
+from polymorphic.query import PolymorphicQuerySet
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from roles.models import (
+    BaseRole,
+    Moderator,
+    Administrator,
+    SuperAdministrator,
+)
 from university.models import (
     DEGREE_TYPES,
     Degree,
@@ -25,9 +32,6 @@ from university.serializers import (
     VerboseDepartmentSerializer,
     RepresentativeSerializer,
     CourseDegreeSerializer,
-)
-from telegrambot.models import (
-    UserPrivilege
 )
 from telegrambot.serializers import UserSerializer
 
@@ -198,13 +202,13 @@ def admin_by_degree(request):
         degree = Degree.objects.get(pk=int(pk)) if pk else Degree.objects.get(slug=slug)
     except (Degree.DoesNotExist, TypeError):
         return Response({"ok": False, "error": "Not found"}, status=404)
-    admins = UserPrivilege.objects.filter(
-        Q(scope=UserPrivilege.PrivilegeScopes.ALL) |
-        Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__slug=degree.slug) |
-        Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__slug=degree.slug) |
-        Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id=degree.group.id)
-    ).filter(type=UserPrivilege.PrivilegeTypes.ADMIN).annotate(u_count=Count("user"))
-    serializer = UserSerializer([admin.user for admin in admins], many=True)
+
+    roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
+        (Q(degrees__in=[degree]) | Q(all_groups=True))
+    )
+    roles = roles.instance_of(Moderator) | roles.instance_of(Administrator)
+    roles |= roles.instance_of(SuperAdministrator)
+    serializer = UserSerializer([role.tg_user for role in roles], many=True)
     return Response(serializer.data)
 
 
