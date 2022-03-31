@@ -206,8 +206,7 @@ def admin_by_degree(request):
     roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
         (Q(degrees__in=[degree]) | Q(all_groups=True))
     )
-    roles = roles.instance_of(Moderator) | roles.instance_of(Administrator)
-    roles |= roles.instance_of(SuperAdministrator)
+    roles = roles.instance_of(Moderator) | roles.instance_of(Administrator) | roles.instance_of(SuperAdministrator)
     serializer = UserSerializer([role.tg_user for role in roles], many=True)
     return Response(serializer.data)
 

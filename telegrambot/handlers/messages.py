@@ -91,8 +91,7 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
         (Q(degrees__in=degrees) | Q(all_groups=True))
     )
-    roles = roles.instance_of(Moderator) | roles.instance_of(Administrator)
-    roles |= roles.instance_of(SuperAdministrator)
+    roles = roles.instance_of(Moderator) | roles.instance_of(Administrator) | roles.instance_of(SuperAdministrator)
 
     caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, roles, reply_to)
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)

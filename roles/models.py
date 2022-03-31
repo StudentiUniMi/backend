@@ -166,10 +166,9 @@ class Representative(BaseRole):
         return super().permissions()
 
     def telegram_permissions(self) -> dict[str, bool]:
-        return {
-            **super().telegram_permissions(),
-            "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else True,
-        }
+        perms = super().telegram_permissions()
+        perms["can_pin_messages"] = self.can_pin_messages if self.can_pin_messages is not None else True
+        return perms
 
     def custom_title(self) -> str:
         return f"{self.political_list}"
@@ -187,10 +186,9 @@ class Professor(BaseRole):
         return super().permissions()
 
     def telegram_permissions(self) -> dict[str, bool]:
-        return {
-            **super().telegram_permissions(),
-            "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else True,
-        }
+        perms = super().telegram_permissions()
+        perms["can_pin_messages"] = self.can_pin_messages if self.can_pin_messages is not None else True
+        return perms
 
     @staticmethod
     def custom_title() -> str | None:
@@ -210,10 +208,10 @@ class Moderator(BaseRole):
         ]
 
     def telegram_permissions(self) -> dict[str, bool]:
-        return {
-            **super().telegram_permissions(),
-            "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else True,
-        }
+        perms = super().telegram_permissions()
+        perms["can_pin_messages"] = self.can_pin_messages if self.can_pin_messages is not None else True
+        perms["can_manage_chat"] = self.can_manage_chat if self.can_manage_chat is not None else True
+        return perms
 
     @staticmethod
     def custom_title() -> str | None:
@@ -238,11 +236,10 @@ class Administrator(BaseRole):
         ]
 
     def telegram_permissions(self) -> dict[str, bool]:
-        return {
-            **super().telegram_permissions(),
-            "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else True,
-            "can_change_info": self.can_change_info if self.can_change_info is not None else True,
-        }
+        perms = super().telegram_permissions()
+        perms["can_pin_messages"] = self.can_pin_messages if self.can_pin_messages is not None else True
+        perms["can_change_info"] = self.can_change_info if self.can_change_info is not None else True
+        return perms
 
     @staticmethod
     def custom_title() -> str | None:
@@ -256,7 +253,6 @@ class SuperAdministrator(BaseRole):
 
     def permissions(self) -> list[EventTypes | None]:
         return [
-            *super().permissions(),
             MODERATION_INFO if self.moderation_info is not False else None,
             MODERATION_DEL if self.moderation_del is not False else None,
             MODERATION_WARN if self.moderation_warn is not False else None,
@@ -270,7 +266,6 @@ class SuperAdministrator(BaseRole):
 
     def telegram_permissions(self) -> dict[str, bool]:
         return {
-            **super().telegram_permissions(),
             "can_change_info": self.can_change_info if self.can_change_info is not None else True,
             "can_invite_users": self.can_invite_users if self.can_invite_users is not None else True,
             "can_pin_messages": self.can_pin_messages if self.can_pin_messages is not None else True,
