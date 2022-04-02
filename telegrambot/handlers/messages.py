@@ -1,16 +1,18 @@
 import logging as logg
+import telegram
+from polymorphic.query import PolymorphicQuerySet
 
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 from django.conf import settings
-from django.db.models import Q, Count
+from django.db.models import Q
 
+from roles.models import Moderator, SuperAdministrator, Administrator, BaseRole
 from telegrambot import logging
 from telegrambot.handlers import utils
 from telegrambot.models import (
     Group as DBGroup,
     User as DBUser,
-    UserPrivilege,
 )
 from university.models import Degree
 
@@ -79,31 +81,28 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     else:
         dbtarget = None
 
-    # Get privs
-    degrees = [
+    logging.log(logging.USER_CALLED_ADMIN, chat, target=dbtarget, issuer=dbuser, msg=reply_to)
+
+    # Get users with privileges (>= Moderator) on the group
+    degrees: list[Degree] = [
         *Degree.objects.filter(courses__group__id=chat.id),
         *Degree.objects.filter(group__id=chat.id)
     ]
-    privs = UserPrivilege.objects.filter(
-        Q(scope=UserPrivilege.PrivilegeScopes.DEGREES, authorized_degrees__in=degrees) |
-        Q(scope=UserPrivilege.PrivilegeScopes.GROUPS, authorized_groups__id=chat.id) |
-        Q(scope=UserPrivilege.PrivilegeScopes.DEPARTMENTS, authorized_departments__degrees__in=degrees) |
-        Q(scope=UserPrivilege.PrivilegeScopes.ALL)
-    ).filter(type=UserPrivilege.PrivilegeTypes.ADMIN).annotate(u_count=Count("user"))  # Gets only users with type "Amministratore"
-    LOG.info(privs)
+    roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
+        (Q(degrees__in=degrees) | Q(all_groups=True))
+    )
+    roles = roles.instance_of(Moderator) | roles.instance_of(Administrator) | roles.instance_of(SuperAdministrator)
 
-    logging.log(logging.USER_CALLED_ADMIN, chat, target=dbtarget, issuer=dbuser, msg=reply_to)
-
-    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, privs, reply_to)
+    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, roles, reply_to)
     context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)
 
 
-def request_broadcast_message(update: Update, context: CallbackContext):
+def request_broadcast_message(update: Update, _: CallbackContext):
     """Command handler for /broadcast used to broadcast a message to all groups of the network"""
     message = update.message
     issuer = update.message.from_user
 
-    if not utils.can_superban(issuer):
+    if not utils.is_superadmin(issuer):
         return
 
     issuer.send_message(
@@ -128,15 +127,27 @@ def request_broadcast_message(update: Update, context: CallbackContext):
 def handle_broadcast_confirm(update: Update, context: CallbackContext):
     bot = context.bot
     message = update.callback_query.message
+    issuer = update.callback_query.from_user
+
+    if not utils.is_superadmin(issuer):
+        return
 
     message.edit_text(message.text_markdown_v2)
 
     for group in DBGroup.objects.all():
-        bot.send_message(group.id, message.text_markdown_v2, parse_mode="markdown")
+        try:
+            bot.send_message(group.id, message.text_markdown_v2, parse_mode="markdown")
+        except telegram.TelegramError:
+            continue
 
-    logging.log(logging.BROADCAST, None, issuer=update.callback_query.from_user, msg=message)
+    logging.log(logging.BROADCAST, None, issuer=issuer, msg=message)
     message.delete()
 
 
-def handle_broadcast_discard(update: Update, context: CallbackContext):
+def handle_broadcast_discard(update: Update, _: CallbackContext):
+    issuer = update.callback_query.from_user
+
+    if not utils.is_superadmin(issuer):
+        return
+
     update.callback_query.message.delete()

@@ -36,8 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'background_task',
+    'polymorphic',
     'university',
     'telegrambot',
+    'roles',
 ]
 
 MIDDLEWARE = [
