@@ -103,6 +103,7 @@ def log_db_save(
         target=None,
         issuer=None,
         reason=None,
+        error_message=None,
         msg: Message = None,
 ) -> None:
     """Save event onto DB"""
@@ -123,6 +124,8 @@ def log_db_save(
         db_log.issuer = DBUser.objects.get(id=issuer.id)
     if reason:
         db_log.reason = reason
+    if error_message and not reason:
+        db_log.reason = error_message
     if msg:
         db_log.message = msg.text_markdown_v2
     db_log.save()
@@ -151,7 +154,16 @@ def log(
     :param prepared_entry: the output of the logging.prepare function
     :return: None
     """
-    log_db_save(event, chat, target=target, issuer=issuer, reason=reason, msg=msg)
+    error_message = kwargs.get("error_message", False)
+    log_db_save(
+        event,
+        chat,
+        target=target,
+        issuer=issuer,
+        reason=reason,
+        msg=msg,
+        error_message=error_message if error_message else None
+    )
 
     text = f"{event.value[1]} #{event.name}"
     if chat is not None:
