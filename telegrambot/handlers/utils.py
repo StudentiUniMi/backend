@@ -112,7 +112,7 @@ def set_admin_rights(user, chat, force=False) -> None:
 def get_permissions(user_id: int, chat_id: int) -> tuple[list[EventTypes | None], dict[str, bool], str | None]:
     BaseRole = apps.get_model("roles.BaseRole")
     group_degrees: QuerySet[u_models.Degree] = u_models.Degree.objects.filter(
-        Q(courses__degrees__group_id=chat_id) | Q(group__id=chat_id)
+        Q(courses__group_id=chat_id) | Q(group__id=chat_id)
     )
     roles: QuerySet[BaseRole] = BaseRole.objects.filter(
         Q(tg_user=user_id) & (Q(degrees__in=group_degrees) | Q(all_groups=True))
