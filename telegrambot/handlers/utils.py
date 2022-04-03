@@ -6,6 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.db.models import Q, QuerySet
 from django.urls import reverse
+from polymorphic.query import PolymorphicQuerySet
 from telegram import User, Chat, TelegramError, Message
 from telegram.ext import DispatcherHandlerStop
 from telegram.utils.helpers import escape
@@ -114,9 +115,11 @@ def get_permissions(user_id: int, chat_id: int) -> tuple[list[EventTypes | None]
     group_degrees: QuerySet[u_models.Degree] = u_models.Degree.objects.filter(
         Q(courses__group_id=chat_id) | Q(group__id=chat_id)
     )
-    roles: QuerySet[BaseRole] = BaseRole.objects.filter(
-        Q(tg_user=user_id) & (Q(degrees__in=group_degrees) | Q(all_groups=True))
-    )
+    roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(tg_user=user_id)
+    if group_degrees:
+        roles = roles.filter(Q(degrees__in=group_degrees) | Q(all_groups=True))
+    else:
+        roles = roles.filter(extra_groups=True)
 
     permissions: list[EventTypes | None] = []
     telegram_permissions: dict[str, bool] = {}

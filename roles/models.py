@@ -27,6 +27,7 @@ class BaseRole(PolymorphicModel):
 
     # Permissions scope
     all_groups = models.BooleanField("All groups", default=False)
+    extra_groups = models.BooleanField("Extra groups", default=False, help_text="Groups without an associated degree")
     degrees = models.ManyToManyField("university.Degree", related_name="roles", blank=True)
 
     # Moderation permissions overrides

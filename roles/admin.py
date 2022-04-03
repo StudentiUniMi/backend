@@ -36,7 +36,7 @@ class BaseRoleChildAdmin(PolymorphicChildModelAdmin):
             "fields": ("tg_user", "django_user"),
         }),
         ("Permissions scope", {
-            "fields": ("all_groups", "degrees", ),
+            "fields": ("all_groups", "extra_groups", "degrees", ),
         }),
         ("Moderation permissions override", {
             "classes": ("collapse", ),

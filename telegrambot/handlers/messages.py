@@ -5,7 +5,7 @@ from polymorphic.query import PolymorphicQuerySet
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from roles.models import Moderator, SuperAdministrator, Administrator, BaseRole
 from telegrambot import logging
@@ -84,13 +84,15 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     logging.log(logging.USER_CALLED_ADMIN, chat, target=dbtarget, issuer=dbuser, msg=reply_to)
 
     # Get users with privileges (>= Moderator) on the group
-    degrees: list[Degree] = [
-        *Degree.objects.filter(courses__group__id=chat.id),
-        *Degree.objects.filter(group__id=chat.id)
-    ]
-    roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
-        (Q(degrees__in=degrees) | Q(all_groups=True))
+    degrees: QuerySet[Degree] = Degree.objects.filter(
+        Q(courses__group__id=chat.id) | Q(group__id=chat.id)
     )
+    if degrees:
+        roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
+            Q(degrees__in=degrees) | Q(all_groups=True)
+        )
+    else:
+        roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(extra_groups=True)
     roles = roles.instance_of(Moderator) | roles.instance_of(Administrator) | roles.instance_of(SuperAdministrator)
 
     caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, roles, reply_to)
