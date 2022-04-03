@@ -38,6 +38,9 @@ class BaseRoleChildAdmin(PolymorphicChildModelAdmin):
         ("Permissions scope", {
             "fields": ("all_groups", "extra_groups", "degrees", ),
         }),
+        ("Custom title override", {
+            "fields": ("custom_title_override", ),
+        }),
         ("Moderation permissions override", {
             "classes": ("collapse", ),
             "fields": ("moderation_info", "moderation_del", "moderation_warn",

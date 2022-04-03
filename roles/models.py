@@ -30,6 +30,9 @@ class BaseRole(PolymorphicModel):
     extra_groups = models.BooleanField("Extra groups", default=False, help_text="Groups without an associated degree")
     degrees = models.ManyToManyField("university.Degree", related_name="roles", blank=True)
 
+    # Custom title override
+    custom_title_override = models.CharField("Custom title", max_length=16, blank=True, null=True)
+
     # Moderation permissions overrides
     moderation_info = models.BooleanField(
         help_text="/info command",
@@ -131,9 +134,8 @@ class BaseRole(PolymorphicModel):
             "can_promote_members": self.can_promote_members if self.can_restrict_members is not None else False,
         }
 
-    @staticmethod
-    def custom_title() -> str | None:
-        raise NotImplementedError()
+    def custom_title(self) -> str | None:
+        return self.custom_title_override
 
     def polymorphic_type(self) -> str:
         return str(self.polymorphic_ctype).split('|')[1].lstrip()
@@ -172,7 +174,9 @@ class Representative(BaseRole):
         return perms
 
     def custom_title(self) -> str:
-        return f"{self.political_list}"
+        if super().custom_title():
+            return super().custom_title()
+        return f"{self.political_role + ' ' if self.political_role else ''}{self.political_list}"
 
     def __str__(self) -> str:
         return f"{super().__str__()} ({self.political_list})"
@@ -191,8 +195,9 @@ class Professor(BaseRole):
         perms["can_pin_messages"] = self.can_pin_messages if self.can_pin_messages is not None else True
         return perms
 
-    @staticmethod
-    def custom_title() -> str | None:
+    def custom_title(self) -> str | None:
+        if super().custom_title():
+            return super().custom_title()
         return "Docente"
 
 
@@ -214,8 +219,9 @@ class Moderator(BaseRole):
         perms["can_manage_chat"] = self.can_manage_chat if self.can_manage_chat is not None else True
         return perms
 
-    @staticmethod
-    def custom_title() -> str | None:
+    def custom_title(self) -> str | None:
+        if super().custom_title():
+            return super().custom_title()
         return "Moderatore"
 
 
@@ -242,8 +248,9 @@ class Administrator(BaseRole):
         perms["can_change_info"] = self.can_change_info if self.can_change_info is not None else True
         return perms
 
-    @staticmethod
-    def custom_title() -> str | None:
+    def custom_title(self) -> str | None:
+        if super().custom_title():
+            return super().custom_title()
         return "Amministratore"
 
 
@@ -277,6 +284,7 @@ class SuperAdministrator(BaseRole):
             "can_promote_members": self.can_promote_members if self.can_restrict_members is not None else True,
         }
 
-    @staticmethod
-    def custom_title() -> str | None:
+    def custom_title(self) -> str | None:
+        if super().custom_title():
+            return super().custom_title()
         return "CdA Network"
