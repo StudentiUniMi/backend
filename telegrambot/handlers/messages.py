@@ -45,7 +45,7 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         # context.bot.leave_chat(chat_id=chat.id)
         raise DispatcherHandlerStop
 
-    utils.save_user(sender, chat)
+    utils.save_user(sender, chat, count_message=True)
 
 
 def handle_admin_tagging(update: Update, context: CallbackContext) -> None:

@@ -37,13 +37,14 @@ def get_bot(chat: Chat) -> telegram.Bot:
 
 # Annotations in this file are not always possible because circular imports
 # def save_user(user: User, chat: Chat) -> telegrambot.User
-def save_user(user: User, chat: Chat):
+def save_user(user: User, chat: Chat, count_message: bool = False):
     """Save a Telegram user and their group membership to the database.
     Should be used before processing any update, to ensure the correctness of the database.
     If the user is globally banned, it will be banned from the chat.
 
     :param user: the Telegram user to save
     :param chat: the Telegram chat the user is in
+    :param count_message: whatever to increment messages_count to GroupMembership or not
     :return: telegrambot.User object representing the user
     """
     DBUser = apps.get_model("telegrambot.User")
@@ -73,7 +74,7 @@ def save_user(user: User, chat: Chat):
             "last_seen": datetime.now(),
         }
     )[0]
-    dbmembership.messages_count += 1
+    dbmembership.messages_count += 1 if count_message else 0
     dbmembership.save()
     return dbuser
 
