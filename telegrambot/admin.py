@@ -40,6 +40,7 @@ class UserLogInline(admin.TabularInline):
     fields = ("iso_timestamp", "event", "chat", "issuer", )
     readonly_fields = ("iso_timestamp", )
     show_change_link = True
+    ordering = ("-timestamp", )
 
     def has_change_permission(self, request, obj=None):
         return False
