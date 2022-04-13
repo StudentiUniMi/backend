@@ -363,3 +363,7 @@ class TelegramLog(models.Model):
         if self.target:
             text += f" -> {self.target.__str__()}"
         return text
+
+    def iso_timestamp(self):
+        return self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+    iso_timestamp.short_description = "Timestamp"

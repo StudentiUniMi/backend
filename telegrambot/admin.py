@@ -33,6 +33,24 @@ class GroupMembershipInline(admin.TabularInline):
     autocomplete_fields = ("group", "user", )
 
 
+class UserLogInline(admin.TabularInline):
+    model = TelegramLog
+    fk_name = "target"
+    extra = 0
+    fields = ("iso_timestamp", "event", "chat", "issuer", )
+    readonly_fields = ("iso_timestamp", )
+    show_change_link = True
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj):
+        return False
+
+
 class GroupOwnerFilter(admin.SimpleListFilter):
     title = "owner"
     parameter_name = "owner"
@@ -61,7 +79,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ("id", "first_name", "last_name", "username", )
     fields = ("id", "first_name", "last_name", "username", "reputation", "warn_count", "banned", "permissions_level",
               "last_seen", )
-    inlines = (GroupMembershipInline, )
+    inlines = (GroupMembershipInline, UserLogInline, )
 
 
 @admin.register(Group)
@@ -201,7 +219,7 @@ class BotWhitelistAdmin(admin.ModelAdmin):
 
 @admin.register(TelegramLog)
 class TelegramLogAdmin(admin.ModelAdmin):
-    list_display = ("id", "event", "chat", "target", "issuer", "timestamp")
+    list_display = ("iso_timestamp", "event", "chat", "target", "issuer", )
     search_fields = [
         "issuer__id",
         "issuer__username",
