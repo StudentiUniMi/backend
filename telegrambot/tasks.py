@@ -1,13 +1,16 @@
-from typing import List
+from django.conf import settings
 import time
+import requests
 
 import telegram.error
 from background_task import background
 from background_task.models import Task
 
-from telegrambot.handlers.utils import get_bot
+from telegrambot.handlers.utils import get_bot, check_blacklist
 from telegrambot.models import (
+    User as DBUser,
     Group as DBGroup,
+    BlacklistedUser,
 )
 
 
@@ -38,5 +41,32 @@ def fetch_telegram_info() -> None:
     print("DONE\n" + '-' * 15)
 
 
+@background(schedule=1)
+def fetch_grouphelp_blocklist() -> None:
+    r = requests.get(settings.GROUPHELP_BLOCKLIST_URL)
+    if not r.status_code == 200:
+        return
+
+    user_ids = r.json().get("result")
+    print(f"Adding {len(user_ids)} users to the blacklist (GroupHelp)")
+    BlacklistedUser.objects.filter(source='GH').delete()
+    for user_id in user_ids:
+        user_id: int = int(user_id)
+        BlacklistedUser.objects.create(
+            user_id=user_id,
+            source='GH',
+        )
+        try:
+            dbuser = DBUser.objects.get(id=user_id)
+            check_blacklist(dbuser)
+        except DBUser.DoesNotExist:
+            pass
+
+
 Task.objects.all().filter(task_name="telegrambot.tasks.fetch_telegram_info").delete()
 fetch_telegram_info(schedule=1, verbose_name="Fetch Telegram group info", repeat=Task.HOURLY)
+
+
+Task.objects.all().filter(task_name="telegrambot.tasks.fetch_grouphelp_blocklist").delete()
+if settings.GROUPHELP_BLOCKLIST_URL:
+    fetch_grouphelp_blocklist(schedule=1, verbose_name="Fetch GroupHelp blocklist", repeat=Task.DAILY)

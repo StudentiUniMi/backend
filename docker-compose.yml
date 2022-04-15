@@ -51,6 +51,7 @@ services:
       - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
       - SENTRY_DSN=${SENTRY_DSN}
       - TELEGRAM_ADMIN_GROUP_ID=${TELEGRAM_ADMIN_GROUP_ID}
+      - GROUPHELP_BLOCKLIST_URL=${GROUPHELP_BLOCKLIST_URL}
     volumes:
       - static_files:/usr/src/app/static/
       - studunimi-backend_userbot-sessions:/usr/src/app/media/userbot-sessions
@@ -96,6 +97,7 @@ services:
       - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
       - SENTRY_DSN=${SENTRY_DSN}
       - TELEGRAM_ADMIN_GROUP_ID=${TELEGRAM_ADMIN_GROUP_ID}
+      - GROUPHELP_BLOCKLIST_URL=${GROUPHELP_BLOCKLIST_URL}
     volumes:
       - studunimi-backend_userbot-sessions:/usr/src/app/media/userbot-sessions
     depends_on:
