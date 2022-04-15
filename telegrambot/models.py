@@ -134,6 +134,7 @@ class GroupMembership(models.Model):
     class Meta:
         verbose_name = "Telegram group membership"
         verbose_name_plural = "Telegram groups memberships"
+        unique_together = ("user", "group")
 
     class MembershipStatus(models.TextChoices):
         CREATOR = ChatMember.CREATOR

@@ -25,14 +25,6 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
     new: ChatMember = update.chat_member.new_chat_member
 
     utils.save_user(new.user, chat)
-    GroupMembership.objects.update_or_create(
-        user_id=new.user.id,
-        group_id=chat.id,
-        defaults={
-            "status": new.status,
-            "last_seen": datetime.now(),
-        }
-    )
 
     if new.status == ChatMember.LEFT:
         logging.log(logging.USER_LEFT, chat=chat, target=user)
