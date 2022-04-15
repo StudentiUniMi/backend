@@ -5,6 +5,7 @@ import telegram
 from telegram import ChatMember
 from django.db import models
 from django.utils.translation import gettext_lazy
+from telegrambot import handlers
 
 
 class User(models.Model):
@@ -384,3 +385,11 @@ class BlacklistedUser(models.Model):
 
     def __str__(self):
         return f"{self.user_id} ({self.get_source_display()})"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        try:
+            dbuser = User.objects.get(id=self.user_id)
+            handlers.utils.check_blacklist(dbuser)
+        except User.DoesNotExist:
+            pass

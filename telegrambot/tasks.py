@@ -60,11 +60,6 @@ def fetch_grouphelp_blocklist() -> None:
             )
         except IntegrityError:  # the user is already blacklisted by another source
             continue
-        try:
-            dbuser = DBUser.objects.get(id=user_id)
-            check_blacklist(dbuser)
-        except DBUser.DoesNotExist:
-            pass
 
 
 Task.objects.all().filter(task_name="telegrambot.tasks.fetch_telegram_info").delete()
