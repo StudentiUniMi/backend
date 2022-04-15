@@ -24,6 +24,7 @@ from telegrambot.models import (
     TelegramUserbot,
     BotWhitelist,
     TelegramLog,
+    BlacklistedUser,
 )
 
 
@@ -245,3 +246,10 @@ class TelegramLogAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(BlacklistedUser)
+class BlacklistedUserAdmin(admin.ModelAdmin):
+    list_display = ("user_id", "source")
+    search_fields = ["user_id", ]
+    list_filter = ("source", )
