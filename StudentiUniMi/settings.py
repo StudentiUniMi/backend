@@ -142,6 +142,7 @@ TELEGRAM_API_HASH = os.environ.get("TELEGRAM_API_HASH", None)
 
 TELEGRAM_ADMIN_GROUP_ID = os.environ.get("TELEGRAM_ADMIN_GROUP_ID", 0)
 
+GROUPHELP_BLOCKLIST_URL = os.environ.get("GROUPHELP_BLOCKLIST_URL", None)
 
 if not DEBUG and len(os.environ.get("SENTRY_DSN", '')) > 0:
     with open("version.txt", "r+") as f:

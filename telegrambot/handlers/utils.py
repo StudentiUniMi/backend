@@ -35,6 +35,33 @@ def get_bot(chat: Chat) -> telegram.Bot:
     return bot
 
 
+def check_blacklist(dbuser: t_models.User):
+    """Check if a user is blacklisted or not.
+    If the user is blacklisted, set its banned attribute to True and log the action
+    in the logging system.
+
+    :param dbuser: the user to check
+    """
+    if dbuser.banned:
+        # the user is already banned or blacklisted
+        return
+
+    BlacklistedUser = t_models.BlacklistedUser
+    try:
+        blacklisted_user: BlacklistedUser = BlacklistedUser.objects.get(user_id=dbuser.id)
+    except BlacklistedUser.DoesNotExist:
+        return
+
+    logging.log(
+        event=logging.MODERATION_SUPERBAN,
+        chat=None,
+        target=dbuser,
+        reason=f"the user is blacklisted (source: {blacklisted_user.get_source_display()})",
+    )
+    dbuser.banned = True
+    dbuser.save()
+
+
 # Annotations in this file are not always possible because circular imports
 # def save_user(user: User, chat: Chat) -> telegrambot.User
 def save_user(user: User, chat: Chat, count_message: bool = False):
@@ -57,6 +84,7 @@ def save_user(user: User, chat: Chat, count_message: bool = False):
             "last_seen": datetime.now(),
         }
     )[0]
+    check_blacklist(dbuser)
     if dbuser.banned:
         # The user is globally banned from the network
         bot = get_bot(chat)

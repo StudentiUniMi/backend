@@ -5,6 +5,7 @@ import telegram
 from telegram import ChatMember
 from django.db import models
 from django.utils.translation import gettext_lazy
+from telegrambot import handlers
 
 
 class User(models.Model):
@@ -316,10 +317,10 @@ class TelegramUserbot(models.Model):
 
 
 class BotWhitelist(models.Model):
-    """A list of bots that won't be autokicked upon joining a group of the network"""
+    """A list of bots that won't be auto-kicked upon joining a group of the network"""
     class Meta:
-        verbose_name = "Whitelist'd bot"
-        verbose_name_plural = "Whitelist'd bots"
+        verbose_name = "Whitelisted bot"
+        verbose_name_plural = "Whitelisted bots"
 
     username = models.CharField("username", max_length=64, null=False, unique=True)
     whitelisted_by = models.ForeignKey(User, on_delete=models.SET_NULL, to_field="id", null=True)
@@ -367,3 +368,28 @@ class TelegramLog(models.Model):
     def iso_timestamp(self):
         return self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
     iso_timestamp.short_description = "Timestamp"
+
+
+class BlacklistedUser(models.Model):
+    """A Blacklisted Telegram User, who can't join our groups"""
+    class Meta:
+        verbose_name = "Blacklisted user"
+        verbose_name_plural = "Blacklisted users"
+
+    class BlacklistSource(models.TextChoices):
+        ADMINISTRATOR = 'A', 'Administrator'
+        GROUPHELP = 'GH', 'GroupHelp'
+
+    user_id = models.PositiveBigIntegerField("Telegram user ID", primary_key=True, unique=True)
+    source = models.CharField("source", choices=BlacklistSource.choices, max_length=2)
+
+    def __str__(self):
+        return f"{self.user_id} ({self.get_source_display()})"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        try:
+            dbuser = User.objects.get(id=self.user_id)
+            handlers.utils.check_blacklist(dbuser)
+        except User.DoesNotExist:
+            pass
