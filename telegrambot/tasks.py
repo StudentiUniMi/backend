@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.utils import IntegrityError
 import time
 import requests
 
@@ -52,10 +53,13 @@ def fetch_grouphelp_blocklist() -> None:
     BlacklistedUser.objects.filter(source='GH').delete()
     for user_id in user_ids:
         user_id: int = int(user_id)
-        BlacklistedUser.objects.create(
-            user_id=user_id,
-            source='GH',
-        )
+        try:
+            BlacklistedUser.objects.create(
+                user_id=user_id,
+                source='GH',
+            )
+        except IntegrityError:  # the user is already blacklisted by another source
+            continue
         try:
             dbuser = DBUser.objects.get(id=user_id)
             check_blacklist(dbuser)
