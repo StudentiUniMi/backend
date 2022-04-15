@@ -28,22 +28,18 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
 
     if new.status == ChatMember.LEFT:
         logging.log(logging.USER_LEFT, chat=chat, target=user)
-        if update.message:
-            update.message.delete()
 
     if new.status == ChatMember.MEMBER:
         if old.status == ChatMember.ADMINISTRATOR:
             return
 
-        if not new.user.is_bot:
-            dbuser: DBUser = utils.save_user(new.user, chat)
-            utils.set_admin_rights(dbuser, chat)
-            logging.log(logging.USER_JOINED, chat=chat, target=new.user)
-        else:
-            whitelisted = BotWhitelist.objects.filter(username=f"@{new.user.username}")
-            if len(whitelisted) == 0:
-                context.bot.kickChatMember(chat.id, new.user.id)
-                return
+        if new.user.is_bot and not BotWhitelist.objects.filter(username=f"@{new.user.username}").exists():
+            context.bot.kickChatMember(chat.id, new.user.id)
+            return
+
+        dbuser: DBUser = utils.save_user(new.user, chat)
+        utils.set_admin_rights(dbuser, chat)
+        logging.log(logging.USER_JOINED, chat=chat, target=new.user)
 
         dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
 
@@ -89,7 +85,15 @@ def claim_command(update: Update, _: CallbackContext) -> None:
 
 
 def handle_left_chat_member_updates(update: Update, _: CallbackContext):
-    """Delete 'user has left the group' status messages"""
-    if not update.message or not update.message.left_chat_member:
+    """Delete 'user has left' and 'user has joined' services messages"""
+    message: Message = update.message
+    chat: Chat = message.chat
+    if not message:
         return
-    update.message.delete()
+
+    # Delete the "user joined" message if the group has more of 50 members
+    if message.new_chat_members and chat.get_member_count() >= 50:
+        tasks.delete_message(chat.id, message.message_id)
+
+    if message.left_chat_member:
+        update.message.delete()
