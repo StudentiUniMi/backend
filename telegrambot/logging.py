@@ -105,6 +105,7 @@ def log_db_save(
         reason=None,
         error_message=None,
         msg: Message = None,
+        msg_deleted: bool = None,
 ) -> None:
     """Save event onto DB"""
     from telegrambot.models import (
@@ -128,6 +129,7 @@ def log_db_save(
         db_log.reason = error_message
     if msg:
         db_log.message = msg.text_markdown_v2
+        db_log.message_deleted = bool(msg_deleted)
     db_log.save()
 
 
@@ -139,6 +141,7 @@ def log(
         reason=None,
         bot=None,
         msg: Message = None,
+        target_message_deleted: bool = None,
         prepared_entry: Message = None,
         **kwargs
 ) -> None:
@@ -151,6 +154,7 @@ def log(
     :param reason: admin-specified reason for the action (only for moderation events)
     :param bot: like target but when the target is not a user but a bot
     :param msg: the message that prompted the action
+    :param target_message_deleted: True if the message was deleted after the default action (with a /...* command)
     :param prepared_entry: the output of the logging.prepare function
     :return: None
     """
@@ -162,10 +166,11 @@ def log(
         issuer=issuer,
         reason=reason,
         msg=msg,
-        error_message=error_message if error_message else None
+        msg_deleted=target_message_deleted,
+        error_message=error_message if error_message else None,
     )
 
-    text = f"{event.value[1]} #{event.name}"
+    text = f"{event.value[1]} #{event.name}{'*' if target_message_deleted else ''}"
     if chat is not None:
         text += f"\n👥 <b>Group</b>: {_format_chat(chat)}"
 

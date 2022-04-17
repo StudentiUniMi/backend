@@ -355,6 +355,7 @@ class TelegramLog(models.Model):
     issuer = models.ForeignKey(User, related_name="log_as_issuer", null=True, on_delete=models.RESTRICT)
     reason = models.TextField(null=True, blank=True)
     message = models.TextField(null=True, blank=True)
+    message_deleted = models.BooleanField(null=True, blank=True)
     timestamp = models.DateTimeField(null=False)
 
     def __str__(self):

@@ -33,8 +33,16 @@ class ModerationCommand:
         self.bot = bot
         self._message: Message = message
         self._text: str = message.text
-        self._command: str = self._text.split()[0][1:].split("@")[0].lower()
+
         self.issuer: User = self._message.from_user
+        self._command: str = self._text.split()[0][1:].split("@")[0].lower()
+        self.delete_target_message = (
+            self._command.endswith('*')
+            and self._message.reply_to_message
+            and self._check_permissions(EventTypes.MODERATION_DEL)
+        )
+        self._command = self._command.rstrip('*')
+
         self.event = self._match_command()
         self.target, self.reason = self._decode_args()
         self.target_message = self._message.reply_to_message
@@ -109,9 +117,9 @@ class ModerationCommand:
 
         raise NoTargetsInCommand()
 
-    def _check_permissions(self) -> bool:
+    def _check_permissions(self, action: EventTypes = None) -> bool:
         permissions, _, __ = utils.get_permissions(self.issuer.id, self._chat_id)
-        return self.event in permissions
+        return (self.event if action is None else action) in permissions
 
     def dispatch(self):
         match self.event:
@@ -141,6 +149,12 @@ class ModerationCommand:
 
             case EventTypes.MODERATION_SUPERFREE:
                 self.superfree()
+
+        if self.delete_target_message and self.event not in (
+            EventTypes.MODERATION_DEL,
+            EventTypes.MODERATION_INFO,
+        ):
+            self.delete()
 
     def info(self):
         texts = utils.format_user_info(self.target)
@@ -261,6 +275,7 @@ def handle_moderation_command(update: Update, context: CallbackContext) -> None:
         issuer=issuer,
         reason=command.reason,
         msg=command.target_message,
+        target_message_deleted=command.delete_target_message,
         prepared_entry=prepared_entry,
     )
 
