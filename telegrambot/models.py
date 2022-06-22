@@ -4,7 +4,6 @@ from typing import List
 import telegram
 from telegram import ChatMember
 from django.db import models
-from django.utils.translation import gettext_lazy
 from telegrambot import handlers
 
 
@@ -27,6 +26,7 @@ class User(models.Model):
     first_name = models.CharField("first name", max_length=256)
     last_name = models.CharField("last name", max_length=256, blank=True, null=True)
     username = models.CharField("username", max_length=64, blank=True, null=True)
+    language = models.CharField("language", max_length=3, blank=True, null=True)
     reputation = models.IntegerField("reputation", default=0)
     warn_count = models.IntegerField("warn count", default=0)
     banned = models.BooleanField("banned?", default=False)
@@ -70,6 +70,7 @@ class Group(models.Model):
     )
     title = models.CharField("title", max_length=512)
     description = models.TextField("description", max_length=2048, blank=True, null=True)
+    language = models.CharField("language", default="it", max_length=3, blank=True, null=True)
     profile_picture = models.ImageField(upload_to=_format_filename, blank=True, null=True)
     invite_link = models.CharField("invite link", max_length=128, blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="groups_owned", blank=True, null=True)
@@ -330,23 +331,23 @@ class BotWhitelist(models.Model):
 class TelegramLog(models.Model):
     """Logs for various things like joined/left channel or moderation commands"""
     class Events(models.IntegerChoices):
-        CHAT_DOES_NOT_EXIST = 0, gettext_lazy("CHAT_DOES_NOT_EXIST")
-        MODERATION_INFO = 5, gettext_lazy("MODERATION_INFO")
-        MODERATION_WARN = 1, gettext_lazy("MODERATION_WARN")
-        MODERATION_KICK = 2, gettext_lazy("MODERATION_KICK")
-        MODERATION_BAN = 3, gettext_lazy("MODERATION_BAN")
-        MODERATION_MUTE = 4, gettext_lazy("MODERATION_MUTE")
-        MODERATION_FREE = 6, gettext_lazy("MODERATION_FREE")
-        MODERATION_SUPERBAN = 7, gettext_lazy("MODERATION_SUPERBAN")
-        MODERATION_SUPERFREE = 11, gettext_lazy("MODERATION_SUPERFREE")
-        USER_JOINED = 8, gettext_lazy("USER_JOINED")
-        USER_LEFT = 9, gettext_lazy("USER_LEFT")
-        NOT_ENOUGH_RIGHTS = 10, gettext_lazy("NOT_ENOUGH_RIGHTS")
-        TELEGRAM_ERROR = 12, gettext_lazy("TELEGRAM_ERROR")
-        USER_CALLED_ADMIN = 13, gettext_lazy("USER_CALLED_ADMIN")
-        MODERATION_DEL = 14, gettext_lazy("MODERATION_DEL")
-        WHITELIST_BOT = 15, gettext_lazy("WHITELIST_BOT")
-        BROADCAST = 16, gettext_lazy("BROADCAST")
+        CHAT_DOES_NOT_EXIST = 0, "CHAT_DOES_NOT_EXIST"
+        MODERATION_INFO = 5, "MODERATION_INFO"
+        MODERATION_WARN = 1, "MODERATION_WARN"
+        MODERATION_KICK = 2, "MODERATION_KICK"
+        MODERATION_BAN = 3, "MODERATION_BAN"
+        MODERATION_MUTE = 4, "MODERATION_MUTE"
+        MODERATION_FREE = 6, "MODERATION_FREE"
+        MODERATION_SUPERBAN = 7, "MODERATION_SUPERBAN"
+        MODERATION_SUPERFREE = 11, "MODERATION_SUPERFREE"
+        USER_JOINED = 8, "USER_JOINED"
+        USER_LEFT = 9, "USER_LEFT"
+        NOT_ENOUGH_RIGHTS = 10, "NOT_ENOUGH_RIGHTS"
+        TELEGRAM_ERROR = 12, "TELEGRAM_ERROR"
+        USER_CALLED_ADMIN = 13, "USER_CALLED_ADMIN"
+        MODERATION_DEL = 14, "MODERATION_DEL"
+        WHITELIST_BOT = 15, "WHITELIST_BOT"
+        BROADCAST = 16, "BROADCAST"
 
     id = models.BigAutoField(primary_key=True)
     event = models.IntegerField(choices=Events.choices)
