@@ -222,7 +222,7 @@ class BotWhitelistAdmin(admin.ModelAdmin):
 
 @admin.register(TelegramLog)
 class TelegramLogAdmin(admin.ModelAdmin):
-    list_display = ("iso_timestamp", "event", "target", "target", "chat", "issuer", )
+    list_display = ("iso_timestamp", "event", "target", "chat", "issuer", )
     search_fields = [
         "issuer__id",
         "issuer__username",
