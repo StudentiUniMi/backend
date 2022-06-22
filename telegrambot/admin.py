@@ -79,8 +79,9 @@ class GroupOwnerFilter(admin.SimpleListFilter):
 class UserAdmin(admin.ModelAdmin):
     list_display = ("name", "id", "reputation", "warn_count", "banned", "permissions_level", )
     search_fields = ("id", "first_name", "last_name", "username", )
-    fields = ("id", "first_name", "last_name", "username", "reputation", "warn_count", "banned", "permissions_level",
-              "last_seen", )
+    fields = ("id", "first_name", "last_name", "username", "language",
+              "reputation", "warn_count", "banned", "permissions_level", "last_seen", )
+    readonly_fields = ("language", )
     inlines = (GroupMembershipInline, UserLogInline, )
 
 
@@ -170,9 +171,9 @@ class GroupAdmin(admin.ModelAdmin):
             )
 
     list_display = ("id", "title", "owner", )
-    list_filter = (GroupOwnerFilter, )
+    list_filter = (GroupOwnerFilter, "language", )
     search_fields = ("id", "title", )
-    fields = ("id", "title", "description", "profile_picture", "invite_link", "owner", "bot", "welcome_model",
+    fields = ("id", "title", "description", "language", "profile_picture", "invite_link", "owner", "bot", "welcome_model",
               "ignore_admin_tagging", )
     autocomplete_fields = ("owner", "bot", )
     actions = [fetch_telegram_info_action, ]
