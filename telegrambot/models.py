@@ -7,6 +7,11 @@ from django.db import models
 from telegrambot import handlers
 
 
+class Languages(models.TextChoices):
+    EN = "en", "English"
+    IT = "it", "Italian"
+
+
 class User(models.Model):
     """A Telegram user.
     Every user seen by the bot should be automatically saved or updated in the database.
@@ -70,7 +75,8 @@ class Group(models.Model):
     )
     title = models.CharField("title", max_length=512)
     description = models.TextField("description", max_length=2048, blank=True, null=True)
-    language = models.CharField("language", default="it", max_length=3, blank=True, null=True)
+    language = models.CharField("preferred language", default="it", choices=Languages.choices,
+                                max_length=3, blank=True, null=True)
     profile_picture = models.ImageField(upload_to=_format_filename, blank=True, null=True)
     invite_link = models.CharField("invite link", max_length=128, blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="groups_owned", blank=True, null=True)

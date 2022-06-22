@@ -81,6 +81,7 @@ def save_user(user: User, chat: Chat, count_message: bool = False):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "username": user.username,
+            "language": user.language_code,
             "last_seen": datetime.now(),
         }
     )[0]
