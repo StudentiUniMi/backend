@@ -14,6 +14,7 @@ from telethon.tl.functions.channels import (
     InviteToChannelRequest,
 )
 from telethon.tl.types import ChatAdminRights
+from modeltranslation.admin import TranslationAdmin
 
 from telegrambot.models import (
     User,
@@ -86,7 +87,7 @@ class UserAdmin(admin.ModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(admin.ModelAdmin):
+class GroupAdmin(TranslationAdmin):
     @staticmethod
     def create_telegram_group(group, bot):
         userbot: TelegramUserbot = TelegramUserbot.objects.all()\

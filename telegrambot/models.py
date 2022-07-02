@@ -83,10 +83,8 @@ class Group(models.Model):
     members = models.ManyToManyField(User, through="GroupMembership", related_name="member_of")
     bot = models.ForeignKey("TelegramBot", on_delete=models.SET_NULL, related_name="groups", blank=False, null=True)
     ignore_admin_tagging = models.BooleanField("Ignore @admin tagging", default=False, null=False)
-    welcome_model = models.TextField("Welcome model", default=(
-        "<b>{greetings}</b> nel gruppo {title}"
-        "\n\nIscriviti al canale @studenti_unimi"
-    ), help_text="Available format parameters: {greetings} and {title}")
+    welcome_model = models.TextField("Welcome model", null=True, blank=True,
+                                     help_text="Available format parameters: {greetings} and {title}")
 
     def __str__(self) -> str:
         return f"{self.title} [{self.id}]"
