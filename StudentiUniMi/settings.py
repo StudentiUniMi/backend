@@ -114,6 +114,11 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
+LANGUAGES = [
+    ('en', 'English'),
+    ('it', 'Italian'),
+]
+
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 MEDIA_ROOT = BASE_DIR / 'media'

@@ -4,18 +4,19 @@ from enum import Enum
 import telegram
 from telegram import Message, Chat
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 
 class EventTypes(Enum):
     CHAT_DOES_NOT_EXIST = 0, '❗️', None
     MODERATION_INFO = 5, 'ℹ️', None
-    MODERATION_WARN = 1, '🟡', "ammonito"
-    MODERATION_KICK = 2, '⚪', "espulso dal gruppo"
-    MODERATION_BAN = 3, '🔴', "espulso permanentemente dal gruppo"
-    MODERATION_MUTE = 4, '🟠', "mutato nel gruppo"
-    MODERATION_FREE = 6, '🟢', "riammesso nel gruppo"
-    MODERATION_SUPERBAN = 7, '⚫️', "espulso permanentemente da tutti i gruppi"
-    MODERATION_SUPERFREE = 11, '✳️', "riammesso in tutti i gruppi"
+    MODERATION_WARN = 1, '🟡', _("warned")
+    MODERATION_KICK = 2, '⚪', _("banned from the group")
+    MODERATION_BAN = 3, '🔴', _("permanently banned from the group")
+    MODERATION_MUTE = 4, '🟠', _("muted in the group")
+    MODERATION_FREE = 6, '🟢', _("unbanned from the group")
+    MODERATION_SUPERBAN = 7, '⚫️', _("permanently banned from all groups")
+    MODERATION_SUPERFREE = 11, '✳️', _("unbanned from all groups")
     USER_JOINED = 8, '➕', None
     USER_LEFT = 9, '➖', None
     NOT_ENOUGH_RIGHTS = 10, '🔰', None

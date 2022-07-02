@@ -1,0 +1,66 @@
+# StudentiUniMi backend: italian translation.
+# Copyright (C) 2022 Network StudentiUniMi
+# This file is distributed under the same license as the rest of the code.
+# AUTHORS (in alphabetic order):
+# - Aceti Marco <marco.aceti@studenti.unimi.it>
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-02 23:05+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: telegrambot/handlers/moderation.py:290
+#, python-format
+msgid ""
+"%(emoji)s <b>User</b> %(mention)s (%(warn_count)d%(warning)s) <b>%(event)s</"
+"b> %(reason)s\n"
+"➡ <a href=\"https://studentiunimi.it/rules/\">Read the network rules</a>"
+msgstr ""
+"%(emoji)s <b>Utente</b> %(mention)s (%(warn_count)d%(warning)s) "
+"<b>%(event)s</b> %(reason)s\n"
+"➡ <a href=\"https://studentiunimi.it/rules/\">Leggi il regolamento del "
+"network</a>"
+
+#. Translators: This is the proposition before the reason why the user is banned, e.g. "_for_ spamming"
+#: telegrambot/handlers/moderation.py:299
+#, python-format
+msgid "for <i>%(reason)s</i>"
+msgstr "per <i>%(reason)s</i>"
+
+#: telegrambot/logging.py:13
+msgid "warned"
+msgstr "ammonito"
+
+#: telegrambot/logging.py:14
+msgid "banned from the group"
+msgstr "espulso dal gruppo"
+
+#: telegrambot/logging.py:15
+msgid "permanently banned from the group"
+msgstr "espulso permanentemente dal gruppo"
+
+#: telegrambot/logging.py:16
+msgid "muted in the group"
+msgstr "mutato nel gruppo"
+
+#: telegrambot/logging.py:17
+msgid "unbanned from the group"
+msgstr "riammesso nel gruppo"
+
+#: telegrambot/logging.py:18
+msgid "permanently banned from all groups"
+msgstr "espulso permanentemente da tutti i gruppi"
+
+#: telegrambot/logging.py:19
+msgid "unbanned from all groups"
+msgstr "riammesso in tutti i gruppi"
