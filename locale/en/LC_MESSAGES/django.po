@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-05 22:27+0200\n"
+"POT-Creation-Date: 2022-07-05 23:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,6 +33,10 @@ msgstr ""
 
 #: telegrambot/handlers/members.py:68
 msgid "👥 Main group"
+msgstr ""
+
+#: telegrambot/handlers/messages.py:113
+msgid "👮 <b>Thanks for your report</b>, admins have been notified."
 msgstr ""
 
 #: telegrambot/handlers/moderation.py:290
