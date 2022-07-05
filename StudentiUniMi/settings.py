@@ -28,6 +28,7 @@ ALLOWED_HOSTS = [
 ]
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -113,6 +114,12 @@ USE_TZ = False
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('it', 'Italian'),
+]
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'

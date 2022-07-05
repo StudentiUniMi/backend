@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 
 import telegram
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from telegram import ChatMember
 from django.db import models
 from telegrambot import handlers
@@ -83,10 +84,8 @@ class Group(models.Model):
     members = models.ManyToManyField(User, through="GroupMembership", related_name="member_of")
     bot = models.ForeignKey("TelegramBot", on_delete=models.SET_NULL, related_name="groups", blank=False, null=True)
     ignore_admin_tagging = models.BooleanField("Ignore @admin tagging", default=False, null=False)
-    welcome_model = models.TextField("Welcome model", default=(
-        "<b>{greetings}</b> nel gruppo {title}"
-        "\n\nIscriviti al canale @studenti_unimi"
-    ), help_text="Available format parameters: {greetings} and {title}")
+    welcome_model = models.TextField("Welcome model", null=True, blank=True,
+                                     help_text="Available format parameters: {greetings} and {title}")
 
     def __str__(self) -> str:
         return f"{self.title} [{self.id}]"
@@ -97,9 +96,20 @@ class Group(models.Model):
         :param members: list of new members who just joined the group
         :return: the welcome message
         """
-        greetings = f"{'Benvenuto' if len(members) == 1 else 'Benvenuti'} " \
-                    f"{', '.join([m.first_name for m in members])}"
-        return self.welcome_model.format(
+        greetings = ngettext_lazy(
+            "Welcome user",
+            "Welcome users",
+            len(members),
+        ) + " " + ", ".join(member.name for member in members)
+
+        welcome_model = self.welcome_model or _(
+            "👋 <b>{greetings}</b> to the group <b>{title}</b>!"
+            "\n🌐 This group is part of the <b>Network StudentiUniMi</b>, make sure you "
+            "<a href=\"https://studentiunimi.it/rules\">read the rules</a> first."
+            "\n\n➕ Join the <b>other groups</b> and explore our <b>extra services</b> by clicking the buttons below!"
+            "\n💡 <b>Tip</b>: use <b>@admin</b> if you need to contact the group administrators."
+        )
+        return welcome_model.format(
             greetings=greetings,
             title=self.title,
         )

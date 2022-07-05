@@ -2,13 +2,15 @@ import logging as logg
 import telegram
 from polymorphic.query import PolymorphicQuerySet
 
+from django.utils.translation import gettext_lazy as _
+
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 from django.conf import settings
 from django.db.models import Q, QuerySet
 
 from roles.models import Moderator, SuperAdministrator, Administrator, BaseRole
-from telegrambot import logging
+from telegrambot import logging, tasks
 from telegrambot.handlers import utils
 from telegrambot.models import (
     Group as DBGroup,
@@ -96,7 +98,22 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
     roles = roles.instance_of(Moderator) | roles.instance_of(Administrator) | roles.instance_of(SuperAdministrator)
 
     caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, roles, reply_to)
-    context.bot.send_message(settings.TELEGRAM_ADMIN_GROUP_ID, caption, parse_mode="html", disable_web_page_preview=True)
+    context.bot.send_message(
+        settings.TELEGRAM_ADMIN_GROUP_ID,
+        caption,
+        parse_mode="html",
+        disable_web_page_preview=True,
+    )
+
+    utils.activate_group_language(dbgroup, dbuser)
+    sent_msg: Message = context.bot.send_message(
+        chat.id,
+        str(_("👮 <b>Thanks for your report</b>, admins have been notified.")),
+        parse_mode="html",
+        disable_web_page_preview=True,
+    )
+    context.bot.delete_message(chat.id, message.message_id)
+    tasks.delete_message(chat.id, sent_msg.message_id)
 
 
 def request_broadcast_message(update: Update, _: CallbackContext):

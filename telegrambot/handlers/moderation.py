@@ -1,6 +1,7 @@
 import logging as logg
 from time import sleep
 
+from django.utils.translation import gettext_lazy as _
 from telegram import Update, Message, User, Chat, ChatPermissions, MessageEntity, Bot
 from telegram.ext import CallbackContext
 from telegram.error import RetryAfter
@@ -284,13 +285,19 @@ def handle_moderation_command(update: Update, context: CallbackContext) -> None:
         return
 
     target: DBUser = command.target
-    text = (
-        f"{command.event.value[1]} <b>Utente</b> {target.generate_mention()} "
-        f"({target.warn_count}{' ⚠' if target.warn_count >= 3 else ''}) "
-        f"<b>{command.event.value[2]}</b> "
-        f"{f'per <i>{command.reason}</i>' if command.reason else ''}"
-        f"\n➡️ <a href=\"https://studentiunimi.it/rules/\">Regolamento del network</a>"
-    )
+    utils.activate_group_language(chat, target)
+    text = _(
+        "%(emoji)s <b>User</b> %(mention)s (%(warn_count)d%(warning)s) <b>%(event)s</b> %(reason)s"
+        "\n➡ <a href=\"https://studentiunimi.it/rules/\">Read the network rules</a>"
+    ) % {
+        "emoji": command.event.value[1],
+        "mention": target.generate_mention(),
+        "warn_count": target.warn_count,
+        "warning": ' ⚠' if target.warn_count >= 3 else '',
+        "event": command.event.value[2],
+        # Translators: This is the proposition before the reason why the user is banned, e.g. "_for_ spamming"
+        "reason": _("for <i>%(reason)s</i>") % {"reason": command.reason} if command.reason else '',
+    }
     sent_msg: Message = bot.send_message(
         chat_id=chat.id,
         text=text,

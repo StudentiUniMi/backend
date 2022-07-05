@@ -6,6 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.db.models import Q, QuerySet
 from django.urls import reverse
+from django.utils.translation import activate
 from polymorphic.query import PolymorphicQuerySet
 from telegram import User, Chat, TelegramError, Message
 from telegram.ext import DispatcherHandlerStop
@@ -138,6 +139,54 @@ def set_admin_rights(user, chat, force=False) -> None:
             logging.log(logging.CHAT_DOES_NOT_EXIST, chat=chat, target=bot)
         elif e.message == "Not enough rights":
             logging.log(logging.NOT_ENOUGH_RIGHTS, chat=chat, target=bot)
+
+
+def get_user_language(user: User) -> str:
+    """Get the language of a user.
+
+    :param user: the user to get the language of
+    :return: the language of the user
+    """
+    if hasattr(user, "language_code"):
+        return user.language_code
+    if hasattr(user, "language"):
+        return user.language
+    return
+
+
+def is_valid_language(lang: str) -> bool:
+    """Check if a language is valid or not.
+
+    :param lang: the language to check
+    :return: True if the language is valid, False otherwise
+    """
+    if not lang:
+        return False
+    return lang in [l[0] for l in settings.LANGUAGES]
+
+
+def activate_user_language(user: User) -> None:
+    """Activate the Telegram user's language in the Django context."""
+    lang = get_user_language(user)
+    if is_valid_language(lang):
+        activate(lang)
+    else:
+        activate(settings.LANGUAGE_CODE)
+
+
+def activate_group_language(group, user: User = None) -> None:
+    """Activate the Telegram group's language in the Django context."""
+    user_lang = get_user_language(user) if user else None
+    if is_valid_language(user_lang):
+        activate(user_lang)
+        return
+
+    if hasattr(group, "language"):
+        lang = group.language
+    else:
+        dbgroup = t_models.Group.objects.get(id=group.id)
+        lang = dbgroup.language
+    activate(lang)
 
 
 def get_permissions(user_id: int, chat_id: int) -> tuple[list[EventTypes | None], dict[str, bool], str | None]:

@@ -1,0 +1,116 @@
+# StudentiUniMi backend: italian translation.
+# Copyright (C) 2022 Network StudentiUniMi
+# This file is distributed under the same license as the rest of the code.
+# AUTHORS (in alphabetic order):
+# - Aceti Marco <marco.aceti@studenti.unimi.it>
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-05 23:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: telegrambot/handlers/members.py:54
+msgid "↗️ All groups"
+msgstr "↗️ Tutti i gruppi"
+
+#: telegrambot/handlers/members.py:58
+msgid "✳️ Extra services"
+msgstr "✳️ Servizi extra"
+
+#: telegrambot/handlers/members.py:64
+msgid "📣 Channel"
+msgstr "📣 Canale"
+
+#: telegrambot/handlers/members.py:68
+msgid "👥 Main group"
+msgstr "👥 Gruppo principale"
+
+#: telegrambot/handlers/messages.py:113
+msgid "👮 <b>Thanks for your report</b>, admins have been notified."
+msgstr ""
+"👮 <b>Grazie per la tua segnalazione</b>, gli amministratori sono stati "
+"notificati."
+
+#: telegrambot/handlers/moderation.py:290
+#, python-format
+msgid ""
+"%(emoji)s <b>User</b> %(mention)s (%(warn_count)d%(warning)s) <b>%(event)s</"
+"b> %(reason)s\n"
+"➡ <a href=\"https://studentiunimi.it/rules/\">Read the network rules</a>"
+msgstr ""
+"%(emoji)s <b>Utente</b> %(mention)s (%(warn_count)d%(warning)s) "
+"<b>%(event)s</b> %(reason)s\n"
+"➡ <a href=\"https://studentiunimi.it/rules/\">Leggi il regolamento del "
+"network</a>"
+
+#. Translators: This is the proposition before the reason why the user is banned, e.g. "_for_ spamming"
+#: telegrambot/handlers/moderation.py:299
+#, python-format
+msgid "for <i>%(reason)s</i>"
+msgstr "per <i>%(reason)s</i>"
+
+#: telegrambot/logging.py:13
+msgid "warned"
+msgstr "ammonito"
+
+#: telegrambot/logging.py:14
+msgid "banned from the group"
+msgstr "espulso dal gruppo"
+
+#: telegrambot/logging.py:15
+msgid "permanently banned from the group"
+msgstr "espulso permanentemente dal gruppo"
+
+#: telegrambot/logging.py:16
+msgid "muted in the group"
+msgstr "mutato nel gruppo"
+
+#: telegrambot/logging.py:17
+msgid "unbanned from the group"
+msgstr "riammesso nel gruppo"
+
+#: telegrambot/logging.py:18
+msgid "permanently banned from all groups"
+msgstr "espulso permanentemente da tutti i gruppi"
+
+#: telegrambot/logging.py:19
+msgid "unbanned from all groups"
+msgstr "riammesso in tutti i gruppi"
+
+#: telegrambot/models.py:100
+msgid "Welcome user"
+msgid_plural "Welcome users"
+msgstr[0] "Benvenuto utente"
+msgstr[1] "Benvenuti utenti"
+
+#: telegrambot/models.py:106
+#, python-brace-format
+msgid ""
+"👋 <b>{greetings}</b> to the group <b>{title}</b>!\n"
+"🌐 This group is part of the <b>Network StudentiUniMi</b>, make sure you <a "
+"href=\"https://studentiunimi.it/rules\">read the rules</a> first.\n"
+"\n"
+"➕ Join the <b>other groups</b> and explore our <b>extra services</b> by "
+"clicking the buttons below!\n"
+"💡 <b>Tip</b>: use <b>@admin</b> if you need to contact the group "
+"administrators."
+msgstr ""
+"👋 <b>{greetings}</b> nel gruppo <b>{title}</b>!\n"
+"🌐 Questo gruppo fa parte del <b>Network StudentiUniMi</b>, assicurati di "
+"aver <a href=\"https://studentiunimi.it/rules\">letto il regolamento</a> "
+"prima di scrivere.\n"
+"\n"
+"➕ Entra <b>negli altri gruppi</b> e scopri i nostri <b>servizi extra</b> "
+"cliccando i pulsanti sotto!\n"
+"💡 <b>Suggerimento</b>: usa <b>@admin</b> se devi contattare gli "
+"amministratori."
