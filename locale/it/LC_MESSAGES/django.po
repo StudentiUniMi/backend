@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 23:05+0200\n"
+"POT-Creation-Date: 2022-07-05 22:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: telegrambot/handlers/members.py:54
+msgid "↗️ All groups"
+msgstr "↗️ Tutti i gruppi"
+
+#: telegrambot/handlers/members.py:58
+msgid "✳️ Extra services"
+msgstr "✳️ Servizi extra"
+
+#: telegrambot/handlers/members.py:64
+msgid "📣 Channel"
+msgstr "📣 Canale"
+
+#: telegrambot/handlers/members.py:68
+msgid "👥 Main group"
+msgstr "👥 Gruppo principale"
 
 #: telegrambot/handlers/moderation.py:290
 #, python-format
@@ -64,3 +80,31 @@ msgstr "espulso permanentemente da tutti i gruppi"
 #: telegrambot/logging.py:19
 msgid "unbanned from all groups"
 msgstr "riammesso in tutti i gruppi"
+
+#: telegrambot/models.py:100
+msgid "Welcome user"
+msgid_plural "Welcome users"
+msgstr[0] "Benvenuto utente"
+msgstr[1] "Benvenuti utenti"
+
+#: telegrambot/models.py:106
+#, python-brace-format
+msgid ""
+"👋 <b>{greetings}</b> to the group <b>{title}</b>!\n"
+"🌐 This group is part of the <b>Network StudentiUniMi</b>, make sure you <a "
+"href=\"https://studentiunimi.it/rules\">read the rules</a> first.\n"
+"\n"
+"➕ Join the <b>other groups</b> and explore our <b>extra services</b> by "
+"clicking the buttons below!\n"
+"💡 <b>Tip</b>: use <b>@admin</b> if you need to contact the group "
+"administrators."
+msgstr ""
+"👋 <b>{greetings}</b> nel gruppo <b>{title}</b>!\n"
+"🌐 Questo gruppo fa parte del <b>Network StudentiUniMi</b>, assicurati di "
+"aver <a href=\"https://studentiunimi.it/rules\">letto il regolamento</a> "
+"prima di scrivere.\n"
+"\n"
+"➕ Entra <b>negli altri gruppi</b> e scopri i nostri <b>servizi extra</b> "
+"cliccando i pulsanti sotto!\n"
+"💡 <b>Suggerimento</b>: usa <b>@admin</b> se devi contattare gli "
+"amministratori."

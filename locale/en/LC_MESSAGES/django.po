@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 23:05+0200\n"
+"POT-Creation-Date: 2022-07-05 22:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: telegrambot/handlers/members.py:54
+msgid "↗️ All groups"
+msgstr ""
+
+#: telegrambot/handlers/members.py:58
+msgid "✳️ Extra services"
+msgstr ""
+
+#: telegrambot/handlers/members.py:64
+msgid "📣 Channel"
+msgstr ""
+
+#: telegrambot/handlers/members.py:68
+msgid "👥 Main group"
+msgstr ""
 
 #: telegrambot/handlers/moderation.py:290
 #, python-format
@@ -59,4 +75,23 @@ msgstr ""
 
 #: telegrambot/logging.py:19
 msgid "unbanned from all groups"
+msgstr ""
+
+#: telegrambot/models.py:100
+msgid "Welcome user"
+msgid_plural "Welcome users"
+msgstr[0] ""
+msgstr[1] ""
+
+#: telegrambot/models.py:106
+#, python-brace-format
+msgid ""
+"👋 <b>{greetings}</b> to the group <b>{title}</b>!\n"
+"🌐 This group is part of the <b>Network StudentiUniMi</b>, make sure you <a "
+"href=\"https://studentiunimi.it/rules\">read the rules</a> first.\n"
+"\n"
+"➕ Join the <b>other groups</b> and explore our <b>extra services</b> by "
+"clicking the buttons below!\n"
+"💡 <b>Tip</b>: use <b>@admin</b> if you need to contact the group "
+"administrators."
 msgstr ""

@@ -94,25 +94,6 @@ class TelegramGroupTestCase(TestCase):
             "invite_link": "https://example.com/join/physics_2",
         })
 
-    def test_generate_welcome_message(self):
-        class DummyMember:
-            def __init__(self, name):
-                self.first_name = name
-
-        members = [DummyMember("Marco"), DummyMember("Davide"), DummyMember("Silvio")]
-        self.assertEqual(self.group1.generate_welcome_message(members[0:1]), (
-            "<b>Benvenuto Marco</b> nel gruppo Programming I"
-            "\n\nIscriviti al canale @studenti_unimi"
-        ))
-        self.assertEqual(self.group1.generate_welcome_message(members[0:2]), (
-            "<b>Benvenuti Marco, Davide</b> nel gruppo Programming I"
-            "\n\nIscriviti al canale @studenti_unimi"
-        ))
-        self.assertEqual(self.group1.generate_welcome_message(members[0:3]), (
-            "<b>Benvenuti Marco, Davide, Silvio</b> nel gruppo Programming I"
-            "\n\nIscriviti al canale @studenti_unimi"
-        ))
-
 
 @skipIf(not (TEST_BOT_USERNAME and TEST_BOT_TOKEN), "The TEST_BOT_* environment variables are not set")
 class TelegramBotTestCase(TestCase):

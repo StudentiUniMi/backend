@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils.translation import gettext_lazy as _
 
 from telegram import Update, User, Message, Chat, InlineKeyboardMarkup, InlineKeyboardButton, ChatMember
 from telegram.ext import CallbackContext
@@ -8,7 +8,6 @@ from telegrambot.handlers import utils
 from telegrambot.models import (
     User as DBUser,
     Group as DBGroup,
-    GroupMembership,
     BotWhitelist,
 )
 
@@ -38,33 +37,35 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
             return
 
         dbuser: DBUser = utils.save_user(new.user, chat)
+        utils.activate_group_language(chat, dbuser)
         utils.set_admin_rights(dbuser, chat)
         logging.log(logging.USER_JOINED, chat=chat, target=new.user)
 
         dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
 
-        # TODO: re-enable welcome messages
-        if dbgroup.bot.username == "@studentiunimibot":
-            return
-
         msg: Message = context.bot.send_message(
             chat_id=chat.id,
             text=dbgroup.generate_welcome_message([new.user, ]),
             parse_mode="html",
+            disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup([
                 [
                     InlineKeyboardButton(
-                        text="↗️ Visita studentiunimi.it",
-                        url="https://studentiunimi.it/",
-                    )
+                        text=str(_("↗️ All groups")),
+                        url="https://studentiunimi.it/courses",
+                    ),
+                    InlineKeyboardButton(
+                        text=str(_("✳️ Extra services")),
+                        url="https://studentiunimi.it/services",
+                    ),
                 ],
                 [
                     InlineKeyboardButton(
-                        text="📣 Canale notizie",
+                        text=str(_("📣 Channel")),
                         url="https://t.me/studenti_unimi",
                     ),
                     InlineKeyboardButton(
-                        text="👥 Gruppo generale",
+                        text=str(_("👥 Main group")),
                         url="https://t.me/unimichat",
                     ),
                 ],
