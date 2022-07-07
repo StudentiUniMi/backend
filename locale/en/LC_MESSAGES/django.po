@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-05 23:04+0200\n"
+"POT-Creation-Date: 2022-07-07 21:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,7 +35,7 @@ msgstr ""
 msgid "👥 Main group"
 msgstr ""
 
-#: telegrambot/handlers/messages.py:113
+#: telegrambot/handlers/messages.py:111
 msgid "👮 <b>Thanks for your report</b>, admins have been notified."
 msgstr ""
 
@@ -82,8 +82,8 @@ msgid "unbanned from all groups"
 msgstr ""
 
 #: telegrambot/models.py:100
-msgid "Welcome user"
-msgid_plural "Welcome users"
+msgid "Welcome"
+msgid_plural "Welcome"
 msgstr[0] ""
 msgstr[1] ""
 

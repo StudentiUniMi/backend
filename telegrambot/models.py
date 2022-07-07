@@ -97,8 +97,8 @@ class Group(models.Model):
         :return: the welcome message
         """
         greetings = ngettext_lazy(
-            "Welcome user",
-            "Welcome users",
+            "Welcome",
+            "Welcome",
             len(members),
         ) + " " + ", ".join(member.name for member in members)
 
