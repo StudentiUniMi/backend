@@ -140,9 +140,9 @@ def import_courses(request: HttpRequest):
 
 @api_view(["GET"])
 def typing_degrees(request):
-    """Return 10 random degrees"""
+    """Return 30 random degrees"""
     pks = Degree.objects.values_list("pk", flat=True)
-    sampled_pks = random.sample(list(pks), min(len(pks), 10))
+    sampled_pks = random.sample(list(pks), min(len(pks), 30))
     degrees = [d.name.lower() for d in Degree.objects.filter(pk__in=sampled_pks).distinct("name")]
     random.shuffle(degrees)
     return Response(degrees)
