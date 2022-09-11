@@ -16,6 +16,7 @@ from university.models import (
     Degree,
     Department,
     Representative,
+    Professor,
 )
 from university.serializers import (
     CourseSerializer,
@@ -70,11 +71,17 @@ class CourseTestCase(TestCase):
             url="https://ariel.example.com/courses/programming_1_seconded",
         )
 
+        prof = Professor.objects.create(
+            first_name="Elio",
+            last_name="Franzini",
+            url="https://unimi.it/",
+        )
         self.course2 = Course.objects.create(
             pk=2,
             name="Linear Algebra I",
             cfu=6,
             wiki_link="https://example.com/wiki/linear_algebra_i.php",
+            professor=prof,
         )
         CourseDegree.objects.create(degree=deg1, course=self.course2, year=1, semester=2)
         CourseDegree.objects.create(degree=deg2, course=self.course2, year=1, semester=1)
@@ -124,6 +131,7 @@ class CourseTestCase(TestCase):
                     },
                 ],
                 "group": None,
+                "professor": None,
             },
             {
                 "pk": 2,
@@ -137,6 +145,11 @@ class CourseTestCase(TestCase):
                     },
                 ],
                 "group": None,
+                "professor": {
+                    "first_name": "Elio",
+                    "last_name": "Franzini",
+                    "url": "https://unimi.it/"
+                },
             },
             {
                 "pk": 3,
@@ -150,6 +163,7 @@ class CourseTestCase(TestCase):
                     "profile_picture": None,
                     "invite_link": "https://example.com/join/qwerty",
                 },
+                "professor": None,
             }
         ])
 

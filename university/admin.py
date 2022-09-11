@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from university.models import (
     Representative,
+    Professor,
     Department,
     Degree,
     Course,
@@ -80,6 +81,11 @@ class RepresentativeAdmin(admin.ModelAdmin):
     autocomplete_fields = ("department", "tguser", )
 
 
+@admin.register(Professor)
+class ProfessorAdmin(admin.ModelAdmin):
+    list_display = ("__str__", )
+    search_fields = ("first_name", "last_name", )
+
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
     search_fields = ("name", )
@@ -98,10 +104,10 @@ class DegreeAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ("name", "cfu", "str_degrees", )
+    list_display = ("name", "cfu", "str_degrees", "professor", )
     list_filter = (CourseDegreeNameFilter, CourseDegreeTypeFilter, )
     search_fields = ("name", )
-    fields = ("name", "cfu", "group", "wiki_link", "slug_unimi")
-    autocomplete_fields = ("group", )
+    fields = ("name", "cfu", "professor", "group", "wiki_link", "slug_unimi")
+    autocomplete_fields = ("professor", "group", )
     readonly_fields = ("slug_unimi", )
     inlines = (CourseDegreeInline, CourseLinkInline, )

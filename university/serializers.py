@@ -6,6 +6,7 @@ from telegrambot.serializers import (
 )
 from university.models import (
     Representative,
+    Professor,
     Course,
     Degree,
     Department,
@@ -22,6 +23,14 @@ class RepresentativeSerializer(serializers.ModelSerializer):
     tguser = TgUserSerializer()
 
 
+class ProfessorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Professor
+        fields = ("first_name", "last_name", "url", )
+
+    url = serializers.URLField()
+
+
 class CourseLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseLink
@@ -31,10 +40,11 @@ class CourseLinkSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ("pk", "name", "cfu", "wiki_link", "links", "group", )
+        fields = ("pk", "name", "cfu", "wiki_link", "links", "group", "professor", )
 
     group = TgGroupSerializer()
     links = CourseLinkSerializer(many=True)
+    professor = ProfessorSerializer()
 
 
 class CourseDegreeSerializer(serializers.ModelSerializer):

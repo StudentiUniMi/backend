@@ -44,6 +44,21 @@ class Representative(models.Model):
         return f"{str(self.tguser)}, {self.degree_name} ({self.department.name})"
 
 
+class Professor(models.Model):
+    """A university professor."""
+    class Meta:
+        verbose_name = "Professor"
+        verbose_name_plural = "Professors"
+        unique_together = ("first_name", "last_name")
+
+    first_name = models.CharField("first name", max_length=64)
+    last_name = models.CharField("last name", max_length=64)
+    url = models.URLField("url", max_length=256, null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+
+
 class Degree(models.Model):
     """An university degree.
 
@@ -81,6 +96,7 @@ class Course(models.Model):
     cfu = models.PositiveSmallIntegerField("CFUs")
     slug_unimi = models.CharField(max_length=200, unique=True, null=True)
     wiki_link = models.CharField("wiki link", max_length=128, blank=True, null=True)
+    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, related_name="courses", null=True, blank=True)
 
     @property
     @admin.display(
