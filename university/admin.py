@@ -55,7 +55,7 @@ class CourseDegreeNameFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
-        return queryset.filter(degrees__in=self.value())
+        return queryset.filter(degrees__in=[self.value()])
 
 
 class CourseDegreeTypeFilter(admin.SimpleListFilter):
