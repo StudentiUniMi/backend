@@ -85,10 +85,13 @@ DATABASES = {
 }
 if 'test' in sys.argv:
     DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': os.environ.get("TEST_POSTGRES_HOST"),
+        'PORT': 5432,
+        'NAME': os.environ.get("TEST_POSTGRES_DBNAME"),
+        'USER': os.environ.get("TEST_POSTGRES_USER"),
+        'PASSWORD': os.environ.get("TEST_POSTGRES_PASSWORD"),
         'TEST_CHARSET': 'UTF8',
-        'NAME': ':memory:',
-        'TEST_NAME': ':memory:',
     }
 
 AUTH_PASSWORD_VALIDATORS = [

@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     name: Django test (Python ${{ matrix.python-version }})
     strategy:
@@ -13,8 +13,29 @@ jobs:
       matrix:
         python-version: ['3.10', ]
 
+    services:
+      test_postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set TEST_POSTGRES_HOST environment variable
+        run: |
+          POSTGRES_CONTAINER_ID=$(docker ps -l -q)
+          POSTGRES_CONTAINER_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $POSTGRES_CONTAINER_ID)
+          echo "TEST_POSTGRES_HOST=$POSTGRES_CONTAINER_IP" >> $GITHUB_ENV
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -32,5 +53,8 @@ jobs:
           DEBUG: 1
           TEST_BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
           TEST_BOT_USERNAME: ${{ secrets.TEST_BOT_USERNAME }}
+          TEST_POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+          TEST_POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+          TEST_POSTGRES_DBNAME: ${{ secrets.TEST_POSTGRES_DB }}
         run: |
           python manage.py test

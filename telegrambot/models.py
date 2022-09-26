@@ -294,7 +294,7 @@ class TelegramBot(models.Model):
         verbose_name = "Telegram bot"
         verbose_name_plural = "Telegram bots"
 
-    token = models.CharField("token", max_length=64, primary_key=True)
+    token = models.CharField("token", max_length=64, unique=True)
     notes = models.TextField("notes", blank=True, null=True)
     username = models.CharField("username", max_length=32, blank=True)
 
