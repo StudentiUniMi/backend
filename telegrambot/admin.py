@@ -204,7 +204,7 @@ class UserPrivilegeAdmin(admin.ModelAdmin):
 class TelegramBotAdmin(admin.ModelAdmin):
     list_display = ("username", "censured_token", "notes")
     search_fields = ("username", )
-    fields = ("id", "censured_token", "notes", )
+    fields = ("notes", )
 
 
 @admin.register(TelegramUserbot)
