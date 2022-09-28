@@ -7,6 +7,7 @@ import time
 from django.conf import settings
 from django.contrib import admin
 from django.core.checks import messages
+from sentry_sdk import capture_exception
 from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import (
     EditAdminRequest,
@@ -161,6 +162,7 @@ class GroupAdmin(TranslationAdmin):
                     request, f"Can't create the group. Telethon error: {e.message}",
                     level=messages.ERROR,
                 )
+                capture_exception(e)
                 return
 
         if not obj.update_info():
