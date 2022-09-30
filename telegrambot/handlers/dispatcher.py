@@ -3,7 +3,7 @@ import logging as logg
 from telegram import Update
 from telegram.ext import MessageHandler, Filters, CommandHandler, ChatMemberHandler, CallbackQueryHandler, Updater
 
-from telegrambot.handlers import messages, members, moderation, errors, memes
+from telegrambot.handlers import messages, members, moderation, errors, memes, message_filter
 
 
 LOG = logg.getLogger(__name__)
@@ -20,6 +20,10 @@ def setup_dispatcher(dispatcher):
     ), group=0)
 
     # Groups
+    dispatcher.add_handler(MessageHandler(
+        filters=Filters.chat_type.groups,
+        callback=message_filter.handle_message_filter,
+    ), group=1)
     dispatcher.add_handler(ChatMemberHandler(
         callback=members.handle_chat_member_updates,
         chat_member_types=ChatMemberHandler.ANY_CHAT_MEMBER,
@@ -31,7 +35,7 @@ def setup_dispatcher(dispatcher):
     dispatcher.add_handler(MessageHandler(
         filters=Filters.chat_type.groups,
         callback=messages.handle_admin_tagging,
-    ), group=1)
+    ), group=2)
 
     # Admin commands
     dispatcher.add_handler(CommandHandler(

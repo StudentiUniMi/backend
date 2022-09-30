@@ -412,3 +412,15 @@ class BlacklistedUser(models.Model):
             handlers.utils.check_blacklist(dbuser)
         except User.DoesNotExist:
             pass
+
+
+class MessageFilter(models.Model):
+    """A filter to prevent users from using specific text in their message"""
+    class Meta:
+        verbose_name = "Message filter"
+        verbose_name_plural = "Message filters"
+
+    text = models.TextField("Regex", max_length=500, unique=True, help_text="The regex will use a fullmatch")
+
+    def __str__(self):
+        return self.text
