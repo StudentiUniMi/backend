@@ -44,7 +44,7 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
         dbgroup: DBGroup = DBGroup.objects.get(id=chat.id)
 
         if dbuser.banned:
-            context.bot.kickChatMember(chat.id, new.user.id)
+            context.bot.banChatMember(chat.id, new.user.id)
 
         msg: Message = context.bot.send_message(
             chat_id=chat.id,
