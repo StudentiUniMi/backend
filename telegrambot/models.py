@@ -422,5 +422,13 @@ class MessageFilter(models.Model):
 
     text = models.TextField("Regex", max_length=500, unique=True, help_text="The regex will use a fullmatch")
 
+    # Actions
+    delete = models.BooleanField("Delete message", help_text="Delete the message that matched the regex")
+    notify = models.BooleanField("Notify admins", help_text="Notify admins that a message matched the regex")
+    reply = models.BooleanField("Reply in chat", help_text="Send the message specified in the message field in the chat"
+                                "of the message that matched the regex")
+
+    message = models.TextField(null=True, blank=True)
+
     def __str__(self):
         return self.text
