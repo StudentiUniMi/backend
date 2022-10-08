@@ -420,6 +420,17 @@ class MessageFilter(models.Model):
         verbose_name = "Message filter"
         verbose_name_plural = "Message filters"
 
+    class Moderation(models.IntegerChoices):
+        NOTHING = 1, "NOTHING"
+        MODERATION_INFO = 2, "MODERATION_INFO"
+        MODERATION_WARN = 3, "MODERATION_WARN"
+        MODERATION_KICK = 4, "MODERATION_KICK"
+        MODERATION_BAN = 5, "MODERATION_BAN"
+        MODERATION_MUTE = 6, "MODERATION_MUTE"
+        MODERATION_FREE = 7, "MODERATION_FREE"
+        MODERATION_SUPERBAN = 8, "MODERATION_SUPERBAN"
+        MODERATION_SUPERFREE = 9, "MODERATION_SUPERFREE"
+
     text = models.TextField("Regex", max_length=500, unique=True, help_text="The regex will use a fullmatch")
 
     # Actions
@@ -429,6 +440,7 @@ class MessageFilter(models.Model):
                                 "of the message that matched the regex")
 
     message = models.TextField(null=True, blank=True)
+    moderation = models.IntegerField(choices=Moderation.choices, null=True)
 
     def __str__(self):
         return self.text

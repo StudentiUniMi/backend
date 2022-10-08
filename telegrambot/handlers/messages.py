@@ -112,7 +112,10 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
         parse_mode="html",
         disable_web_page_preview=True,
     )
-    context.bot.delete_message(chat.id, message.message_id)
+    try:
+        context.bot.delete_message(chat.id, message.message_id)
+    except telegram.TelegramError:
+        pass
     tasks.delete_message(chat.id, sent_msg.message_id)
 
 

@@ -262,4 +262,4 @@ class BlacklistedUserAdmin(admin.ModelAdmin):
 
 @admin.register(MessageFilter)
 class MessageFilterAdmin(admin.ModelAdmin):
-    list_display = ("text", "delete", "notify", "reply")
+    list_display = ("text", "delete", "notify", "reply", "moderation")

@@ -229,4 +229,7 @@ def log(
         prepared_entry.edit_text(text=text, parse_mode="html")
 
     if msg and not prepared_entry:
-        msg.forward(chat_id=settings.LOGGING_CHAT_ID)
+        try:
+            msg.forward(chat_id=settings.LOGGING_CHAT_ID)
+        except telegram.TelegramError:
+            pass
