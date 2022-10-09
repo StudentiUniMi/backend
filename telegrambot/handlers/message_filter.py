@@ -18,12 +18,6 @@ class FakeUpdate:
     message = None
 
 
-class FakeMessage:
-    from_user = None
-    chat = None
-    reply_to_message = None
-
-
 def handle_message_filter(update: Update, context: CallbackContext):
     filters = MessageFilter.objects.all()
     for filt in filters:
