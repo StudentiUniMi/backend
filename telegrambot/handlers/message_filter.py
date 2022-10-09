@@ -1,6 +1,5 @@
 import re
 import copy
-import logging
 
 from telegram import Update, ChatMemberOwner
 from telegram.error import RetryAfter, TelegramError
@@ -10,10 +9,6 @@ from telegrambot.models import MessageFilter
 from telegrambot import tasks
 from telegrambot.handlers.messages import handle_admin_tagging
 from telegrambot.handlers.moderation import handle_moderation_command
-
-
-LOG = logging.getLogger(__name__)
-LOG.setLevel("INFO")
 
 
 ENUM_MODERATION = ["/warn", "/kick", "/ban", "/mute", "/free", "/superban", "/superfree"]
