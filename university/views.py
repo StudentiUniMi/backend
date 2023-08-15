@@ -24,11 +24,10 @@ from university.models import (
     Course,
     Representative,
     CourseDegree,
+    FeaturedGroup,
+    FeaturedGroupCategories,
 )
-from telegrambot.models import (
-    ExtraGroupCategories,
-    Group,
-)
+
 from university.serializers import (
     DegreeSerializer,
     VerboseDegreeSerializer,
@@ -36,11 +35,9 @@ from university.serializers import (
     VerboseDepartmentSerializer,
     RepresentativeSerializer,
     CourseDegreeSerializer,
+    FeaturedGroupSerializer,
 )
-from telegrambot.serializers import (
-    UserSerializer,
-    ExtraGroupSerializer,
-)
+from telegrambot.serializers import UserSerializer
 
 
 def _get_all_objects(model, serializer):
@@ -247,19 +244,19 @@ def representatives_by_department(request):
 
 
 @api_view(["GET"])
-def extra_groups(request):
+def featured_groups(request):
     _category_pretty_names = {
         "u": "university_groups",
         "a": "announcement_groups",
         "s": "student_associations",
     }
 
-    queryset = Group.objects.all().exclude(extra_group_category__isnull=True)
+    queryset = FeaturedGroup.objects.all()
 
     response = {}
-    for category in ExtraGroupCategories.choices:
-        subset = queryset.filter(extra_group_category=category[0])
-        serializer = ExtraGroupSerializer(subset, many=True)
+    for category in FeaturedGroupCategories.choices:
+        subset = queryset.filter(category=category[0])
+        serializer = FeaturedGroupSerializer(subset, many=True)
         response = {**response, _category_pretty_names[category[0]]: serializer.data}
 
     return Response(response)

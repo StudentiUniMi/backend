@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from modeltranslation.admin import TranslationAdmin
+
 from university.models import (
     Representative,
     Professor,
@@ -8,6 +10,7 @@ from university.models import (
     Course,
     CourseDegree,
     CourseLink,
+    FeaturedGroup,
     DEGREE_TYPES,
 )
 
@@ -111,3 +114,13 @@ class CourseAdmin(admin.ModelAdmin):
     autocomplete_fields = ("professor", "group", )
     readonly_fields = ("slug_unimi", )
     inlines = (CourseDegreeInline, CourseLinkInline, )
+
+
+@admin.register(FeaturedGroup)
+class FeaturedGroupAdmin(TranslationAdmin):
+    list_display = ("name", "category")
+    list_filter = ("category", )
+    search_fields = ("name", )
+    fields = ("group", "name", "description", "category", "image_url",
+              "external_url", "button_name", )
+    autocomplete_fields = ("group", )

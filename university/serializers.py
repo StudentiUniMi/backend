@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from university.translation import serialize_translated_field
 from telegrambot.serializers import (
     GroupSerializer as TgGroupSerializer,
     UserSerializer as TgUserSerializer,
@@ -12,7 +13,9 @@ from university.models import (
     Department,
     CourseDegree,
     CourseLink,
+    FeaturedGroup,
 )
+from telegrambot.models import GroupMembership
 
 
 class RepresentativeSerializer(serializers.ModelSerializer):
@@ -96,3 +99,42 @@ class VerboseDepartmentSerializer(serializers.ModelSerializer):
 
     degrees = DegreeSerializer(many=True, read_only=True)
     representatives = RepresentativeSerializer(many=True)
+
+
+class FeaturedGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeaturedGroup
+        fields = ("id", "name", "description", "invite_link", "user_count",
+                  "image_url", "external_url", "button_name")
+
+    id = serializers.IntegerField(source="group.id")
+    name = serializers.SerializerMethodField("get_names")
+    description = serializers.SerializerMethodField("get_descriptions")
+    invite_link = serializers.CharField(source="group.invite_link")
+    user_count = serializers.SerializerMethodField("get_user_count")
+    button_name = serializers.SerializerMethodField("get_button_names")
+
+
+    @staticmethod
+    def get_names(obj):
+        return serialize_translated_field(obj, "name")
+
+
+    @staticmethod
+    def get_descriptions(obj):
+        return serialize_translated_field(obj, "description")
+
+
+    @staticmethod
+    def get_button_names(obj):
+        return serialize_translated_field(obj, "button_name")
+
+
+    @staticmethod
+    def get_user_count(obj):
+        return obj.group.members.filter(groupmembership__status__in=[
+            GroupMembership.MembershipStatus.CREATOR,
+            GroupMembership.MembershipStatus.ADMINISTRATOR,
+            GroupMembership.MembershipStatus.MEMBER,
+            GroupMembership.MembershipStatus.RESTRICTED,
+        ]).count()
