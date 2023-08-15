@@ -15,4 +15,5 @@ urlpatterns = [
     path(r"representatives", views.representatives_by_department, name="api-representatives"),
     path(r"typing-degrees", views.typing_degrees, name="api-typing-degrees"),
     path(r"admins", views.admin_by_degree, name="admins-by-degree"),
+    path(r"extra-groups", views.extra_groups, name="extra-groups"),
 ]
