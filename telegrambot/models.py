@@ -13,6 +13,12 @@ class Languages(models.TextChoices):
     IT = "it", "Italian"
 
 
+class ExtraGroupCategories(models.TextChoices):
+    UNIVERSITY_GROUP = "u", "University group"
+    ANNOUNCEMENT_GROUP = "a", "Announcement group"
+    STUDENT_ASSOCIATION_GROUP = "s", "Student association group"
+
+
 class User(models.Model):
     """A Telegram user.
     Every user seen by the bot should be automatically saved or updated in the database.
@@ -86,6 +92,12 @@ class Group(models.Model):
     ignore_admin_tagging = models.BooleanField("Ignore @admin tagging", default=False, null=False)
     welcome_model = models.TextField("Welcome model", null=True, blank=True,
                                      help_text="Available format parameters: {greetings} and {title}")
+
+    # These fields are used in the 'university' section of the website
+    extra_group_name = models.TextField("Extra group name", max_length=150, blank=True, null=True)
+    extra_group_description = models.TextField("Extra group description", max_length=150, blank=True, null=True)
+    extra_group_category = models.CharField("Extra group category", max_length=2, blank=True, null=True,
+                                            choices=ExtraGroupCategories.choices)
 
     def __str__(self) -> str:
         return f"{self.title} [{self.id}]"

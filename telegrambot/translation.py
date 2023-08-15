@@ -4,4 +4,8 @@ from telegrambot.models import Group
 
 @register(Group)
 class GroupTranslationOptions(TranslationOptions):
-    fields = ("welcome_model", )
+    fields = (
+        "welcome_model",
+        "extra_group_name",
+        "extra_group_description",
+    )

@@ -177,7 +177,7 @@ class GroupAdmin(TranslationAdmin):
     list_filter = (GroupOwnerFilter, "language", )
     search_fields = ("id", "title", )
     fields = ("id", "title", "description", "language", "profile_picture", "invite_link", "owner", "bot", "welcome_model",
-              "ignore_admin_tagging", )
+              "ignore_admin_tagging", "extra_group_name", "extra_group_description", "extra_group_category")
     autocomplete_fields = ("owner", "bot", )
     actions = [fetch_telegram_info_action, ]
 
