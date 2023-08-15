@@ -92,6 +92,7 @@ if 'test' in sys.argv:
         'USER': os.environ.get("TEST_POSTGRES_USER"),
         'PASSWORD': os.environ.get("TEST_POSTGRES_PASSWORD"),
         'TEST_CHARSET': 'UTF8',
+        'DISABLE_SERVER_SIDE_CURSORS': True,
     }
 
 AUTH_PASSWORD_VALIDATORS = [

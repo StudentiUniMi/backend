@@ -24,7 +24,10 @@ from university.models import (
     Course,
     Representative,
     CourseDegree,
+    FeaturedGroup,
+    FeaturedGroupCategories,
 )
+
 from university.serializers import (
     DegreeSerializer,
     VerboseDegreeSerializer,
@@ -32,6 +35,7 @@ from university.serializers import (
     VerboseDepartmentSerializer,
     RepresentativeSerializer,
     CourseDegreeSerializer,
+    FeaturedGroupSerializer,
 )
 from telegrambot.serializers import UserSerializer
 
@@ -237,6 +241,25 @@ def representatives_by_department(request):
         .select_related("tguser")
     serializer = RepresentativeSerializer(queryset, many=True)
     return Response(serializer.data)
+
+
+@api_view(["GET"])
+def featured_groups(request):
+    _category_pretty_names = {
+        "u": "university_groups",
+        "a": "announcement_groups",
+        "s": "student_associations",
+    }
+
+    queryset = FeaturedGroup.objects.all()
+
+    response = {}
+    for category in FeaturedGroupCategories.choices:
+        subset = queryset.filter(category=category[0])
+        serializer = FeaturedGroupSerializer(subset, many=True)
+        response = {**response, _category_pretty_names[category[0]]: serializer.data}
+
+    return Response(response)
 
 
 class DepartmentViewSet(viewsets.ViewSet):

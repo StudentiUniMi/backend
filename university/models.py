@@ -13,6 +13,12 @@ DEGREE_TYPES = (
 )
 
 
+class FeaturedGroupCategories(models.TextChoices):
+    UNIVERSITY_GROUP = "u", "University group"
+    ANNOUNCEMENT_GROUP = "a", "Announcement group"
+    STUDENT_ASSOCIATION_GROUP = "s", "Student association group"
+
+
 class Department(models.Model):
     """An university department.
 
@@ -134,3 +140,25 @@ class CourseLink(models.Model):
 
     def __str__(self):
         return f"{str(self.course)} - {self.name}"
+
+
+class FeaturedGroup(models.Model):
+    """Featured groups in the 'university' section of the website"""
+
+    class Meta:
+        verbose_name = "Featured Group"
+        verbose_name_plural = "Featured Groups"
+
+    group = models.ForeignKey(TgGroup, on_delete=models.CASCADE)
+    name = models.CharField("Display name", max_length=150, )
+    description = models.CharField("Display description", max_length=150, )
+    category = models.CharField("Extra group category", max_length=2, blank=True, null=True,
+                                choices=FeaturedGroupCategories.choices)
+    image_url = models.URLField("Image URL", blank=True, null=True)
+
+    external_url = models.URLField("External URL", blank=True, null=True)
+    button_name = models.CharField("Button name", max_length=16, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.name} [{self.group.id}]"
+
