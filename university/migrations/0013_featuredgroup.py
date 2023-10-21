@@ -6,8 +6,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('university', '0013_featuredgroup'), ('university', '0014_auto_20230815_1957')]
-
     dependencies = [
         ('telegrambot', '__first__'),
         ('university', '0012_auto_20220911_1116'),

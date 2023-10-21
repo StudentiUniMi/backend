@@ -5,8 +5,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('telegrambot', '0026_auto_20230815_1642'), ('telegrambot', '0027_auto_20230815_1659')]
-
     dependencies = [
         ('telegrambot', '0025_alter_telegrambot_token'),
     ]
