@@ -3,7 +3,7 @@
 ## What is this?
 This is the official repository for the backend code used by [StudentiUniMi](https://studentiunimi.it) 
 to operate its website and Telegram groups.
-The project is mainly written in Python (>=3.10) and uses [Django](https://www.djangoproject.com) and 
+The project is mainly written in Python (>=3.11) and uses [Django](https://www.djangoproject.com) and 
 [python-telegram-bot](https://python-telegram-bot.readthedocs.io/en/stable/) as helper frameworks.
 
 The code is released under MIT license, and the copyright holder is StudentiUniMi.

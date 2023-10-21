@@ -1,0 +1,8 @@
+venv/
+backups/
+scripts/
+static/
+docker-compose-debug.yml
+media/
+*.patch
+*.sql
