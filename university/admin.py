@@ -118,9 +118,10 @@ class CourseAdmin(admin.ModelAdmin):
 
 @admin.register(FeaturedGroup)
 class FeaturedGroupAdmin(TranslationAdmin):
-    list_display = ("name", "category")
+    list_display = ("name", "category", "order")
     list_filter = ("category", )
     search_fields = ("name", )
-    fields = ("group", "name", "description", "category", "image_url",
+    fields = ("group", "name", "description", "category", "order", "image_url",
               "external_url", "button_name", )
     autocomplete_fields = ("group", )
+    ordering = ("-order", )

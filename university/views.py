@@ -251,7 +251,7 @@ def featured_groups(request):
         "s": "student_associations",
     }
 
-    queryset = FeaturedGroup.objects.all()
+    queryset = FeaturedGroup.objects.all().order_by("-order")
 
     response = {}
     for category in FeaturedGroupCategories.choices:

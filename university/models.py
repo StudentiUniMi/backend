@@ -149,15 +149,15 @@ class FeaturedGroup(models.Model):
         verbose_name = "Featured Group"
         verbose_name_plural = "Featured Groups"
 
-    group = models.ForeignKey(TgGroup, on_delete=models.CASCADE)
-    name = models.CharField("Display name", max_length=150, )
-    description = models.CharField("Display description", max_length=150, )
-    category = models.CharField("Extra group category", max_length=2, blank=True, null=True,
-                                choices=FeaturedGroupCategories.choices)
+    group = models.ForeignKey(TgGroup, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField("Display name", max_length=150)
+    description = models.CharField("Display description", max_length=150)
+    category = models.CharField("Extra group category", max_length=2, choices=FeaturedGroupCategories.choices)
     image_url = models.URLField("Image URL", blank=True, null=True)
 
     external_url = models.URLField("External URL", blank=True, null=True)
     button_name = models.CharField("Button name", max_length=16, blank=True, null=True)
+    order = models.PositiveIntegerField("Order", default=100)
 
     def __str__(self):
         return f"{self.name} [{self.group.id}]"
