@@ -73,7 +73,7 @@ msgstr "espulso permanentemente dal gruppo"
 
 #: telegrambot/logging.py:16
 msgid "muted in the group"
-msgstr "mutato nel gruppo"
+msgstr "silenziato nel gruppo"
 
 #: telegrambot/logging.py:17
 msgid "unbanned from the group"
