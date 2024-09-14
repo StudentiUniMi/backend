@@ -211,6 +211,7 @@ class Moderator(BaseRole):
             *super().permissions(),
             MODERATION_INFO if self.moderation_info is not False else None,
             MODERATION_DEL if self.moderation_del is not False else None,
+            MODERATION_MUTE if self.moderation_mute is not False else None,
         ]
 
     def telegram_permissions(self) -> dict[str, bool]:
