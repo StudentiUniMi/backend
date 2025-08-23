@@ -3,10 +3,9 @@
 The `urlpatterns` list routes URLs to views.
 """
 from django.conf import settings
-from django.conf.urls import url
 from django.contrib import admin
 from django.http import HttpResponse, HttpRequest
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import RedirectView
 from sentry_sdk import configure_scope
 
@@ -27,11 +26,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(university.urls)),
     path('telegrambot/', include(telegrambot.urls)),
-    url(r'^robots.txt$', lambda r: HttpResponse(
+    re_path(r'^robots\.txt$', lambda r: HttpResponse(
         "User-Agent: *\nDisallow: /",
         content_type="text/plain",
     ), name="robots_txt"),
-    url(r"^healthcheck$", healthcheck, name="healthcheck"),
+    re_path(r"^healthcheck$", healthcheck, name="healthcheck"),
 ]
 
 if not settings.DEBUG:
