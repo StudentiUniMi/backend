@@ -25,6 +25,11 @@ DEBUG = bool(os.environ.get("DEBUG", False))
 ALLOWED_HOSTS = [
     'django',
     '127.0.0.1',
+    'api.studentiunimi.it',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://api.studentiunimi.it',
 ]
 
 INSTALLED_APPS = [
