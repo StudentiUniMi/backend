@@ -17,7 +17,7 @@ networks:
 
 services:
   postgres:
-    image: postgres:12
+    image: postgres:16
     container_name: studentiunimi_backend_postgres
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -39,6 +39,7 @@ services:
   django:
     image: ghcr.io/studentiunimi/backend:latest
     container_name: studentiunimi_backend_django
+    hostname: django
     environment:
       - SERVER_NAME=${SERVER_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
