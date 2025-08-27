@@ -261,6 +261,11 @@ def featured_groups(request):
 
     return Response(response)
 
+@api_view(["GET"])
+def slug_degrees(request):
+    """Return an array of all degree slugs"""
+    slugs = list(Degree.objects.values_list("slug", flat=True).order_by("name"))
+    return Response(slugs)
 
 class DepartmentViewSet(viewsets.ViewSet):
     @staticmethod
