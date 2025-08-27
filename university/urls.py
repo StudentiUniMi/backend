@@ -16,4 +16,5 @@ urlpatterns = [
     path(r"typing-degrees", views.typing_degrees, name="api-typing-degrees"),
     path(r"admins", views.admin_by_degree, name="admins-by-degree"),
     path(r"featured-groups", views.featured_groups, name="featured-groups"),
+    path(r"slug-degrees", views.slug_degrees, name="api-slug-degrees"),
 ]
