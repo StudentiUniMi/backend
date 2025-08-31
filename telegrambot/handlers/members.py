@@ -55,7 +55,7 @@ def handle_chat_member_updates(update: Update, context: CallbackContext) -> None
                 [
                     InlineKeyboardButton(
                         text=str(_("↗️ All groups")),
-                        url="https://studentiunimi.it/courses",
+                        url="https://studentiunimi.it/",
                     ),
                     InlineKeyboardButton(
                         text=str(_("✳️ Extra services")),
