@@ -182,6 +182,20 @@ def degree_by_slug_or_pk(request):
 
 
 @api_view(["GET"])
+def degrees_by_query(request):
+    query = request.query_params.get("q", None)
+    if not query:
+        return Response([])
+
+    queryset = Degree.objects.all()\
+        .filter(name__icontains=query)\
+        .select_related("group")\
+        .order_by(Length("name").asc(), "name", "type")
+    serializer = DegreeSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
 def search(request):
     query = request.query_params.get("q", None)
     if not query:
