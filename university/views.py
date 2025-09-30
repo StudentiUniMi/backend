@@ -182,17 +182,29 @@ def degree_by_slug_or_pk(request):
 
 
 @api_view(["GET"])
-def degrees_by_query(request):
+def search(request):
     query = request.query_params.get("q", None)
     if not query:
-        return Response([])
+        return Response({"degrees": [], "courses": []})
 
-    queryset = Degree.objects.all()\
-        .filter(name__icontains=query)\
+    # Degrees
+    degrees_qs = Degree.objects.filter(name__icontains=query)\
         .select_related("group")\
         .order_by(Length("name").asc(), "name", "type")
-    serializer = DegreeSerializer(queryset, many=True)
-    return Response(serializer.data)
+    degrees_data = DegreeSerializer(degrees_qs, many=True).data
+
+    # Didactic courses
+    courses_qs = Course.objects.filter(name__icontains=query)\
+        .prefetch_related("degrees", "links")\
+        .order_by("name")
+    course_degrees_qs = CourseDegree.objects.filter(course__in=courses_qs)\
+        .select_related("course", "course__group")
+    courses_data = CourseDegreeSerializer(course_degrees_qs, many=True).data
+
+    return Response({
+        "degrees": degrees_data,
+        "courses": courses_data
+    })
 
 
 @api_view(["GET"])
