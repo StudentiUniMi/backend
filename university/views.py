@@ -212,8 +212,13 @@ def search(request):
         .prefetch_related("degrees", "links")\
         .order_by("name")
     course_degrees_qs = CourseDegree.objects.filter(course__in=courses_qs)\
-        .select_related("course", "course__group")
-    courses_data = CourseDegreeSerializer(course_degrees_qs, many=True).data
+        .select_related("course", "course__group", "degree")
+    courses_data = []
+    # Add degree name to the didactic course
+    for cd in course_degrees_qs:
+        serialized = CourseDegreeSerializer(cd).data
+        serialized["degree_name"] = cd.degree.name if cd.degree else None
+        courses_data.append(serialized)
 
     return Response({
         "degrees": degrees_data,
