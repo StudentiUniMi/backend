@@ -32,5 +32,5 @@ Telethon==1.23.0
 tornado==6.5.2
 typing_extensions==4.14.1
 tzlocal==5.3.1
-urllib3==2.6.0
+urllib3==1.26.20
 wheel==0.45.1
