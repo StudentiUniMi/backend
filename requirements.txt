@@ -4,7 +4,7 @@ asgiref==3.9.1
 cachetools==4.2.2
 certifi==2025.8.3
 charset-normalizer==2.0.12
-Django==5.2.5
+Django==5.2.9
 django-background-tasks==1.2.8
 django-modeltranslation==0.19.16
 django-polymorphic==4.1.0
@@ -32,5 +32,5 @@ Telethon==1.23.0
 tornado==6.5.2
 typing_extensions==4.14.1
 tzlocal==5.3.1
-urllib3==1.26.20
+urllib3==2.6.0
 wheel==0.45.1
