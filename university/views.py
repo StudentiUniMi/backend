@@ -10,6 +10,7 @@ from polymorphic.query import PolymorphicQuerySet
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.utils.html import escape
 
 from roles.models import (
     BaseRole,
@@ -98,7 +99,7 @@ def import_degrees(request: HttpRequest):
     if len(unparsed) > 0:
         text = "<br><br>The following JSON objects couldn't be added, please do so manually:<br>"
         for course in unparsed:
-            text += "&emsp;" + str(course) + "<br>"
+            text += "&emsp;" + escape(str(course)) + "<br>"
     else:
         text = ""
     text += "\n{} degrees where already present and have been ignored.".format(ignored)
