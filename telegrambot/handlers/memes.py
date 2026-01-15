@@ -2,6 +2,10 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, Telegra
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 
 
+def send_exercises(update: Update, context: CallbackContext) -> None:
+    update.message.chat.send_message("Immagina volere esercizi aggiuntivi!")
+
+
 def init_respects(update: Update, context: CallbackContext) -> None:
     message = update.message
     chat = message.chat

@@ -86,6 +86,7 @@ def setup_dispatcher(dispatcher):
         callback=memes.add_respect,
         pattern="^press_f$",
     ), group=3)
+    dispatcher.add_handler(CommandHandler(command=["esercizi", "Esercizi"], callback=memes.send_exercises), group=3)
 
 
 # Tokens that are sent to this function have already been checked againts the DB
