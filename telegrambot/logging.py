@@ -5,6 +5,7 @@ import telegram
 from telegram import Message, Chat
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from html import escape
 
 
 class EventTypes(Enum):
@@ -67,7 +68,7 @@ def _normalize_user_id(user_id) -> str:
 def _format_chat(chat) -> str:
     if not chat:
         return ""
-    return f"{getattr(chat, 'title')} {_normalize_group_id(getattr(chat, 'id'))}"
+    return escape(f"{getattr(chat, 'title')} {_normalize_group_id(getattr(chat, 'id'))}")
 
 
 def _format_user(user) -> str:
@@ -80,7 +81,7 @@ def _format_user(user) -> str:
     if getattr(user, "username"):
         text += f" [{'@' if user.username[0] != '@' else ''}{user.username}]"
 
-    return f"{text} {_normalize_user_id(getattr(user, 'id'))}"
+    return escape(f"{text} {_normalize_user_id(getattr(user, 'id'))}")
 
 
 def prepare(msg: Message = None) -> Message:
