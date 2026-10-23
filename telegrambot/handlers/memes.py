@@ -1,9 +1,13 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, TelegramError
 from telegram.ext import CallbackContext, DispatcherHandlerStop
 
+from telegrambot import tasks
+
 
 def send_exercises(update: Update, context: CallbackContext) -> None:
-    update.message.chat.send_message("Immagina volere esercizi aggiuntivi!")
+    msg = update.message.chat.send_message("Immagina volere esercizi aggiuntivi!")
+    update.message.delete()
+    tasks.delete_message(update.message.chat_id, msg.message_id)
 
 
 def init_respects(update: Update, context: CallbackContext) -> None:
