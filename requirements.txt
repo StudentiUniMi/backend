@@ -4,7 +4,7 @@ asgiref==3.9.1
 cachetools==4.2.2
 certifi==2025.8.3
 charset-normalizer==2.0.12
-Django==5.2.9
+Django==5.2.11
 django-background-tasks==1.2.8
 django-modeltranslation==0.19.16
 django-polymorphic==4.1.0
