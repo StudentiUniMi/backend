@@ -26,6 +26,7 @@ class EventTypes(Enum):
     MODERATION_DEL = 14, '✏️', None
     WHITELIST_BOT = 15, '⚪', None
     BROADCAST = 16, '📡', None
+    REVOKE_INVITE = 17, '🔁', None
 
     @property
     def command(self) -> str:
@@ -51,6 +52,7 @@ WHITELIST_BOT = EventTypes.WHITELIST_BOT
 USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
 MODERATION_DEL = EventTypes.MODERATION_DEL
 BROADCAST = EventTypes.BROADCAST
+REVOKE_INVITE = EventTypes.REVOKE_INVITE
 
 
 def _normalize_group_id(group_id) -> str:
@@ -207,6 +209,7 @@ def log(
         EventTypes.MODERATION_DEL,
         EventTypes.USER_CALLED_ADMIN,
         EventTypes.BROADCAST,
+        EventTypes.REVOKE_INVITE,
     ]:
         text += f"\n👮 <b>Issuer</b>: {_format_user(issuer)}"
     if event in [

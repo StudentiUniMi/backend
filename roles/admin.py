@@ -45,7 +45,7 @@ class BaseRoleChildAdmin(PolymorphicChildModelAdmin):
             "classes": ("collapse", ),
             "fields": ("moderation_info", "moderation_del", "moderation_warn",
                        "moderation_kick", "moderation_ban", "moderation_mute", "moderation_free",
-                       "moderation_superban", "moderation_superfree", ),
+                       "moderation_superban", "moderation_superfree", "moderation_revoke_invite",),
         }),
         ("Telegram permissions override", {
             "classes": ("collapse", ),

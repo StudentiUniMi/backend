@@ -13,6 +13,7 @@ from telegrambot.logging import (
     MODERATION_FREE,
     MODERATION_SUPERBAN,
     MODERATION_SUPERFREE,
+    REVOKE_INVITE,
 )
 
 
@@ -68,6 +69,10 @@ class BaseRole(PolymorphicModel):
     )
     moderation_superfree = models.BooleanField(
         help_text="/superfree command",
+        null=True, blank=True, default=None,
+    )
+    moderation_revoke_invite = models.BooleanField(
+        help_text="/revoke_invite command",
         null=True, blank=True, default=None,
     )
 
@@ -271,6 +276,7 @@ class SuperAdministrator(BaseRole):
             MODERATION_FREE if self.moderation_free is not False else None,
             MODERATION_SUPERBAN if self.moderation_superban is not False else None,
             MODERATION_SUPERFREE if self.moderation_superfree is not False else None,
+            REVOKE_INVITE if self.moderation_revoke_invite is not False else None,
         ]
 
     def telegram_permissions(self) -> dict[str, bool]:

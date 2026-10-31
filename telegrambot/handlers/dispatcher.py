@@ -49,6 +49,10 @@ def setup_dispatcher(dispatcher):
         callback=moderation.handle_moderation_command,
     ), group=2)
     dispatcher.add_handler(CommandHandler(
+        command="revoke_invite",
+        callback=moderation.handle_invite_revocation,
+    ), group=2)
+    dispatcher.add_handler(CommandHandler(
         command="claim",
         callback=members.claim_command,
     ), group=2)

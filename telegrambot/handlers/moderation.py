@@ -367,3 +367,26 @@ def handle_toggle_admin_tagging(update: Update, _: CallbackContext) -> None:
         new_msg = chat.send_message("@admin are now not ignored in this group")
     tasks.delete_message(chat_id=chat.id, message_id=new_msg.message_id)
     message.delete()
+
+
+def handle_invite_revocation(update: Update, _: CallbackContext) -> None:
+    message: Message = update.message
+    sender: User = message.from_user
+    chat: Chat = message.chat
+
+    permissions, _, __ = utils.get_permissions(sender.id, chat.id)
+    if EventTypes.REVOKE_INVITE not in permissions:
+        return
+
+    try:
+        group = DBGroup.objects.get(id=chat.id)
+    except DBGroup.DoesNotExist:
+        message.delete()
+        return
+
+    chat.revoke_invite_link(invite_link=group.invite_link)
+    logging.log(logging.REVOKE_INVITE, chat, issuer=sender)
+    group.update_info()
+
+    chat.send_message("Revoked invite link")
+    message.delete()
