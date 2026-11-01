@@ -49,8 +49,8 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         raise DispatcherHandlerStop
 
     utils.save_user(sender, chat, count_message=True)
-    roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(tg_user=sender.id)
-    if len(roles) > 0:
+    roles_count = BaseRole.objects.filter(tg_user=sender.id).count()
+    if roles_count > 0:
         return
 
     filters = MessageFilter.objects.all()
