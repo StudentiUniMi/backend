@@ -1,3 +1,4 @@
+import logging as logg
 from datetime import datetime
 from typing import List, TYPE_CHECKING
 
@@ -11,6 +12,9 @@ from telegrambot import handlers, logging
 if TYPE_CHECKING:
     from telegrambot.models import BaseRole
 from StudentiUniMi import settings
+
+
+LOG = logg.getLogger(__name__)
 
 
 class Languages(models.TextChoices):
@@ -419,21 +423,25 @@ class MessageFilter(models.Model):
     superban = models.BooleanField(default=False)
 
     def _is_applicable(self, message: str) -> bool:
-        match self.match_type:
-            case self.MatchTypes.CONTAINS:
-                return self.text in message
-            case self.MatchTypes.STARTS_WITH:
-                return message.startswith(self.text)
-            case self.MatchTypes.ENDS_WITH:
-                return message.endswith(self.text)
+        if self.match_type == self.MatchTypes.choices[0][0]:
+            return self.text in message
+        if self.match_type == self.MatchTypes.choices[1][0]:
+            return message.startswith(self.text)
+        if self.match_type == self.MatchTypes.choices[2][0]:
+            return message.endswith(self.text)
+        return False
 
     def apply(self, message: Message, context: CallbackContext, dbuser: User, dbgroup: Group, roles: 'BaseRole'):
-        from telegrambot.handlers import utils
         if not self._is_applicable(message.text):
             return
 
         if self.notify:
-            caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, roles, message.reply_to_message)
+            caption = handlers.utils.generate_admin_tagging_notification(
+                dbuser,
+                dbgroup,
+                roles,
+                message
+            )
             context.bot.send_message(
                 settings.TELEGRAM_ADMIN_GROUP_ID,
                 caption,
@@ -454,9 +462,10 @@ class MessageFilter(models.Model):
             message.chat.kick_member(message.from_user.id)
 
         if self.superban:
-            user = User.objects.get(id=message.from_user.id)
-            for group in Group.objects.filter(members__id=self.target.id):
-                context.bot.kick_chat_member(chat_id=group.id, user_id=user.id)
+            dbuser.banned = True
+            dbuser.save()
+            for group in Group.objects.filter(members__id=dbuser.id):
+                context.bot.kick_chat_member(chat_id=group.id, user_id=dbuser.id)
 
         logging.log(logging.FILTER_TRIGGER, message.chat, target=message.from_user.id)
 

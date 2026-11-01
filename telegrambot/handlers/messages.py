@@ -57,7 +57,7 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
     filters = MessageFilter.objects.all()
     for fil in filters:
         # TODO: Move role generation in generate_admin_tagging_notification()
-        fil.apply(message.text, context, dbuser, dbgroup, [])
+        fil.apply(message, context, dbuser, dbgroup, [])
 
 
 def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
