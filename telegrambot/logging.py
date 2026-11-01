@@ -27,6 +27,7 @@ class EventTypes(Enum):
     WHITELIST_BOT = 15, '⚪', None
     BROADCAST = 16, '📡', None
     REVOKE_INVITE = 17, '🔁', None
+    FILTER_TRIGGER = 18, '⚡', None
 
     @property
     def command(self) -> str:
@@ -53,6 +54,7 @@ USER_CALLED_ADMIN = EventTypes.USER_CALLED_ADMIN
 MODERATION_DEL = EventTypes.MODERATION_DEL
 BROADCAST = EventTypes.BROADCAST
 REVOKE_INVITE = EventTypes.REVOKE_INVITE
+FILTER_TRIGGER = EventTypes.FILTER_TRIGGER
 
 
 def _normalize_group_id(group_id) -> str:

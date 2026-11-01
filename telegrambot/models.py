@@ -1,11 +1,16 @@
 from datetime import datetime
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import telegram
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
-from telegram import ChatMember
+from telegram import ChatMember, Message, ChatPermissions
+from telegram.ext import CallbackContext
 from django.db import models
-from telegrambot import handlers
+
+from telegrambot import handlers, logging
+if TYPE_CHECKING:
+    from telegrambot.models import BaseRole
+from StudentiUniMi import settings
 
 
 class Languages(models.TextChoices):
@@ -365,6 +370,7 @@ class TelegramLog(models.Model):
         WHITELIST_BOT = 15, "WHITELIST_BOT"
         BROADCAST = 16, "BROADCAST"
         REVOKE_INVITE = 17, "REVOKE_INVITE"
+        FILTER_TRIGGER = 18, "FILTER_TRIGGER"
 
     id = models.BigAutoField(primary_key=True)
     event = models.IntegerField(choices=Events.choices)
@@ -388,6 +394,71 @@ class TelegramLog(models.Model):
     def iso_timestamp(self):
         return self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
     iso_timestamp.short_description = "Timestamp"
+
+
+class MessageFilter(models.Model):
+    """Messages sent by users are matched against these filters.
+    If there's a match trigger the corresponding actions
+    """
+
+    class Meta:
+        unique_together = ("text", "match_type")
+
+    class MatchTypes(models.IntegerChoices):
+        CONTAINS = 0, "CONTAINS"
+        STARTS_WITH = 1, "STARTS_WITH"
+        ENDS_WITH = 2, "ENDS_WITH"
+
+    id = models.BigAutoField(primary_key=True)
+    text = models.TextField(null=False, blank=False)
+    match_type = models.IntegerField(choices=MatchTypes.choices)
+    notify = models.BooleanField(default=False)
+    delete = models.BooleanField(default=False)
+    mute = models.BooleanField(default=False)
+    ban = models.BooleanField(default=False)
+    superban = models.BooleanField(default=False)
+
+    def _is_applicable(self, message: str) -> bool:
+        match self.match_type:
+            case self.MatchTypes.CONTAINS:
+                return self.text in message
+            case self.MatchTypes.STARTS_WITH:
+                return message.startswith(self.text)
+            case self.MatchTypes.ENDS_WITH:
+                return message.endswith(self.text)
+
+    def apply(self, message: Message, context: CallbackContext, dbuser: User, dbgroup: Group, roles: 'BaseRole'):
+        from telegrambot.handlers import utils
+        if not self._is_applicable(message.text):
+            return
+
+        if self.notify:
+            caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, roles, message.reply_to_message)
+            context.bot.send_message(
+                settings.TELEGRAM_ADMIN_GROUP_ID,
+                caption,
+                parse_mode="html",
+                disable_web_page_preview=True,
+            )
+
+        if self.delete:
+            message.delete()
+
+        if self.mute:
+            message.chat.restrict_member(
+                user_id=message.from_user.id,
+                permissions=ChatPermissions(can_send_messages=False)
+            )
+
+        if self.ban:
+            message.chat.kick_member(message.from_user.id)
+
+        if self.superban:
+            user = User.objects.get(id=message.from_user.id)
+            for group in Group.objects.filter(members__id=self.target.id):
+                context.bot.kick_chat_member(chat_id=group.id, user_id=user.id)
+
+        logging.log(logging.FILTER_TRIGGER, message.chat, target=message.from_user.id)
 
 
 class BlacklistedUser(models.Model):

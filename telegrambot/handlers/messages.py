@@ -15,6 +15,7 @@ from telegrambot.handlers import utils
 from telegrambot.models import (
     Group as DBGroup,
     User as DBUser,
+    MessageFilter,
 )
 from university.models import Degree
 
@@ -48,6 +49,13 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
         raise DispatcherHandlerStop
 
     utils.save_user(sender, chat, count_message=True)
+    roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(tg_user=sender.id)
+    if len(roles) > 0:
+        return
+
+    filters = MessageFilter.objects.all()
+    for fil in filters:
+        fil.apply(message.text, context)
 
 
 def handle_admin_tagging(update: Update, context: CallbackContext) -> None:

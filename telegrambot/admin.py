@@ -27,6 +27,7 @@ from telegrambot.models import (
     BotWhitelist,
     TelegramLog,
     BlacklistedUser,
+    MessageFilter,
 )
 
 
@@ -257,3 +258,9 @@ class BlacklistedUserAdmin(admin.ModelAdmin):
     list_display = ("user_id", "source")
     search_fields = ["user_id", ]
     list_filter = ("source", )
+
+
+@admin.register(MessageFilter)
+class MessageFilterAdmin(admin.ModelAdmin):
+    list_display = ("text", "match_type", "notify", "delete", "mute", "ban", "superban")
+    search_fields = ["text", ]
