@@ -193,6 +193,7 @@ def log(
         EventTypes.USER_JOINED,
         EventTypes.NOT_ENOUGH_RIGHTS,
         EventTypes.USER_CALLED_ADMIN,
+        EventTypes.FILTER_TRIGGER,
     ] and target is not None:
         text += f"\n👤 <b>Target user</b>: {_format_user(target)}"
     if event in [EventTypes.WHITELIST_BOT, ]:

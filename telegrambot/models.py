@@ -467,7 +467,7 @@ class MessageFilter(models.Model):
             for group in Group.objects.filter(members__id=dbuser.id):
                 context.bot.kick_chat_member(chat_id=group.id, user_id=dbuser.id)
 
-        logging.log(logging.FILTER_TRIGGER, message.chat, target=message.from_user.id)
+        logging.log(logging.FILTER_TRIGGER, message.chat, target=message.from_user)
 
 
 class BlacklistedUser(models.Model):
