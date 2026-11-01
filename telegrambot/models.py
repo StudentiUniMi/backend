@@ -364,6 +364,7 @@ class TelegramLog(models.Model):
         MODERATION_DEL = 14, "MODERATION_DEL"
         WHITELIST_BOT = 15, "WHITELIST_BOT"
         BROADCAST = 16, "BROADCAST"
+        REVOKE_INVITE = 17, "REVOKE_INVITE"
 
     id = models.BigAutoField(primary_key=True)
     event = models.IntegerField(choices=Events.choices)
