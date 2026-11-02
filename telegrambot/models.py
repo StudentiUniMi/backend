@@ -431,7 +431,7 @@ class MessageFilter(models.Model):
             return message.endswith(self.text)
         return False
 
-    def apply(self, message: Message, context: CallbackContext, dbuser: User, dbgroup: Group, roles: 'BaseRole'):
+    def apply(self, message: Message, context: CallbackContext, dbuser: User, dbgroup: Group):
         if not self._is_applicable(message.text):
             return
 
@@ -439,8 +439,8 @@ class MessageFilter(models.Model):
             caption = handlers.utils.generate_admin_tagging_notification(
                 dbuser,
                 dbgroup,
-                roles,
-                message
+                message,
+                tag_admin=False,
             )
             context.bot.send_message(
                 settings.TELEGRAM_ADMIN_GROUP_ID,

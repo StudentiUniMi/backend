@@ -350,10 +350,32 @@ def generate_group_creation_message(group: telegram.Chat) -> str:
     return text
 
 
-def generate_admin_tagging_notification(sender, chat, roles, reply_to: Message) -> str:
+def generate_admin_tagging_notification(sender, chat, reply_to: Message, tag_admin=True) -> str:
+    Degree = apps.get_model("university.Degree")
+    BaseRole = apps.get_model("roles.BaseRole")
+    Moderator = apps.get_model("roles.Moderator")
+    Administrator = apps.get_model("roles.Administrator")
+    SuperAdministrator = apps.get_model("roles.SuperAdministrator")
     admins = ""
-    for admin in {role.tg_user for role in roles}:
-        admins += f"{admin.generate_mention()} "
+
+    if tag_admin:
+        degrees: QuerySet[Degree] = Degree.objects.filter(
+            Q(courses__group__id=chat.id) | Q(group__id=chat.id)
+        )
+        if degrees:
+            roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
+                Q(degrees__in=degrees) | Q(all_groups=True)
+            )
+        else:
+            roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(extra_groups=True)
+
+        roles = roles.instance_of(Moderator) \
+            | roles.instance_of(Administrator) \
+            | roles.instance_of(SuperAdministrator)
+
+        for admin in {role.tg_user for role in roles}:
+            admins += f"{admin.generate_mention()} "
+
     name = sender.username if sender.username else sender.first_name
     text = f"A user has tagged @admin\n"\
            f"👤 <b>Issuer</b>: {escape(name)} [<a href=\"tg://user?id={sender.id}\">{sender.id}</a>]\n"\

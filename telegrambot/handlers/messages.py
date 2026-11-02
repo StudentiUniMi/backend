@@ -56,8 +56,7 @@ def handle_group_messages(update: Update, context: CallbackContext) -> None:
     dbuser = DBUser.objects.get(id=sender.id)
     filters = MessageFilter.objects.all()
     for fil in filters:
-        # TODO: Move role generation in generate_admin_tagging_notification()
-        fil.apply(message, context, dbuser, dbgroup, [])
+        fil.apply(message, context, dbuser, dbgroup)
 
 
 def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
@@ -95,19 +94,7 @@ def handle_admin_tagging(update: Update, context: CallbackContext) -> None:
 
     logging.log(logging.USER_CALLED_ADMIN, chat, target=dbtarget, issuer=dbuser, msg=reply_to)
 
-    # Get users with privileges (>= Moderator) on the group
-    degrees: QuerySet[Degree] = Degree.objects.filter(
-        Q(courses__group__id=chat.id) | Q(group__id=chat.id)
-    )
-    if degrees:
-        roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(
-            Q(degrees__in=degrees) | Q(all_groups=True)
-        )
-    else:
-        roles: PolymorphicQuerySet[BaseRole] = BaseRole.objects.filter(extra_groups=True)
-    roles = roles.instance_of(Moderator) | roles.instance_of(Administrator) | roles.instance_of(SuperAdministrator)
-
-    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, roles, reply_to)
+    caption = utils.generate_admin_tagging_notification(dbuser, dbgroup, reply_to)
     context.bot.send_message(
         settings.TELEGRAM_ADMIN_GROUP_ID,
         caption,
